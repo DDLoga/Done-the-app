@@ -103,28 +103,20 @@
         <div class="not-project-fltr-div">
           <div class="nto-project-fltr">
             <div class="menu-txt-grey">Filter</div>
-            <input class="form-control" type="search"
-              name="search" placeholder="Begin Typing To Search Users..."
-              hx-get="/search/results/"
-              hx-trigger="keyup changed, search"
-              hx-target="#search-results"
-              hx-indicator=".htmx-indicator">
-            {% comment %} <input type="text" class="task-name-frame w-input" maxlength="256" name="filter-filter-3" data-name="Filter Filter 3" placeholder="filter your project" id="filter-filter-3"> {% endcomment %}
+
+            <input type="text" class="task-name-frame w-input" maxlength="256" name="filter-filter-3" data-name="Filter Filter 3" placeholder="filter your project" id="filter-filter-3">
           </div>
         </div>
         <div class="nto-proj-lst-div">
 
-          <div id="search-results">
-            {% include "search_results.html" %}
-          </div>
 
 
-          {% comment %} {% for radio in form.parent %}
+          {% for radio in form.parent %}
           <div class="nto-prj-btn-field w-radio">
               {{ radio.tag }}
               <label class="project-list-txt w-form-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
           </div>
-          {% endfor %} {% endcomment %}
+          {% endfor %}
 
         </div>
         <div class="w-layout-hflex form-btn-bar">

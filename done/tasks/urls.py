@@ -10,7 +10,6 @@ urlpatterns = [
     path('new-task-organizer/submit-project/', views.NewTaskOrganizerSubmitProject, name="NewTaskOrganizerSubmitProject"),
     
     
-    
     path('test/',views.test_form_view, name='test_page'),
 ]
 
