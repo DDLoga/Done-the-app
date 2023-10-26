@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Quick Task Entry{% endblock title %}
+{% block content %}
+
+  <div class="main-section">
+    <div class="quick_task_entry_header">
+      <div class="done_big_black_logo">DONE</div>
+      <div class="h2_clear_your_mind">Clear your mind</div>
+    </div>
+    <div class="quick_task_entry_form_block w-form">
+
+        <form id="wf-form-quick-task-entry" name="wf-form-quick-task-entry" data-name="quick-task-entry" method="post" class="quick_task_entry_form" data-wf-page-id="652482ea837db348b1939c9b" data-wf-element-id="b6ebab90-92b8-380a-24dd-d29f74557882">
+                {% csrf_token %}
+                {{ quick_task_entry }}
+            <input type="submit" value="Add" data-wait="Submitting..." class="btn w-button"/>
+        </form>
+
+        <div class="quick_task_entry_form_success w-form-done">
+        <div class="quick_task_entry_form_successtext">Good job!<br>Get back to work or process your inputs in the next pane.</div>
+      </div>
+      <div class="quick_task_entry_form_error w-form-fail">
+        <div class="quick_task_entry_form_errortext">Oops! Something went wrong while submitting the form.</div>
+      </div>
+    </div>
+    <div class="frame-427318913">
+      <a href="#" target="_blank" class="btn">
+        <div class="btn-txt">Close</div>
+      </a>
+    </div>
+  </div>
+
+  {% endblock content %}
