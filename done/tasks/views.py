@@ -99,6 +99,26 @@ def NewTaskOrganizerDelete(request):
     return render(request, 'tasks/new-task-o-wizard.html')
 
 
+def search_view(request):
+    all_projects = Projects.objects.all()
+    context = {'count': all_projects.count()}
+    return render(request, 'tasks/new-task-o-wizard.html', context)
+
+
+def search_results_view(request):
+    query = request.GET.get('search', '')
+    print(f'{query = }')
+
+    all_projects = Projects.objects.all()
+    if query:
+        project = all_projects.filter(name__icontains=query)
+    else:
+        project = []
+
+    context = {'project': project, 'count': all_projects.count()}
+    return render(request, 'search_results.html', context)
+
+
 # TESTS
 
 
