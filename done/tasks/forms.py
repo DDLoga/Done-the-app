@@ -19,7 +19,7 @@ class QuickTaskEntry(forms.ModelForm):
         self.fields['name'].widget.attrs.update({'class': 'quick_task_entry_form_text w-input'})
         
 
-class NewTaskOrganizerForm(forms.ModelForm):
+class NewTaskOrganizerTaskForm(forms.ModelForm):
     class Meta:
         model = Tasks
         widgets = {'deadline' : DateInput(),'parent':forms.RadioSelect()}
@@ -29,7 +29,15 @@ class NewTaskOrganizerForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['effort'].widget.attrs['placeholder'] = 'time'
 
-        
+
+class NewTaskOrganizerProjectForm(forms.ModelForm):
+    class Meta:
+        model = Projects
+        widgets = {'project_deadline' : DateInput()}
+        fields = ['project_priority', 'project_name', 'project_deadline']
+
+
+
 
 
 #################### TESTS ############################

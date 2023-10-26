@@ -12,10 +12,10 @@ class Context(models.Model):
 
 class Projects(models.Model):
     PRIORITIES = [
-        ("A", "Critical"),
-        ("B", "Important"),
-        ("C", "Secondary"),
-        ("D", "Not Important"),
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
     ]
     STATUSES = [
         ("Co", "Completed"),
@@ -25,14 +25,14 @@ class Projects(models.Model):
         ("Ns", "Not Started"),
         ("Wa", "Wait for"),
     ]
-    priority = models.CharField(max_length=1, choices=PRIORITIES)
-    status = models.CharField(max_length=2, choices=STATUSES)
-    complete = models.BooleanField(default=False)
-    name = models.CharField(max_length=200)
-    deadline = models.DateField(null=True, blank=True)
+    project_priority = models.CharField(max_length=1, choices=PRIORITIES, null=True, blank=True)
+    project_status = models.CharField(max_length=2, choices=STATUSES)
+    project_complete = models.BooleanField(default=False)
+    project_name = models.CharField(max_length=200)
+    project_deadline = models.DateField(null=True, blank=True)
     
     def __str__(self):
-        return self.name
+        return self.project_name
 
 
 class Tasks(models.Model):
@@ -50,7 +50,7 @@ class Tasks(models.Model):
         ("Ns", "Not Started"),
         ("Wa", "Wait for"),
     ]
-    priority = models.CharField(max_length=1, choices=PRIORITIES)
+    priority = models.CharField(max_length=1, choices=PRIORITIES, null=True, blank=True)
     status = models.CharField(max_length=2, choices=STATUSES, default='Ns')
     complete = models.BooleanField(default=False)
     name = models.CharField(max_length=200)

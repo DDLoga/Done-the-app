@@ -34,7 +34,7 @@
               <div class="hdr-2">New Task Organizer</div>
             </div>
             <div class="nto-prj-slctr-div">
-              <div class="menu-hdr-blue">Organizing item {{ task_count }} of {{ task_qty }}</div>
+              <div class="menu-hdr-blue">{{ task_qty }} remaining entries. Current:</div>
               <div class="project-name">{{ new_task_name }}</div>
             </div>
           </div>
@@ -130,7 +130,8 @@
 
     <!-- NEW ENTRY IS PROJECT FROM -->
     <div data-w-id="e371bd6b-262e-5b69-3cad-5070134018e4" style="display:none" class="w-form">
-      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="e371bd6b-262e-5b69-3cad-5070134018e5">
+      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/welcome/" action="/new-task-organizer/submit-project/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="e371bd6b-262e-5b69-3cad-5070134018e5">
+        {% csrf_token %}
         <div class="nto-dtl-info-div">
           <div class="nto-dtl-info-lft-div">
             <div class="menu-hdr-grey">Details:</div>
@@ -138,21 +139,27 @@
           <aside class="nto-dtl-info-rgh-div">
             <div class="nto-project-fltr">
               <div class="menu-txt-grey">Name:</div>
-              {{ form.name|add_class:"task-name-frame w-input"}}
+              {{ form_project.project_name|add_class:"task-name-frame w-input"}}
               {% comment %} <input type="text" class="task-name-frame w-input" maxlength="256" name="name-project" data-name="name-project" placeholder="original name of the input" id="name-project" required=""> {% endcomment %}
             </div>
             <div class="div-nto-details">
               <div class="priority-box">
                 <label for="priority-project" class="menu-txt-grey">Priority:</label>
-                {{ form.priority|add_class:"task-name-frame centered w-input"}}
+                {{ form_project.project_priority|add_class:"task-name-frame priority w-input"}}
                 {% comment %} <input type="text" class="task-name-frame centered w-input" maxlength="256" name="priority-project" data-name="priority-project" placeholder="A" id="priority-project"></div> {% endcomment %}
-              <div class="deadline-box"><label for="deadline-project" class="menu-txt-grey">Deadline:</label><input type="text" class="task-name-frame centered w-input" maxlength="256" name="deadline-project" data-name="deadline-project" placeholder="date" id="deadline-project"></div>
+              <div class="deadline-box">
+                <label for="deadline-project" class="menu-txt-grey">Deadline:</label>
+                {{ form_project.project_deadline|add_class:"task-name-frame deadline w-input"}}
+                {% comment %} <input type="text" class="task-name-frame centered w-input" maxlength="256" name="deadline-project" data-name="deadline-project" placeholder="date" id="deadline-project"> {% endcomment %}
+              </div>
             </div>
           </aside>
         </div>
         <div class="not-proj-nxt-act-div">
           <div class="nto-project-fltr">
-            <div class="menu-txt-grey">Next Action</div><input type="text" class="task-name-frame w-input" maxlength="256" name="next-action-project" data-name="next-action-project" placeholder="enter the first action for this project" id="next-action-project">
+            <div class="menu-txt-grey">Next Action</div>
+            {{ form_task.name|add_class:"task-name-frame w-input"}}
+            {% comment %} <input type="text" class="task-name-frame w-input" maxlength="256" name="next-action-project" data-name="next-action-project" placeholder="enter the first action for this project" id="next-action-project"> {% endcomment %}
           </div>
         </div>
         <div class="w-layout-hflex form-btn-bar"><input type="submit" value="Process &amp; Next" data-wait="Please wait..." class="submit-btn w-button"><input type="submit" value="Close" data-wait="Please wait..." class="submit-btn w-button"></div>
@@ -167,7 +174,7 @@
 
     <!-- NEW ENTRY IS NOT ACTIONABLE FORM -->
     <div data-w-id="6239a38c-1ca4-4b06-5bab-b17bb0bd6a55" style="display:none" class="w-form">
-      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="6239a38c-1ca4-4b06-5bab-b17bb0bd6a56">
+      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/welcome/" action="/new-task-organizer/delete-entry/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="6239a38c-1ca4-4b06-5bab-b17bb0bd6a56">
         {% csrf_token %}
         <div class="nto-dtl-info-div">
           <div class="nto-dtl-info-lft-div">
