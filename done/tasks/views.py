@@ -23,7 +23,6 @@ def index(request):
 
     return render(request, 'tasks/index.html', {'quick_task_entry': quick_task_entry})
 
-
 def NewTaskOrganizerWelcome(request):
 
     task_qty = Tasks.objects.filter(new_task=1).count()             # count the total amount of new entries
@@ -87,8 +86,6 @@ def NewTaskOrganizerSubmitProject(request):
             Tasks.objects.filter(new_task=1)[0].delete()
     
     return render(request, 'tasks/new-task-o-wizard.html')
-    
-    
 
 def NewTaskOrganizerDelete(request):
     object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
@@ -98,26 +95,24 @@ def NewTaskOrganizerDelete(request):
         obj.delete()
     return render(request, 'tasks/new-task-o-wizard.html')
 
+def project_filter_view(request):
+    all_projects = Projects.objects.all()
+    context = {'count': all_projects.count()}
+    return render(request, 'tasks/project_filter.html', context)
 
-
-# TESTS
-
-
-def search_view(request):
-    all_people = Projects.objects.all()
-    context = {'count': all_people.count()}
-    return render(request, 'tasks/search.html', context)
-
-
-def search_results_view(request):
+def project_filter_results_view(request):
     query = request.GET.get('search', '')
     print(f'{query = }')
 
-    all_people = Projects.objects.all()
+    all_projects = Projects.objects.all()
+    
     if query:
-        people = all_people.filter(project_name__icontains=query)
+        project = all_projects.filter(project_name__icontains=query)
     else:
-        people = []
+        # project = []
+        project = all_projects.all()
+    context = {'project': project, 'count': all_projects.count()}
+    return render(request, 'tasks/project_filter_results.html', context)
 
-    context = {'people': people, 'count': all_people.count()}
-    return render(request, 'tasks/search_results.html', context)
+
+# TESTS
