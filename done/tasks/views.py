@@ -103,29 +103,21 @@ def NewTaskOrganizerDelete(request):
 # TESTS
 
 
-def Test(request):
-    name = Tasks.objects.all()
-    return render(request, 'tasks/test_page.html', {'name': name})
+def search_view(request):
+    all_people = Projects.objects.all()
+    context = {'count': all_people.count()}
+    return render(request, 'tasks/search.html', context)
 
-def test_form_view(request):
-    name = Tasks.objects.all()
-    if request.method == 'POST':
-        form = TestForm(request.POST)
-        if form.is_valid():
-            form.save()  # This saves the data to the database
-            return redirect('success_page')  # Redirect to a success page
+
+def search_results_view(request):
+    query = request.GET.get('search', '')
+    print(f'{query = }')
+
+    all_people = Projects.objects.all()
+    if query:
+        people = all_people.filter(project_name__icontains=query)
     else:
-        form = TestForm()
-    
-    return render(request, 'tasks/test_page.html', {'form': form,'name': name})
+        people = []
 
-
-# what's inside a form post:
-#         for field_name, field in form.fields.items():
-#             print(f"Field Name: {field_name}")
-#             print(f"Field Value: {form[field_name].value()}")
-
-# what are the errors while posting a form:
-#             else:
-#             errors = form.errors
-#             print(errors)
+    context = {'people': people, 'count': all_people.count()}
+    return render(request, 'tasks/search_results.html', context)
