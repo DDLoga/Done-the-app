@@ -28,15 +28,18 @@ def NewTaskOrganizerWelcome(request):
     task_qty = Tasks.objects.filter(new_task=1).count()             # count the total amount of new entries
     new_task_name = Tasks.objects.filter(new_task=1)[0].name        # get the entry name to proceed
     
-    initial_data_task = {'name': new_task_name}                          # autofill with entry name to proceed
+    initial_data_task = {'name': new_task_name}                     # autofill with entry name to proceed
     projects = Projects.objects.all()                               # get the list of existing projects
-    initial_data_project = {'project_name': new_task_name}                          # autofill with entry name to proceed
-    projects = Projects.objects.all()                               # get the list of existing projects
+    initial_data_project = {'project_name': new_task_name}          # autofill with entry name to proceed
     object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
     obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
-    form = NewTaskOrganizerTaskForm(initial=initial_data_task, instance=obj)           # display form with auto filled data
-    form_task = NewTaskOrganizerTaskForm()
-    form_project = NewTaskOrganizerProjectForm(initial=initial_data_project, instance=obj)
+    form = NewTaskOrganizerTaskForm(
+        initial=initial_data_task,
+        instance=obj)                                               # display task form with auto filled data
+    form_task = NewTaskOrganizerTaskForm()                          # used in default screen and non actionable screen
+    form_project = NewTaskOrganizerProjectForm(
+        initial=initial_data_project,
+        instance=obj)                                               # display project form with auto filled data
     
     return render(request, 'tasks/new-task-o-wizard.html', {
         'form': form,
@@ -56,7 +59,6 @@ def NewTaskOrganizerSubmitTask(request):
     if request.method == 'POST':
         form = NewTaskOrganizerTaskForm(request.POST, instance=obj)
         if form.is_valid():
-            print(form)
             form.save()                                             # This saves the data to the database
             task_count = task_count + 1
 
@@ -96,23 +98,23 @@ def NewTaskOrganizerDelete(request):
     return render(request, 'tasks/new-task-o-wizard.html')
 
 def project_filter_view(request):
-    all_projects = Projects.objects.all()
-    project = all_projects.all()
-    context = {'count': all_projects.count(),'project': project,}
+    form = NewTaskOrganizerTaskForm()                               #call an instance of the form
+    project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
+    context = {'count': project.count(),'project': project,}
     return render(request, 'tasks/project_filter.html', context)
 
 def project_filter_results_view(request):
     query = request.GET.get('search', '')
     print(f'{query = }')
-
-    all_projects = Projects.objects.all()
+    
+    form = NewTaskOrganizerTaskForm()
+    project = form.fields['parent'].queryset
     
     if query:
-        project = all_projects.filter(project_name__icontains=query)
+        project = project.filter(project_name__icontains=query)
     else:
-        # project = []
-        project = all_projects.all()
-    context = {'project': project, 'count': all_projects.count()}
+        project = form.fields['parent'].queryset
+    context = {'project': project, 'count': project.count()}
     return render(request, 'tasks/project_filter_results.html', context)
 
 
