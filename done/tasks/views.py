@@ -97,7 +97,8 @@ def NewTaskOrganizerDelete(request):
 
 def project_filter_view(request):
     all_projects = Projects.objects.all()
-    context = {'count': all_projects.count()}
+    project = all_projects.all()
+    context = {'count': all_projects.count(),'project': project,}
     return render(request, 'tasks/project_filter.html', context)
 
 def project_filter_results_view(request):
