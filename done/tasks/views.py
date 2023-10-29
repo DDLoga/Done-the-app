@@ -100,7 +100,7 @@ def NewTaskOrganizerDelete(request):
 def project_filter_view(request):
     form = NewTaskOrganizerTaskForm()                               #call an instance of the form
     project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
-    context = {'count': project.count(),'project': project,}
+    context = {'count': project.count(),'project': project, 'form':form}
     return render(request, 'tasks/project_filter.html', context)
 
 def project_filter_results_view(request):
@@ -114,7 +114,7 @@ def project_filter_results_view(request):
         project = project.filter(project_name__icontains=query)
     else:
         project = form.fields['parent'].queryset
-    context = {'project': project, 'count': project.count()}
+    context = {'project': project, 'count': project.count(), 'form':form}
     return render(request, 'tasks/project_filter_results.html', context)
 
 
