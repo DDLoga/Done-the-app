@@ -100,7 +100,28 @@
             </div>
           </aside>
         </div>
+
         <div class="not-project-fltr-div">
+          <div class="nto-project-fltr">
+              <div class="menu-txt-grey">Filter</div>
+              {% csrf_token %}
+              <input class="form-control task-name-frame w-input" type="search"
+                      name="search" placeholder="filter your project"
+                      hx-get="/search/results/"
+                      hx-trigger="keyup changed, search"
+                      hx-target="#search-results"
+                      hx-indicator=".htmx-indicator">
+          </div>
+        </div>
+        <div class="nto-proj-lst-div">
+          <div id="search-results">
+      
+                  {% include "tasks/project_filter_results.html" %}
+      
+          </div>
+        </div>
+
+        {% comment %} <div class="not-project-fltr-div">
           <div class="nto-project-fltr">
             <div class="menu-txt-grey">Filter</div>
 
@@ -118,7 +139,7 @@
           </div>
           {% endfor %}
 
-        </div>
+        </div> {% endcomment %}
         <div class="w-layout-hflex form-btn-bar">
           {% comment %} <input type="submit" name = "process" value="Process &amp; Next" data-wait="Please wait..." class="submit-btn w-button"> {% endcomment %}
           <button type="submit" name="action" value="pocess" class="submit-btn w-button">Process & Next</button>

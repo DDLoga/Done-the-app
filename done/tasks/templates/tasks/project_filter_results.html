@@ -5,8 +5,10 @@ Matches {{project|length}} / {{ count }} project in the directory.
 
 
 {% for p in project %}
+<div class="nto-prj-btn-field w-radio">
   <input type="radio" id='{{p.pk}}' name="parent" value="{{p.pk}}">
-  <label for="{{p.pk}}">{{p.project_name}}</label><br>
+  <label class="project-list-txt w-form-label" for="{{p.pk}}">{{p.project_name}}</label><br>
+</div>
 {% endfor %}
 
 {% comment %} {% for radio in form.parent %}

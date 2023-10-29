@@ -40,6 +40,7 @@ def NewTaskOrganizerWelcome(request):
     form_project = NewTaskOrganizerProjectForm(
         initial=initial_data_project,
         instance=obj)                                               # display project form with auto filled data
+    project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
     
     return render(request, 'tasks/new-task-o-wizard.html', {
         'form': form,
@@ -48,6 +49,8 @@ def NewTaskOrganizerWelcome(request):
         'task_qty': task_qty,
         'new_task_name': new_task_name,
         'projects' : projects,
+        'count': project.count(),
+        'project': project,
     }) 
 
 def NewTaskOrganizerSubmitTask(request):
@@ -97,11 +100,11 @@ def NewTaskOrganizerDelete(request):
         obj.delete()
     return render(request, 'tasks/new-task-o-wizard.html')
 
-def project_filter_view(request):
-    form = NewTaskOrganizerTaskForm()                               #call an instance of the form
-    project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
-    context = {'count': project.count(),'project': project, 'form':form}
-    return render(request, 'tasks/project_filter.html', context)
+# def project_filter_view(request):
+#     form = NewTaskOrganizerTaskForm()                               #call an instance of the form
+#     project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
+#     context = {'count': project.count(),'project': project, 'form':form}
+#     return render(request, 'tasks/project_filter.html', context)
 
 def project_filter_results_view(request):
     query = request.GET.get('search', '')
