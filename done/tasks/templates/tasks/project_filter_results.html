@@ -1,19 +1,16 @@
-Matches {{project|length}} / {{ count }} project in the directory.
 {% comment %} {% for p in project %}
-<p>{{ p.project_name }}</p>
-{% endfor %} {% endcomment %}
-
-
-{% for p in project %}
 <div class="nto-prj-btn-field w-radio">
   <input type="radio" id='{{p.pk}}' name="parent" value="{{p.pk}}">
   <label class="project-list-txt w-form-label" for="{{p.pk}}">{{p.project_name}}</label><br>
 </div>
+{% endfor %} {% endcomment %}
+
+{% for p in project %}
+<label class="nto-prj-btn-field w-radio">
+    <input type="radio" id='{{p.pk}}' name="parent" value="{{p.pk}}" class="w-form-formradioinput w-radio-input">
+    <span class="project-list-txt w-form-label" for="{{p.pk}}">{{p.project_name}}</span>
+</label>
 {% endfor %}
 
-{% comment %} {% for radio in form.parent %}
-<div class="nto-prj-btn-field w-radio">
-    {{ radio.tag }}
-    <label class="project-list-txt w-form-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-</div>
-{% endfor %} {% endcomment %}
+{% comment %} <span class="project-list-txt w-form-label" for="project">A Project that has an extended name</span> {% endcomment %}
+{% comment %} <input type="radio" id="project" name="parent-task" value="project" data-name="parent-task" class="w-form-formradioinput w-radio-input"> {% endcomment %}

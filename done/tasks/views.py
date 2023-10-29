@@ -100,19 +100,10 @@ def NewTaskOrganizerDelete(request):
         obj.delete()
     return render(request, 'tasks/new-task-o-wizard.html')
 
-# def project_filter_view(request):
-#     form = NewTaskOrganizerTaskForm()                               #call an instance of the form
-#     project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
-#     context = {'count': project.count(),'project': project, 'form':form}
-#     return render(request, 'tasks/project_filter.html', context)
-
 def project_filter_results_view(request):
     query = request.GET.get('search', '')
-    print(f'{query = }')
-    
     form = NewTaskOrganizerTaskForm()
-    project = form.fields['parent'].queryset
-    
+    project = form.fields['parent'].queryset    
     if query:
         project = project.filter(project_name__icontains=query)
     else:

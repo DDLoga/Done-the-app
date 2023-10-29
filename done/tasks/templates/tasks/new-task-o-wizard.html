@@ -68,7 +68,7 @@
 
     <!-- NEW ENTRY IS TASK FORM -->
     <div data-w-id="78698cbd-15e1-ff16-772a-d14af70e56e6" style="display:none" class="w-form">
-      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/welcome/" action="/new-task-organizer/submit-task/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="78698cbd-15e1-ff16-772a-d14af70e56e7">
+      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/" action="/new-task-organizer/submit-task/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="78698cbd-15e1-ff16-772a-d14af70e56e7">
         {% csrf_token %}
         <div id="not" class="nto-dtl-info-div">
           <div class="nto-dtl-info-lft-div">
@@ -113,13 +113,13 @@
                       hx-indicator=".htmx-indicator">
           </div>
         </div>
-        <div class="nto-proj-lst-div">
-          <div id="search-results">
+        {% comment %} <div class="nto-proj-lst-div"> {% endcomment %}
+          <div id="search-results" class="nto-proj-lst-div">
       
                   {% include "tasks/project_filter_results.html" %}
       
           </div>
-        </div>
+        {% comment %} </div> {% endcomment %}
 
         {% comment %} <div class="not-project-fltr-div">
           <div class="nto-project-fltr">
@@ -155,7 +155,7 @@
 
     <!-- NEW ENTRY IS PROJECT FROM -->
     <div data-w-id="e371bd6b-262e-5b69-3cad-5070134018e4" style="display:none" class="w-form">
-      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/welcome/" action="/new-task-organizer/submit-project/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="e371bd6b-262e-5b69-3cad-5070134018e5">
+      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/" action="/new-task-organizer/submit-project/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="e371bd6b-262e-5b69-3cad-5070134018e5">
         {% csrf_token %}
         <div class="nto-dtl-info-div">
           <div class="nto-dtl-info-lft-div">
@@ -199,7 +199,7 @@
 
     <!-- NEW ENTRY IS NOT ACTIONABLE FORM -->
     <div data-w-id="6239a38c-1ca4-4b06-5bab-b17bb0bd6a55" style="display:none" class="w-form">
-      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/welcome/" action="/new-task-organizer/delete-entry/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="6239a38c-1ca4-4b06-5bab-b17bb0bd6a56">
+      <form id="wf-form-new-entry-form" name="wf-form-new-entry-form" data-name="new-entry-form" data-redirect="/new-task-organizer/" action="/new-task-organizer/delete-entry/" method="post" class="form" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="6239a38c-1ca4-4b06-5bab-b17bb0bd6a56">
         {% csrf_token %}
         <div class="nto-dtl-info-div">
           <div class="nto-dtl-info-lft-div">

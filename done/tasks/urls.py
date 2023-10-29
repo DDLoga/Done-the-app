@@ -5,16 +5,9 @@ urlpatterns = [
     path('tasks/', views.index, name="index"),
     # path('new-task-organizer/', views.NewTaskOrganizer, name="NewTaskOrganizer"),
     path('new-task-organizer/submit-task/', views.NewTaskOrganizerSubmitTask, name="NewTaskOrganizerSubmitTask"),
-    path('new-task-organizer/welcome/', views.NewTaskOrganizerWelcome, name="NewTaskOrganizerWelcome"),
+    path('new-task-organizer/', views.NewTaskOrganizerWelcome, name="NewTaskOrganizerWelcome"),
     path('new-task-organizer/delete-entry/', views.NewTaskOrganizerDelete, name="NewTaskOrganizerDelete"),
     path('new-task-organizer/submit-project/', views.NewTaskOrganizerSubmitProject, name="NewTaskOrganizerSubmitProject"),
-    
-    # path('search/', views.project_filter_view, name='project_filter_view'),
     path('search/results/', views.project_filter_results_view, name='project_filter_results_view'),
     
 ]
-
-# urlpatterns = [
-#     path('myform/', views.my_form_view, name='my_form_view'),
-#     path('success/', success_view, name='success_page'),  # Create a success page URL
-# ]
