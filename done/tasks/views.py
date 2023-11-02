@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from .models import Tasks, Projects
 from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganizerProjectForm, TestForm
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 def index(request):
     quick_task_entry = QuickTaskEntry()
 
@@ -118,3 +121,34 @@ def Prioritizer(request):
     return render(request,"tasks/prioritizer.html",{'tasks':all_tasks,'projects':all_projects})
 
 # TESTS
+@csrf_exempt
+def save_tasks(request):
+    id=request.POST.get('id','')
+    type=request.POST.get('type','')
+    value=request.POST.get('value','')
+    task=Tasks.objects.get(id=id)
+        
+    if type=="complete":
+        task.complete=value
+
+    if type == "priority":
+        task.priority = value
+
+    if type == "name":
+        task.name = value
+
+    if type == "effort":
+        task.effort = value
+
+    if type == "context":
+        task.context = value
+
+    if type == "deadline":
+        task.deadline = value
+
+    if type == "assignee":
+        task.assignee = value
+
+
+    task.save()
+    return JsonResponse({"success":"Updated"})
