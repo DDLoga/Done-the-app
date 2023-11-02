@@ -111,5 +111,10 @@ def project_filter_results_view(request):
     context = {'project': project, 'count': project.count(), 'form':form}
     return render(request, 'tasks/project_filter_results.html', context)
 
+def Prioritizer(request):
+    all_tasks=Tasks.objects.all()
+    all_projects=Projects.objects.all()
+
+    return render(request,"tasks/prioritizer.html",{'tasks':all_tasks,'projects':all_projects})
 
 # TESTS

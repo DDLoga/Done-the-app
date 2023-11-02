@@ -9,5 +9,6 @@ urlpatterns = [
     path('new-task-organizer/delete-entry/', views.NewTaskOrganizerDelete, name="NewTaskOrganizerDelete"),
     path('new-task-organizer/submit-project/', views.NewTaskOrganizerSubmitProject, name="NewTaskOrganizerSubmitProject"),
     path('search/results/', views.project_filter_results_view, name='project_filter_results_view'),
+    path('prioritizer/', views.Prioritizer, name="prioritizer"),
     
 ]
