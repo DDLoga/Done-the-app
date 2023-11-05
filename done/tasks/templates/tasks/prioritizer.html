@@ -32,7 +32,15 @@
       <table class="task-table_component">
         <thead class="task-table_head">
           <tr class="task-table_row">
-            <th class="tbl-hdr" data-sort="completion">Completion</th>
+            <th class="tbl-hdr" data-sort="completion">
+              <div class="filter-dropdown">
+                <select class="filter-select" id="completion-filter">
+                    <option value="">All</option>
+                    <option value='false'>Completed</option>
+                    <option value='true'>Not Completed</option>
+                </select>
+              </div>
+            </th>
             <th class="tbl-hdr" data-sort="compound">Compound <br>Priority</th>
             <th class="tbl-hdr" data-sort="priority">Priority</th>
             <th class="tbl-hdr" data-sort="name">Name</th>
@@ -44,16 +52,16 @@
         </thead>
 
           {% for task in tasks %}
-          <tr>
-              <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="complete">
+          <tr class="rendered-row">
+              <td class="tbl-cell centered" data-id="{{ task.id }}" data-type="complete">
                 {% if task.complete %}
-                <input type="checkbox" class="input-data form-control" checked>
+                  <input type="checkbox" class="input-data form-control completion-checkbox" checked>
                 {% else %}
-                    <input type="checkbox" class="input-data form-control">
+                  <input type="checkbox" class="input-data form-control completion-checkbox">
                 {% endif %}
               </td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="compound">compnd</td>
-              <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
+              <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
               <td class="editable tbl-cell" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="effort">{{ task.effort }}</td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="context">{{ task.contex }}</td>

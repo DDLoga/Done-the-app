@@ -5,26 +5,54 @@ $(document).ready(function() {
     // DOUBLE CLICK TO EDIT
     // on double click event listener for all .editable class
     $(document).on("dblclick", ".editable", function() {
-            // get the existing text, tag of the item double clicked on and set input_type as text
-            var value = $(this).text();
-            var data_type = $(this).data("type");
-            var input_type = "text";
-            // if field deadline chosen, bring a date picker
-            if (data_type === "deadline") {
-                input_type = "date";
-            }
-            // create the html form
-            var input="<input type='"+input_type+"' class='input-data' value='"+value+"' class='form-control'>";
-            // pass to html page
-            $(this).html(input);
-            $(this).removeClass("editable")
+        // get the data type of the element double clicked on
+        var data_type = $(this).data("type");
+        // get the existing text, tag of the item double clicked on and set input_type as text
+        var value = $(this).text();
+        var input_type = "text";
+        // if field deadline chosen, bring a date picker
+        if (data_type === "deadline") {
+            input_type = "date";
+        }
+        // create the html form
+        var input="<input type='"+input_type+"' class='input-data' value='"+value+"' class='form-control'>";
+        // pass to html page
+        $(this).html(input);
+        $(this).removeClass("editable")
     });
+
+    // PRIORITY DROP DOWN MENU ON CLICK
+    $(document).on("click", ".priority", function() {
+        // get the ID and data type of the edited row
+        var taskId = $(this).data("id");
+        var data_type = $(this).data("type");
+        // Define the priority options here
+        var priorityOptions = ['A', 'B', 'C', 'D'];
+
+        // Create a <select> element with <option> elements
+        var selectHtml = '<select id="priority-select-' + taskId + '" class="input-data form-control">';
+        for (var i = 0; i < priorityOptions.length; i++) {
+            selectHtml += '<option value="' + priorityOptions[i] + '">' + priorityOptions[i] + '</option>';
+        }
+        selectHtml += '</select>';
+
+        // Append the <select> element to the table cell
+        $(this).html(selectHtml);
+        $(this).removeClass("priority");
+
+        // Handle form submission for priority change
+        $("#priority-select-" + taskId).change(function () {
+            var newPriority = $(this).val();
+            sendToServer(taskId, newPriority, data_type);
+            // (this).addClass("priority");
+    })});
 
     // SAVE WHEN CLICKING SOMEWHERE ELSE
     // once clicking somewhere else, call this function on items with .input-data class
     $(document).on("blur",".input-data",function(){
         // get the value of the newly keyed input
         var value=$(this).val();
+        var data_type = $(this).data("type");
         // get the value of the parent
         if (value !== "on") {
             var td=$(this).parent("td");
@@ -32,7 +60,11 @@ $(document).ready(function() {
             $(this).remove();
             // set the newly entered value and class to the td component
             td.html(value);
-            td.addClass("editable");
+            console.log('data type is: ' + data_type)
+            if (data_type === "priority") {
+                td.addClass("editable");
+            } 
+            else {td.addClass("editable");}
             // get the data type of td
             var type=td.data("type");
             // send the pk + value + data type to server
@@ -102,6 +134,29 @@ $(document).ready(function() {
         // bindDoubleClickEditing();
     });
 
+    // TASK COMPLETE FILTER
+    // Event listener for the filter drop-down change
+    $('#completion-filter').on('change', function() {
+        // get the value defined on completion-filter id in selector from HTML file
+        var selectedValue = $(this).val();
+        // pass this value to the function
+        filterTableByCompletion(selectedValue);
+    });
+
+    // Function to filter the table
+    function filterTableByCompletion(selectedValue) {
+        // Show all rows initially
+        $('.rendered-row').show();
+        // for each table cell of the datatype complete and input checkbox
+        $('.tbl-cell[data-type="complete"] input:checkbox').each(function() {
+            // Get the value of the checkbox and convert to string
+            var isChecked = $(this).prop('checked').toString();
+            // hide each row that don't match
+            if (isChecked == selectedValue) {
+                $(this).closest('.rendered-row').hide();
+            } 
+        });
+    }
 
 
     function sendToServer(id,value,type){
