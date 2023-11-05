@@ -631,6 +631,14 @@ body {
   font-style: italic;
   font-weight: 400;
   line-height: 16px;
+  cursor: pointer;
+}
+
+.tbl-hdr.asc:after {
+  content: " ▲";
+}
+.tbl-hdr.desc:after {
+  content: " ▼";
 }
 
 .tbl-cell {

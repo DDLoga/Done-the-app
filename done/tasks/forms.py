@@ -46,3 +46,9 @@ class TestForm(forms.ModelForm):
         model = Tasks
         fields = ['priority', 'status', 'name', 'deadline', 'context', 'effort', 'assignee', 'parent']
         last_active = forms.DateField(widget=DateInput)
+        
+        
+class Task_Form(forms.ModelForm):
+    class Meta:
+        model = Tasks
+        fields = ['priority']

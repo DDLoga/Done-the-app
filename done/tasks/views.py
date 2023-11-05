@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Tasks, Projects
-from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganizerProjectForm, TestForm
+from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganizerProjectForm, Task_Form
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -117,6 +117,7 @@ def project_filter_results_view(request):
 def Prioritizer(request):
     all_tasks=Tasks.objects.all()
     all_projects=Projects.objects.all()
+    # task_form = Task_Form()
 
     return render(request,"tasks/prioritizer.html",{'tasks':all_tasks,'projects':all_projects})
 
