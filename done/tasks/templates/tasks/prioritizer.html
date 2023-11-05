@@ -45,7 +45,13 @@
 
           {% for task in tasks %}
           <tr>
-              <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="complete">{{ task.complete }}</td>
+              <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="complete">
+                {% if task.complete %}
+                <input type="checkbox" class="input-data form-control" checked>
+                {% else %}
+                    <input type="checkbox" class="input-data form-control">
+                {% endif %}
+              </td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="compound">compnd</td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
               <td class="editable tbl-cell" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
