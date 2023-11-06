@@ -64,7 +64,7 @@
               <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
               <td class="editable tbl-cell" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="effort">{{ task.effort }}</td>
-              <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="context">{{ task.contex }}</td>
+              <td class="context tbl-cell centered" data-id="{{ task.id }}" data-type="context">{{ task.context.name }}</td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="deadline">{{ task.deadline }}</td>
               <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="assignee">{{ task.assignee }}</td>
           </tr>
@@ -162,7 +162,11 @@
 
   {% block custom_js %}
   {% comment %} control table behaviour {% endcomment %}
-  <script> var serverUrl = "{% url 'save_tasks' %}"; </script>
+  <script> 
+    var serverUrl = "{% url 'save_tasks' %}";
+    var contextUrl = "{% url 'prioritizer' %}";
+    var contextOptions = {{ context_options_list|safe }};
+  </script>
   <script src="{% static 'tasks/table.js' %}" id="url"></script>
   {% endblock custom_js %}
 

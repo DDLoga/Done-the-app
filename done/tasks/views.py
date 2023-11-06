@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Tasks, Projects
-from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganizerProjectForm, Task_Form
+from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganizerProjectForm, Context
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -117,9 +117,15 @@ def project_filter_results_view(request):
 def Prioritizer(request):
     all_tasks=Tasks.objects.all()
     all_projects=Projects.objects.all()
+    context_options = Context.objects.values_list('name', flat=True)
+    context_options_list = list(context_options)
     # task_form = Task_Form()
 
-    return render(request,"tasks/prioritizer.html",{'tasks':all_tasks,'projects':all_projects})
+    return render(request,
+                "tasks/prioritizer.html",
+                {'tasks':all_tasks,
+                'projects':all_projects,
+                'context_options_list':context_options_list})
 
 # TESTS
 @csrf_exempt
@@ -142,7 +148,9 @@ def save_tasks(request):
         task.effort = value
 
     if type == "context":
-        task.context = value
+        # Retrieve the Context instance based on the provided value
+        context_instance, created = Context.objects.get_or_create(name=value)
+        task.context = context_instance
 
     if type == "deadline":
         task.deadline = value

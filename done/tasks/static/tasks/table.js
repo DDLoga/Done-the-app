@@ -27,7 +27,6 @@ $(document).ready(function() {
     $(document).on("click", ".priority", function() {
         // get the ID and data type of the edited row
         var taskId = $(this).data("id");
-        var data_type = $(this).data("type");
         // Define the priority options here
         var priorityOptions = ['A', 'B', 'C', 'D'];
 
@@ -42,6 +41,25 @@ $(document).ready(function() {
         $(this).html(selectHtml);
         $(this).removeClass("priority");
     });
+
+   // CREATE A CONTEXT DROP DOWN MENU ON CLICK
+    $(document).on("click", ".context", function() {
+        var taskId = $(this).data("id");
+        
+        // Create a <select> element with <option> elements using contextOptions
+        var selectHtml = '<select id="priority-select-' + taskId + '" class="input-data-priority form-control">';
+        for (var i = 0; i < contextOptions.length; i++) {
+            selectHtml += '<option value="' + contextOptions[i] + '">' + contextOptions[i] + '</option>';
+        }
+        selectHtml += '</select>';
+
+        // Append the <select> element to the table cell
+        $(this).html(selectHtml);
+        $(this).removeClass("context");
+    });
+
+
+
 
     // SAVE WHEN CLICKING SOMEWHERE ELSE
     // once clicking somewhere else, call this function on items with .input-data class
@@ -208,7 +226,7 @@ $(document).ready(function() {
             console.log(response);
         })
         .fail(function(){
-           console.log("Error Occurred");
+            console.log("Error Occurred");
         });
 
     }
