@@ -13,6 +13,8 @@ $(document).ready(function() {
         // if field deadline chosen, bring a date picker
         if (data_type === "deadline") {
             input_type = "date";
+        } else if (data_type === "effort") {
+            input_type = "number";
         }
         // create the html form
         var input="<input type='"+input_type+"' class='input-data' value='"+value+"' class='form-control'>";
@@ -21,7 +23,7 @@ $(document).ready(function() {
         $(this).removeClass("editable")
     });
 
-    // PRIORITY DROP DOWN MENU ON CLICK
+    // CREATE A PRIORITY DROP DOWN MENU ON CLICK
     $(document).on("click", ".priority", function() {
         // get the ID and data type of the edited row
         var taskId = $(this).data("id");
@@ -30,7 +32,7 @@ $(document).ready(function() {
         var priorityOptions = ['A', 'B', 'C', 'D'];
 
         // Create a <select> element with <option> elements
-        var selectHtml = '<select id="priority-select-' + taskId + '" class="input-data form-control">';
+        var selectHtml = '<select id="priority-select-' + taskId + '" class="input-data-priority form-control">';
         for (var i = 0; i < priorityOptions.length; i++) {
             selectHtml += '<option value="' + priorityOptions[i] + '">' + priorityOptions[i] + '</option>';
         }
@@ -39,32 +41,40 @@ $(document).ready(function() {
         // Append the <select> element to the table cell
         $(this).html(selectHtml);
         $(this).removeClass("priority");
-
-        // Handle form submission for priority change
-        $("#priority-select-" + taskId).change(function () {
-            var newPriority = $(this).val();
-            sendToServer(taskId, newPriority, data_type);
-            // (this).addClass("priority");
-    })});
+    });
 
     // SAVE WHEN CLICKING SOMEWHERE ELSE
     // once clicking somewhere else, call this function on items with .input-data class
     $(document).on("blur",".input-data",function(){
         // get the value of the newly keyed input
         var value=$(this).val();
-        var data_type = $(this).data("type");
-        // get the value of the parent
         if (value !== "on") {
+            // get the value of the parent
             var td=$(this).parent("td");
             // remove the input entry keyed
             $(this).remove();
             // set the newly entered value and class to the td component
             td.html(value);
-            console.log('data type is: ' + data_type)
-            if (data_type === "priority") {
-                td.addClass("editable");
-            } 
-            else {td.addClass("editable");}
+            td.addClass("editable");
+            // get the data type of td
+            var type=td.data("type");
+            // send the pk + value + data type to server
+            sendToServer(td.data("id"),value,type);
+    }});
+
+   // SAVE WHEN CLICKING SOMEWHERE ELSE FOR PRIORITY DROPDOWN ONLY
+    // once clicking somewhere else, call this function on items with .input-data class
+    $(document).on("blur",".input-data-priority",function(){
+        // get the value of the newly keyed input
+        var value=$(this).val();
+        if (value !== "on") {
+            // get the value of the parent
+            var td=$(this).parent("td");
+            // remove the input entry keyed
+            $(this).remove();
+            // set the newly entered value and class to the td component
+            td.html(value);
+            td.addClass("priority");
             // get the data type of td
             var type=td.data("type");
             // send the pk + value + data type to server
@@ -87,6 +97,32 @@ $(document).ready(function() {
                 // set the newly entered value and class to the td component
                 td.html(value);
                 td.addClass("editable");
+                // get the data type of td
+                var type=td.data("type");
+                // send the pk + value + data type to server
+                sendToServer(td.data("id"),value,type);
+        }
+        
+        
+    
+    }});
+
+    // SAVE WHEN ENTER FRO PRIORITY DROPDOWN ONLY
+    // event listener on keypress for classes with .input-data which calls the function "e"
+    $(document).on("keypress",".input-data-priority",function(e){
+        // retrieves the keycode of the entered key
+        // if "enter"
+        if(e.key === 'Enter'){
+            // get the value of the newly keyed input
+            var value=$(this).val();
+            if (value !== "on") {
+                // get the value of the parent
+                var td=$(this).parent("td");
+                // remove the input entry keyed
+                $(this).remove();
+                // set the newly entered value and class to the td component
+                td.html(value);
+                td.addClass("priority");
                 // get the data type of td
                 var type=td.data("type");
                 // send the pk + value + data type to server
@@ -158,7 +194,6 @@ $(document).ready(function() {
         });
     }
 
-
     function sendToServer(id,value,type){
         console.log(id);
         console.log(value);
@@ -178,3 +213,4 @@ $(document).ready(function() {
 
     }
 });
+
