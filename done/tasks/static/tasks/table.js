@@ -28,30 +28,28 @@ $(document).ready(function() {
         // get the ID and data type of the edited row
         var taskId = $(this).data("id");
         // Define the priority options here
-        var priorityOptions = ['A', 'B', 'C', 'D'];
+        var options = ['A', 'B', 'C', 'D'];
+        var dropdownClass = "input-data-priority form-control"
+        var dropdownId = 'priority-select-'
 
         // Create a <select> element with <option> elements
-        var selectHtml = '<select id="priority-select-' + taskId + '" class="input-data-priority form-control">';
-        for (var i = 0; i < priorityOptions.length; i++) {
-            selectHtml += '<option value="' + priorityOptions[i] + '">' + priorityOptions[i] + '</option>';
-        }
-        selectHtml += '</select>';
-
+        var selectHtml = createDropdown(taskId, options, dropdownClass, dropdownId);
+        console.log(selectHtml)
+        
         // Append the <select> element to the table cell
         $(this).html(selectHtml);
         $(this).removeClass("priority");
     });
 
-   // CREATE A CONTEXT DROP DOWN MENU ON CLICK
+   // CREATE A CONTEXT DROP DOWN MENU ON CLICK - NEED TO FIX THE 'PRIORITY' CLASS ISSUE
     $(document).on("click", ".context", function() {
         var taskId = $(this).data("id");
-        
-        // Create a <select> element with <option> elements using contextOptions
-        var selectHtml = '<select id="priority-select-' + taskId + '" class="input-data-priority form-control">';
-        for (var i = 0; i < contextOptions.length; i++) {
-            selectHtml += '<option value="' + contextOptions[i] + '">' + contextOptions[i] + '</option>';
-        }
-        selectHtml += '</select>';
+        var options = contextOptions
+        var dropdownClass = "input-data-context form-control"
+        var dropdownId = 'context-select-'
+
+        // Create a <select> element with <option> elements
+        var selectHtml = createDropdown(taskId, options, dropdownClass, dropdownId);
 
         // Append the <select> element to the table cell
         $(this).html(selectHtml);
@@ -59,11 +57,22 @@ $(document).ready(function() {
     });
 
 
+    function createDropdown(taskId, options, dropdownClass, dropdownId) {
+        var selectHtml = '<select id="' + dropdownId + taskId + '" class="' + dropdownClass + '">';
+        for (var i = 0; i < options.length; i++) {
+            selectHtml += '<option value="' + options[i] + '">' + options[i] + '</option>';
+        }
+        selectHtml += '</select>';
+        return selectHtml;
+    }
+
+
 
 
     // SAVE WHEN CLICKING SOMEWHERE ELSE
     // once clicking somewhere else, call this function on items with .input-data class
     $(document).on("blur",".input-data",function(){
+        var classToAdd = "editable";
         // get the value of the newly keyed input
         var value=$(this).val();
         if (value !== "on") {
@@ -98,6 +107,27 @@ $(document).ready(function() {
             // send the pk + value + data type to server
             sendToServer(td.data("id"),value,type);
     }});
+
+
+    // SAVE WHEN CLICKING SOMEWHERE ELSE FOR CONTEXT DROPDOWN ONLY
+    // once clicking somewhere else, call this function on items with .input-data class
+    $(document).on("blur",".input-data-context",function(){
+        // get the value of the newly keyed input
+        var value=$(this).val();
+        if (value !== "on") {
+            // get the value of the parent
+            var td=$(this).parent("td");
+            // remove the input entry keyed
+            $(this).remove();
+            // set the newly entered value and class to the td component
+            td.html(value);
+            td.addClass("context");
+            // get the data type of td
+            var type=td.data("type");
+            // send the pk + value + data type to server
+            sendToServer(td.data("id"),value,type);
+    }});
+
 
     // SAVE WHEN ENTER
     // event listener on keypress for classes with .input-data which calls the function "e"
@@ -151,17 +181,19 @@ $(document).ready(function() {
     
     }});
 
-    // CHECKBOX STATE CHANGE
+    // SAVE WHEN CHECKBOX STATE CHANGE
     // Add an event listener for checkbox state changes
     $(document).on("change", ".input-data[type=checkbox]", function() {
+        // get the checkbox status
         var isChecked = this.checked;
+        // concert to string to make it comparable with the filter input
         var value = isChecked.toString().charAt(0).toUpperCase() + isChecked.toString().slice(1); // Capitalize the first letter
         var td = $(this).closest("td");
         var type = td.data("type");
         sendToServer(td.data("id"), value, type);
     });
 
-    // SORTING
+    // SORTING ONCE CLICKED ON TABLE HEADER
     // event listener on click for classes with table header
     $('.tbl-hdr').on('click', function() {
         var column = $(this).data('sort');
