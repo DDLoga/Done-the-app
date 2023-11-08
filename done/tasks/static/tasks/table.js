@@ -20,9 +20,25 @@ $(document).ready(function() {
         var input="<input type='"+input_type+"' class='input-data' value='"+value+"' class='form-control'>";
         // pass to html page
         $(this).html(input);
-        $(this).removeClass("editable")
+        $(this).removeClass("editable");
+
+        if (input_type === "date") {
+            // Handle the date input change event
+            $(this)
+                .find("input[type=date]")
+                .on("change", function() {
+                    var selectedDate = this.value;
+                    // Parse the selected date to your desired format
+                    var formattedDate = parseAndFormatDate(selectedDate);
+                    var td = $(this).closest("td");
+                    td.html(formattedDate);
+                    td.addClass("editable");
+                    sendToServer(td.data("id"), formattedDate, data_type);
+                });
+        }
     });
 
+    // ////////////////////////////////////////////// DROP DOWN MENUS //////////////////////////////////////////////////////
     // CREATE A PRIORITY DROP DOWN MENU ON CLICK
     $(document).on("click", ".priority", function() {
         // get the ID and data type of the edited row
@@ -34,14 +50,13 @@ $(document).ready(function() {
 
         // Create a <select> element with <option> elements
         var selectHtml = createDropdown(taskId, options, dropdownClass, dropdownId);
-        console.log(selectHtml)
         
         // Append the <select> element to the table cell
         $(this).html(selectHtml);
         $(this).removeClass("priority");
     });
 
-   // CREATE A CONTEXT DROP DOWN MENU ON CLICK - NEED TO FIX THE 'PRIORITY' CLASS ISSUE
+// CREATE A CONTEXT DROP DOWN MENU ON CLICK
     $(document).on("click", ".context", function() {
         var taskId = $(this).data("id");
         var options = contextOptions
@@ -56,130 +71,122 @@ $(document).ready(function() {
         $(this).removeClass("context");
     });
 
+    // CREATE AN ASSIGNEE DROP DOWN MENU ON CLICK
+    $(document).on("click", ".assignee", function() {
+        console.log("event assignee triggered")
+        var taskId = $(this).data("id");
+        var options = assigneeOptions;
+        var dropdownClass = "input-data-assignee form-control"
+        var dropdownId = 'assignee-select-'
 
-    function createDropdown(taskId, options, dropdownClass, dropdownId) {
-        var selectHtml = '<select id="' + dropdownId + taskId + '" class="' + dropdownClass + '">';
-        for (var i = 0; i < options.length; i++) {
-            selectHtml += '<option value="' + options[i] + '">' + options[i] + '</option>';
-        }
-        selectHtml += '</select>';
-        return selectHtml;
-    }
+        // Create a <select> element with <option> elements
+        var selectHtml = createDropdown(taskId, options, dropdownClass, dropdownId);
+
+        // Append the <select> element to the table cell
+        $(this).html(selectHtml);
+        $(this).removeClass("assignee");
+    });
 
 
-
-
-    // SAVE WHEN CLICKING SOMEWHERE ELSE
-    // once clicking somewhere else, call this function on items with .input-data class
+    // ////////////////////////////////////////////// AUTOSAVE WHEN AWAY //////////////////////////////////////////////////////
+    // SAVE WHEN CLICKING SOMEWHERE ELSE (ANY EXCEPT LISTED AFTER)
+        // once clicking somewhere else, call this function on items with .input-data class
     $(document).on("blur",".input-data",function(){
-        var classToAdd = "editable";
         // get the value of the newly keyed input
         var value=$(this).val();
-        if (value !== "on") {
-            // get the value of the parent
-            var td=$(this).parent("td");
-            // remove the input entry keyed
-            $(this).remove();
-            // set the newly entered value and class to the td component
-            td.html(value);
-            td.addClass("editable");
-            // get the data type of td
-            var type=td.data("type");
-            // send the pk + value + data type to server
-            sendToServer(td.data("id"),value,type);
-    }});
+        // set the class to restore for further edit
+        var classToAdd = "editable";
+        var td=$(this).parent("td");
+        exitForm(classToAdd,value,td);
+    });
 
-   // SAVE WHEN CLICKING SOMEWHERE ELSE FOR PRIORITY DROPDOWN ONLY
-    // once clicking somewhere else, call this function on items with .input-data class
+    // SAVE WHEN CLICKING SOMEWHERE ELSE (PRIORITY FORM)
     $(document).on("blur",".input-data-priority",function(){
         // get the value of the newly keyed input
+        console.log("event triggered")
         var value=$(this).val();
-        if (value !== "on") {
-            // get the value of the parent
-            var td=$(this).parent("td");
-            // remove the input entry keyed
-            $(this).remove();
-            // set the newly entered value and class to the td component
-            td.html(value);
-            td.addClass("priority");
-            // get the data type of td
-            var type=td.data("type");
-            // send the pk + value + data type to server
-            sendToServer(td.data("id"),value,type);
-    }});
+        // set the class to restore for further edit
+        var classToAdd = ("priority");
+        var td=$(this).parent("td");
+        exitForm(classToAdd,value,td)
+    });
 
-
-    // SAVE WHEN CLICKING SOMEWHERE ELSE FOR CONTEXT DROPDOWN ONLY
-    // once clicking somewhere else, call this function on items with .input-data class
+    // SAVE WHEN CLICKING SOMEWHERE ELSE (CONTEXT FORM)
     $(document).on("blur",".input-data-context",function(){
         // get the value of the newly keyed input
         var value=$(this).val();
-        if (value !== "on") {
-            // get the value of the parent
-            var td=$(this).parent("td");
-            // remove the input entry keyed
-            $(this).remove();
-            // set the newly entered value and class to the td component
-            td.html(value);
-            td.addClass("context");
-            // get the data type of td
-            var type=td.data("type");
-            // send the pk + value + data type to server
-            sendToServer(td.data("id"),value,type);
-    }});
+        // set the class to restore for further edit
+        var classToAdd = ("context");
+        var td=$(this).parent("td");
+        exitForm(classToAdd,value,td)
+    });
 
+    // SAVE WHEN CLICKING SOMEWHERE ELSE (ASSIGNEE FORM)
+    $(document).on("blur",".input-data-assignee",function(){
+        // get the value of the newly keyed input
+        var value=$(this).val();
+        // set the class to restore for further edit
+        var classToAdd = ("assignee");
+        var td=$(this).parent("td");
+        exitForm(classToAdd,value,td)
+    });
 
-    // SAVE WHEN ENTER
-    // event listener on keypress for classes with .input-data which calls the function "e"
+    // ////////////////////////////////////////////// AUTOSAVE WHEN ENTER //////////////////////////////////////////////////////
+    // SAVE WHEN ENTER (ANY EXCEPT LISTED AFTER)
     $(document).on("keypress",".input-data",function(e){
         // retrieves the keycode of the entered key
         // if "enter"
         if(e.key === 'Enter'){
             // get the value of the newly keyed input
             var value=$(this).val();
-            if (value !== "on") {
-                // get the value of the parent
-                var td=$(this).parent("td");
-                // remove the input entry keyed
-                $(this).remove();
-                // set the newly entered value and class to the td component
-                td.html(value);
-                td.addClass("editable");
-                // get the data type of td
-                var type=td.data("type");
-                // send the pk + value + data type to server
-                sendToServer(td.data("id"),value,type);
+            var classToAdd = "editable";
+            var td=$(this).parent("td");
+            exitForm(classToAdd,value,td)
         }
         
-        
-    
-    }});
+    });
 
-    // SAVE WHEN ENTER FRO PRIORITY DROPDOWN ONLY
-    // event listener on keypress for classes with .input-data which calls the function "e"
+    // SAVE WHEN ENTER (PRIORITY FORM)
     $(document).on("keypress",".input-data-priority",function(e){
         // retrieves the keycode of the entered key
         // if "enter"
         if(e.key === 'Enter'){
             // get the value of the newly keyed input
             var value=$(this).val();
-            if (value !== "on") {
-                // get the value of the parent
-                var td=$(this).parent("td");
-                // remove the input entry keyed
-                $(this).remove();
-                // set the newly entered value and class to the td component
-                td.html(value);
-                td.addClass("priority");
-                // get the data type of td
-                var type=td.data("type");
-                // send the pk + value + data type to server
-                sendToServer(td.data("id"),value,type);
+            var classToAdd = "priority";
+            var td=$(this).parent("td");
+            exitForm(classToAdd,value,td)
         }
         
+    });
         
-    
-    }});
+    // SAVE WHEN ENTER (CONTEXT FORM)
+    $(document).on("keypress",".input-data-priority",function(e){
+        // retrieves the keycode of the entered key
+        // if "enter"
+        if(e.key === 'Enter'){
+            // get the value of the newly keyed input
+            var value=$(this).val();
+            var classToAdd = "context";
+            var td=$(this).parent("td");
+            exitForm(classToAdd,value,td)
+        }
+        
+    });
+
+    // SAVE WHEN ENTER (ASSIGNEE FORM)
+    $(document).on("keypress",".input-data-assignee",function(e){
+        // retrieves the keycode of the entered key
+        // if "enter"
+        if(e.key === 'Enter'){
+            // get the value of the newly keyed input
+            var value=$(this).val();
+            var classToAdd = "assignee";
+            var td=$(this).parent("td");
+            exitForm(classToAdd,value,td)
+        }
+        
+    });
 
     // SAVE WHEN CHECKBOX STATE CHANGE
     // Add an event listener for checkbox state changes
@@ -193,6 +200,7 @@ $(document).ready(function() {
         sendToServer(td.data("id"), value, type);
     });
 
+    // ////////////////////////////////////////////// OTHER EVENTS //////////////////////////////////////////////////////
     // SORTING ONCE CLICKED ON TABLE HEADER
     // event listener on click for classes with table header
     $('.tbl-hdr').on('click', function() {
@@ -229,6 +237,8 @@ $(document).ready(function() {
         filterTableByCompletion(selectedValue);
     });
 
+
+    // ////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////////
     // Function to filter the table
     function filterTableByCompletion(selectedValue) {
         // Show all rows initially
@@ -262,5 +272,40 @@ $(document).ready(function() {
         });
 
     }
+
+    function exitForm(classToAdd,value,td) {
+        if (value !== "on") {
+            // get the value of the parent
+            // remove the input entry keyed
+            $(this).remove();
+            // set the newly entered value and class to the td component
+            td.html(value);
+            td.addClass(classToAdd);
+            // get the data type of td
+            var type=td.data("type");
+            // send the pk + value + data type to server
+            sendToServer(td.data("id"),value,type);
+        }
+    }
+
+    function createDropdown(taskId, options, dropdownClass, dropdownId) {
+        var selectHtml = '<select id="' + dropdownId + taskId + '" class="' + dropdownClass + ' custom-select">';
+        for (var i = 0; i < options.length; i++) {
+            selectHtml += '<option value="' + options[i] + '">' + options[i] + '</option>';
+        }
+        selectHtml += '</select>';
+        return selectHtml;
+    }
+
+    function parseAndFormatDate(selectedDate) {
+        // Parse the selected date using JavaScript Date object
+        const date = new Date(selectedDate);
+        // Format the date as "d Mmm" (e.g., "1 Jan")
+        const day = date.getDate();
+        const month = date.toLocaleString("default", { month: "short" });
+        return `${day}-${month}`;
+    }
+
+
 });
 

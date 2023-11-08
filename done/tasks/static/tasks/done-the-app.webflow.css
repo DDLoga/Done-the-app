@@ -155,7 +155,7 @@ body {
 }
 
 .body {
-  background-color: rgba(255, 255, 255, 0);
+  background-color: #2f324e;
   background-image: linear-gradient(236deg, #0d0260, #000 62%);
   flex-direction: column;
   justify-content: flex-start;
