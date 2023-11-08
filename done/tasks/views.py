@@ -165,3 +165,25 @@ def save_tasks(request):
 
     task.save()
     return JsonResponse({"success":"Updated"})
+
+@csrf_exempt
+def save_projects(request):
+    id=request.POST.get('id','')
+    type=request.POST.get('type','')
+    value=request.POST.get('value','')
+    project=Projects.objects.get(id=id)
+        
+    if type=="complete":
+        project.project_complete=value
+
+    if type == "priority":
+        project.project_priority = value
+
+    if type == "name":
+        project.project_name = value
+        
+    if type == "deadline":
+        project.project_deadline = value
+
+    project.save()
+    return JsonResponse({"success":"Updated"})

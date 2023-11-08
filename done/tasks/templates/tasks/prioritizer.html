@@ -15,7 +15,16 @@
               <div class="hdr-2">Priorizer</div>
             </div>
           </div>
-          <div class="nto-inpt-slct-div horizontal single-line"><label data-w-id="89f1164f-914e-c1bf-ad36-09a1e20dd40a" class="radio-btn-field w-radio"><input type="radio" id="project-2" name="input-type" value="project" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input"><span class="menu-txt w-form-label" for="project-2">Projects</span></label><label data-w-id="89f1164f-914e-c1bf-ad36-09a1e20dd40e" class="radio-btn-field w-radio"><input type="radio" id="not-actionable" name="input-type" value="not actionable" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input"><span class="radio-button-label w-form-label" for="not-actionable">Tasks</span></label></div>
+          <div class="nto-inpt-slct-div horizontal single-line">
+            <label data-w-id="89f1164f-914e-c1bf-ad36-09a1e20dd40a" class="project-radio radio-btn-field w-radio">
+              <input type="radio" id="project-radio" name="input-type" value="project" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input">
+              <span class="menu-txt w-form-label" for="project-2">Projects</span>
+            </label>
+            <label data-w-id="89f1164f-914e-c1bf-ad36-09a1e20dd40e" class="task-radio radio-btn-field w-radio">
+              <input type="radio" id="not-actionable" name="input-type" value="not actionable" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input">
+              <span class="radio-button-label w-form-label" for="not-actionable">Tasks</span>
+            </label>
+          </div>
         </div>
       </form>
       <div class="w-form-done">
@@ -76,79 +85,28 @@
       <table class="task-table_component">
         <thead class="task-table_head">
           <tr class="task-table_row">
-            <th class="tbl-hdr" data-sort=">Completion</th>
-            <th class="tbl-hdr" data-sort=">Priority</th>
-            <th class="tbl-hdr" data-sort=">Name</th>
-            <th class="tbl-hdr" data-sort=">Effort</th>
-            <th class="tbl-hdr" data-sort=">Context</th>
-            <th class="tbl-hdr" data-sort=">Deadline</th>
-            <th class="tbl-hdr" data-sort=">Assignee</th>
+            <th class="tbl-hdr" data-sort="completion">Completion</th>
+            <th class="tbl-hdr" data-sort="priority">Priority</th>
+            <th class="tbl-hdr" data-sort="name">Name</th>
+            <th class="tbl-hdr" data-sort="deadline">Deadline</th>
           </tr>
         </thead>
         <tbody class="task-table_body">
-          <tr class="task-table_row">
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
+
+          {% for project in projects %}
+          <tr class="rendered-row">
+              <td class="tbl-cell centered" data-id="{{ project.id }}" data-type="complete">
+                {% if project.project_complete %}
+                  <input type="checkbox" class="input-data form-control completion-checkbox" checked>
+                {% else %}
+                  <input type="checkbox" class="input-data form-control completion-checkbox">
+                {% endif %}
+              </td>
+              <td class="priority tbl-cell centered" data-id="{{ project.id }}" data-type="priority">{{ project.project_priority }}</td>
+              <td class="editable tbl-cell" data-id="{{ project.id }}" data-type="name">{{ project.project_name }}</td>
+              <td class="editable tbl-cell centered" data-id="{{ project.id }}" data-type="deadline">{{ project.project_deadline|date:"j M" }}</td>
           </tr>
-          <tr class="task-table_row">
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-          </tr>
-          <tr class="task-table_row">
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-          </tr>
-          <tr class="task-table_row">
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-          </tr>
-          <tr class="task-table_row">
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-          </tr>
-          <tr class="task-table_row">
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-          </tr>
-          <tr class="task-table_row">
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-            <td class="tbl-cell centered">Cell</td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -163,7 +121,8 @@
   {% block custom_js %}
   {% comment %} control table behaviour {% endcomment %}
   <script> 
-    var serverUrl = "{% url 'save_tasks' %}";
+    var taskServerUrl = "{% url 'save_tasks' %}";
+    var projectServerUrl = "{% url 'save_projects' %}";
     var contextUrl = "{% url 'prioritizer' %}";
     var contextOptions = {{ context_options_list|safe }};
     var assigneeOptions = {{ assignee_options_list|safe}}

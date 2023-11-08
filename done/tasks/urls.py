@@ -11,5 +11,5 @@ urlpatterns = [
     path('search/results/', views.project_filter_results_view, name='project_filter_results_view'),
     path('prioritizer/', views.Prioritizer, name="prioritizer"),
     path('save_tasks/', views.save_tasks, name='save_tasks'),
-    
+    path('save_projects/', views.save_projects, name='save_projects')
 ]

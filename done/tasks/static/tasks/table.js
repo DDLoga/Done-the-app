@@ -1,6 +1,6 @@
-
 // once the document is fully loaded
 $(document).ready(function() {
+    
 
     // DOUBLE CLICK TO EDIT
     // on double click event listener for all .editable class
@@ -237,7 +237,6 @@ $(document).ready(function() {
         filterTableByCompletion(selectedValue);
     });
 
-
     // ////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////////
     // Function to filter the table
     function filterTableByCompletion(selectedValue) {
@@ -254,10 +253,24 @@ $(document).ready(function() {
         });
     }
 
-    function sendToServer(id,value,type){
+    function sendToServer(id,value,type,serverUrl){
+        var isChecked = $("#project-radio").is(":checked");
+        var serverUrl;
+    
+        if (isChecked) {
+            // Set serverUrl to a specific value when the radio button is checked
+            serverUrl = projectServerUrl;
+            console.log("serverUrl is set to: " + serverUrl);
+        } else {
+            // If the radio button is unchecked, you can clear or set it to another value
+            serverUrl = taskServerUrl;
+            console.log("serverUrl is set to: " + serverUrl);
+        }
+        
         console.log(id);
         console.log(value);
         console.log(type);
+        console.log('serverurl is: '+ serverUrl)
         $.ajax({
             // serverUrl is rendered on the html page
             url:serverUrl,
