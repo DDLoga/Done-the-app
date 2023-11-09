@@ -56,7 +56,7 @@ $(document).ready(function() {
         $(this).removeClass("priority");
     });
 
-// CREATE A CONTEXT DROP DOWN MENU ON CLICK
+    // CREATE A CONTEXT DROP DOWN MENU ON CLICK
     $(document).on("click", ".context", function() {
         var taskId = $(this).data("id");
         var options = contextOptions
@@ -228,20 +228,40 @@ $(document).ready(function() {
         // bindDoubleClickEditing();
     });
 
+    
     // TASK COMPLETE FILTER
     // Event listener for the filter drop-down change
-    $('#completion-filter').on('change', function() {
+    $('#task-completion-filter, #project-completion-filter').on('change', function() {
         // get the value defined on completion-filter id in selector from HTML file
         var selectedValue = $(this).val();
+        console.log("filter value on event: ", +selectedValue)
         // pass this value to the function
         filterTableByCompletion(selectedValue);
     });
 
+
+    // reset the completion filter on view change (task/project)
+    function handleRadioChange(radioId, selectId) {
+        $(radioId).on('change', function() {
+            if ($(this).is(':checked')) {
+                // Reset the value of the select element to "All"
+                $(selectId).val('');
+                var selectedValue = '';
+                filterTableByCompletion(selectedValue);
+            }
+        });
+    }
+    
+    handleRadioChange('#project-radio', '#project-completion-filter');
+    handleRadioChange('#task-radio', '#task-completion-filter');
+
+
     // ////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////////
     // Function to filter the table
     function filterTableByCompletion(selectedValue) {
-        // Show all rows initially
+        // Show all rows initially (tr class)
         $('.rendered-row').show();
+        console.log("filter value on function: ", +selectedValue)
         // for each table cell of the datatype complete and input checkbox
         $('.tbl-cell[data-type="complete"] input:checkbox').each(function() {
             // Get the value of the checkbox and convert to string
