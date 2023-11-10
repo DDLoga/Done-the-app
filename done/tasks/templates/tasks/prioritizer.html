@@ -82,7 +82,7 @@
       </table>
     </div>
     <div data-w-id="702bb6ac-73de-582a-b6b8-eae4ff24e7c1" class="tbl-frame">
-      <table class="task-table_component">
+      <table class="project-table_component">
         <thead class="task-table_head">
           <tr class="task-table_row">
             <th class="tbl-hdr" data-sort="completion">
@@ -136,11 +136,14 @@
     var assigneeOptions = {{ assignee_options_list|safe}}
   </script>
   <script src="{% static 'tasks/table.js' %}" id="url"></script>
+  <script src="{% static 'tasks/colResizable-1.6.min.js' %}" id="url"></script>
+  
   {% endblock custom_js %}
-
   
   {% comment %} required to send to server {% endcomment %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.rawgit.com/alvaro-prieto/colResizable/master/colResizable-1.6.min.js"></script>
+  
 
 
 

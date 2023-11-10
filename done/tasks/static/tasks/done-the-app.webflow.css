@@ -715,6 +715,10 @@ body {
   width: 100%;
 }
 
+.project-table_component {
+  width: 100%;
+}
+
 .hint-block {
   padding-top: 187px;
   padding-bottom: 187px;

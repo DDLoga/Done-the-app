@@ -1,6 +1,20 @@
 // once the document is fully loaded
 $(document).ready(function() {
-    
+
+
+    // Apply colResizable to both tables
+    $('.task-table_component, .project-table_component').each(function() {
+        // Return the class name of (this) in console
+        console.log('class triggered is: ' + this.className);
+        $(this).colResizable({
+            liveDrag: true,
+            resizeMode: 'fit',
+            draggingClass: "dragging",
+            gripInnerHtml: "<div class='grip'></div>",
+            minWidth: 15
+        });
+    });
+
 
     // DOUBLE CLICK TO EDIT
     // on double click event listener for all .editable class
