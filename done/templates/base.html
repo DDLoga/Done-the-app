@@ -5,8 +5,7 @@
 <head>
   <meta charset="utf-8">
   <title>{% block title %}{% endblock title %}</title>
-  <!-- <meta content="new task organizer wizard" property="og:title">
-  <meta content="new task organizer wizard" property="twitter:title"> -->
+
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <meta content="Webflow" name="generator">
   <link rel="stylesheet" href="{% static 'tasks/normalize.css' %}" />
@@ -22,11 +21,100 @@
   <link href="{% static 'tasks/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
   <link href="{% static 'tasks/webclip.png' %}" rel="apple-touch-icon">
 </head>
-  <body class="body">
+<body class="body">
+  <div class="full-frame">
+    <div class="side-menu-div">
+      <div class="nav-hdr">
+        <div class="text">DONE</div>
+      </div>
+      <div class="all-tabs">
+        <div class="tab-div">
+          <a href="{% url 'index' %}" class="tab-div-round">
+            <div class="icon-bg">
+              <img src="{% static 'tasks/Vectors-Wrapper.svg' %}" loading="lazy" width="21" height="20" alt="" class="new-tsk-icon">
+            </div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">Quick task entry</div>
+            </div>
+          </a>
+        </div>
+        <div class="tab-div">
+          <div class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_1.svg' %}" loading="lazy" width="17.691770553588867" height="21" alt="" class="add-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">Next Task Capture</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-div">
+          <a href="{% url 'NewTaskOrganizerWelcome' %}" class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_2.svg' %}" loading="lazy" width="18" height="18.000696182250977" alt="" class="nto-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">New Task Organizer</div>
+            </div>
+          </a>
+        </div>
+        <div class="tab-div">
+          <a href="{% url 'prioritizer' %}" class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">Prioritizer</div>
+            </div>
+          </a>
+        </div>
+        <div class="tab-div">
+          <div class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">next tab comming soon</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-div">
+          <div class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">next tab comming soon</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-div">
+          <div class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">next tab comming soon</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-div">
+          <div class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">next tab comming soon</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-div">
+          <div class="tab-div-round">
+            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+            <div class="side-nemu-txt-div">
+              <div class="side-menu-text">next tab comming soon</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="slider-btn">
+        <div class="slider-icon">&lt;</div>
+      </footer>
+    </div>
+  <div class="content-div-5">
     {% block content %}
     {% endblock content %}
+  </div>
+  </div>
     <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=652482ea837db348b1939c93" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="{% static 'tasks/webflow.js' %}" id="url"></script>
+    <script src="{% static 'tasks/side-menu.js' %}" id="url"></script>
     {% block custom_js %}{% endblock custom_js %}
   </body>
 </html>

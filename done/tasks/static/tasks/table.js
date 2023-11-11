@@ -270,6 +270,7 @@ $(document).ready(function() {
     handleRadioChange('#task-radio', '#task-completion-filter');
 
 
+
     // ////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////////
     // Function to filter the table
     function filterTableByCompletion(selectedValue) {
