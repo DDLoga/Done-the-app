@@ -6,7 +6,10 @@ from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganiz
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-def index(request):
+def home(request):
+    return render(request, 'tasks/index.html')
+
+def QuickTaskEntryView(request):
     quick_task_entry = QuickTaskEntry()
 
     if request.POST:
@@ -24,7 +27,7 @@ def index(request):
                     print("there is a problem the form is not valid")
             quick_task_entry = QuickTaskEntry()                     #reset the form
 
-    return render(request, 'tasks/index.html', {'quick_task_entry': quick_task_entry})
+    return render(request, 'tasks/quick-task-entry.html', {'quick_task_entry': quick_task_entry})
 
 def NewTaskOrganizerWelcome(request):
 

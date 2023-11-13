@@ -61,3 +61,4 @@ class Tasks(models.Model):
     assignee = models.ForeignKey(Assignee, on_delete=models.CASCADE, null=True, blank=True)
     parent = models.ForeignKey(Projects, on_delete=models.CASCADE, null=True, blank=True)
     new_task = models.BooleanField(default=True)
+    compound_priority = models.IntegerField(null=True, blank=True)
