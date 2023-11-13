@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Tasks, Projects
+from django.views import View
+from tasks.models import Projects, Tasks
 from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganizerProjectForm, Context, Assignee
+from .manager import project_priority_dict, task_priority_dict
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -60,7 +62,6 @@ def NewTaskOrganizerWelcome(request):
     }) 
 
 def NewTaskOrganizerSubmitTask(request):
-    task_count=1                                                    # initialize counter
     form = NewTaskOrganizerTaskForm()                               # initialize variable ???
     object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
     obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
@@ -69,7 +70,8 @@ def NewTaskOrganizerSubmitTask(request):
         form = NewTaskOrganizerTaskForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()                                             # This saves the data to the database
-            task_count = task_count + 1
+
+
 
     return render(request, 'tasks/new-task-o-wizard.html')
 
@@ -145,7 +147,10 @@ def save_tasks(request):
         task.complete=value
 
     if type == "priority":
-        task.priority = value
+        task.priority = value                  # set the priority value in the task instance
+        parent_priority = task.parent.project_priority      # get the parent priority value
+        calculated_compound_priority = project_priority_dict(parent_priority) * task_priority_dict(task.priority) * 100/3
+        task.compound_priority = calculated_compound_priority
 
     if type == "name":
         task.name = value
@@ -181,6 +186,14 @@ def save_projects(request):
 
     if type == "priority":
         project.project_priority = value
+        # get the list of tasks related to the project
+        tasks = Tasks.objects.filter(parent=project)
+        # update the priority of each task
+        for task in tasks:
+            # get the task priority value
+            calculated_compound_priority = project_priority_dict(value) * task_priority_dict(task.priority) * 100/3
+            task.compound_priority = calculated_compound_priority
+            task.save()
 
     if type == "name":
         project.project_name = value
@@ -190,3 +203,11 @@ def save_projects(request):
 
     project.save()
     return JsonResponse({"success":"Updated"})
+
+# return the priority value of a task upon change (works with JS file)
+class CompoundPriorityView(View):
+    def get(self, request, *args, **kwargs):
+        task_id = request.GET.get('task_id')
+        task = Tasks.objects.get(id=task_id)
+        compound_priority = task.compound_priority  # replace this with the actual field name
+        return JsonResponse({'compound_priority': compound_priority})

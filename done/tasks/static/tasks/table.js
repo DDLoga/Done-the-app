@@ -1,6 +1,19 @@
 // once the document is fully loaded
 $(document).ready(function() {
 
+    // document.querySelectorAll('.priority').forEach(function(element) {
+    //     element.addEventListener('change', function() {
+    //     console.log('task priority event triggered');
+    //     var task_id = this.dataset.id;  // replace this with the correct way to get the task ID
+    //     console.log('task id is: ' + task_id);
+    //     fetch(`/compound_priority/?task_id=${task_id}`)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             var compoundPriority = data.compound_priority;
+    //             console.log('compound priority is: ' + compoundPriority);
+    //             document.getElementById('compound-priority').textContent = compoundPriority;
+    //         });
+    // })});
 
     // Apply colResizable to both tables
     $('.task-table_component, .project-table_component').each(function() {
@@ -117,7 +130,6 @@ $(document).ready(function() {
     // SAVE WHEN CLICKING SOMEWHERE ELSE (PRIORITY FORM)
     $(document).on("blur",".input-data-priority",function(){
         // get the value of the newly keyed input
-        console.log("event triggered")
         var value=$(this).val();
         // set the class to restore for further edit
         var classToAdd = ("priority");
@@ -289,37 +301,49 @@ $(document).ready(function() {
     }
 
     function sendToServer(id,value,type,serverUrl){
+        console.log('type: ', type)
         var isChecked = $("#project-radio").is(":checked");
         var serverUrl;
     
         if (isChecked) {
             // Set serverUrl to a specific value when the radio button is checked
             serverUrl = projectServerUrl;
-            console.log("serverUrl is set to: " + serverUrl);
         } else {
             // If the radio button is unchecked, you can clear or set it to another value
             serverUrl = taskServerUrl;
-            console.log("serverUrl is set to: " + serverUrl);
         }
         
-        console.log(id);
-        console.log(value);
-        console.log(type);
-        console.log('serverurl is: '+ serverUrl)
         $.ajax({
             // serverUrl is rendered on the html page
             url:serverUrl,
             type:"POST",
             data:{id:id,type:type,value:value},
         })
+
         .done(function(response){
             console.log(response);
         })
+
         .fail(function(){
             console.log("Error Occurred");
         });
 
-    }
+
+        // start to fix here
+        if (type === 'priority') {
+            console.log('task priority event triggered');
+            var task_id = this.dataset.id;  // replace this with the correct way to get the task ID
+            console.log('task id is: ' + task_id);
+            fetch(`/compound_priority/?task_id=${task_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    var compoundPriority = data.compound_priority;
+                    console.log('compound priority is: ' + compoundPriority);
+                    document.getElementById('compound-priority').textContent = compoundPriority;
+                });
+            };
+    };
+    
 
     function exitForm(classToAdd,value,td) {
         if (value !== "on") {
