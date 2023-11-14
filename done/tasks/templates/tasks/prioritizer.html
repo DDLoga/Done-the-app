@@ -135,6 +135,8 @@
   <script> 
     var taskServerUrl = "{% url 'save_tasks' %}";
     var projectServerUrl = "{% url 'save_projects' %}";
+    var compound_priority_url = "{% url 'compound_priority' %}";
+    var api_tasks_url = "{% url 'api_tasks' %}";
     var contextUrl = "{% url 'prioritizer' %}";
     var contextOptions = {{ context_options_list|safe }};
     var assigneeOptions = {{ assignee_options_list|safe}}

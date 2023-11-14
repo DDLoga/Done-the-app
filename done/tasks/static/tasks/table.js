@@ -334,7 +334,7 @@ $(document).ready(function() {
             if (type === 'priority' && !isChecked) {
                 var task_id = id;
                 // call a view that pull the compound priority from the database and update the task
-                fetch(`/compound_priority/?task_id=${task_id}`)
+                fetch(compound_priority_url+`?task_id=${task_id}`)
                     .then(response => response.json())
                     .then(data => {
                         var compoundPriority = data.compound_priority;
@@ -343,7 +343,8 @@ $(document).ready(function() {
                     
             } else if (type === 'priority' && isChecked) {
                 // call a view that pull the completion percentage from the database and update all tasks
-                fetch('/api/tasks/') 
+                // fetch('/api/tasks/')
+                fetch(api_tasks_url) 
                     .then(response => response.json())
                     .then(tasks => {
                         tasks.forEach(task => {
