@@ -4,9 +4,10 @@ from django.views import View
 from tasks.models import Projects, Tasks
 from tasks.forms import QuickTaskEntry, NewTaskOrganizerTaskForm, NewTaskOrganizerProjectForm, Context, Assignee
 from .manager import project_priority_dict, task_priority_dict
-
+from django.core import serializers
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 def home(request):
     return render(request, 'tasks/index.html')
@@ -204,6 +205,15 @@ def save_projects(request):
     project.save()
     return JsonResponse({"success":"Updated"})
 
+
+
+def api_tasks_compound_priorities(request):
+    tasks = Tasks.objects.all()
+    tasks_serialized = serializers.serialize('json', tasks)
+    tasks_list = json.loads(tasks_serialized)
+    return JsonResponse(tasks_list, safe=False)
+
+
 # return the priority value of a task upon change (works with JS file)
 class CompoundPriorityView(View):
     def get(self, request, *args, **kwargs):
@@ -211,3 +221,4 @@ class CompoundPriorityView(View):
         task = Tasks.objects.get(id=task_id)
         compound_priority = task.compound_priority
         return JsonResponse({'compound_priority': compound_priority})
+    

@@ -1,35 +1,44 @@
 // once the document is fully loaded
 $(document).ready(function() {
 
-    // document.querySelectorAll('.priority').forEach(function(element) {
-    //     element.addEventListener('change', function() {
-    //     console.log('task priority event triggered');
-    //     var task_id = this.dataset.id;  // replace this with the correct way to get the task ID
-    //     console.log('task id is: ' + task_id);
-    //     fetch(`/compound_priority/?task_id=${task_id}`)
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             var compoundPriority = data.compound_priority;
-    //             console.log('compound priority is: ' + compoundPriority);
-    //             document.getElementById('compound-priority').textContent = compoundPriority;
-    //         });
-    // })});
 
-    // Apply colResizable to both tables
-    $('.task-table_component, .project-table_component').each(function() {
-        // Return the class name of (this) in console
-        console.log('class triggered is: ' + this.className);
-        $(this).colResizable({
+    // MANAGE THE SHOW/HIDE OF THE HINT, PROJECT AND TASK TABLES AND APPLY COLRESIZABLE //////////////////////////////////////
+    // Hide both divs on page load
+    $('#task-table-div').hide();
+    $('#project-table-div').hide();
+
+
+    const hideDivs = () => {
+        $('#hint-div').hide();
+        $('#task-table-div').hide();
+        $('#project-table-div').hide();
+    };
+
+    const applyColResizable = (selector) => {
+        $(selector).colResizable({
             liveDrag: true,
             resizeMode: 'fit',
             draggingClass: "dragging",
             gripInnerHtml: "<div class='grip'></div>",
             minWidth: 15
         });
+    };
+
+    // Add event listener for change event on the radio buttons
+    $('input[type=radio][name=input-type]').change(function() {
+        hideDivs();
+        if (this.id == 'project-radio') {
+            $('#project-table-div').show();
+            applyColResizable('.project-table_component');
+        }
+        else if (this.id == 'task-radio') {
+            $('#task-table-div').show();
+            applyColResizable('.task-table_component');
+        }
     });
 
 
-    // DOUBLE CLICK TO EDIT
+    ///////////////////////////////////////////// DOUBLE CLICK TO EDIT //////////////////////////////////////////////////////
     // on double click event listener for all .editable class
     $(document).on("dblclick", ".editable", function() {
         // get the data type of the element double clicked on
@@ -321,32 +330,51 @@ $(document).ready(function() {
         })
 
         .done(function(response){
-            console.log(response);
-
             // update the compound priority dynamically on the page
             if (type === 'priority' && !isChecked) {
                 var task_id = id;
-                // call a view that pull the compound priority from the database
+                // call a view that pull the compound priority from the database and update the task
                 fetch(`/compound_priority/?task_id=${task_id}`)
                     .then(response => response.json())
                     .then(data => {
                         var compoundPriority = data.compound_priority;
                         document.getElementById('compound-priority-'+id).textContent = compoundPriority;
                     });
-                };
-
-
-        })
+                    
+            } else if (type === 'priority' && isChecked) {
+                // call a view that pull the completion percentage from the database and update all tasks
+                fetch('/api/tasks/') 
+                    .then(response => response.json())
+                    .then(tasks => {
+                        tasks.forEach(task => {
+                            var tdElement = document.getElementById('compound-priority-' + task.pk);
+                            if (tdElement) {
+                                tdElement.textContent = task.fields.compound_priority;
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }})
 
         .fail(function(){
             console.log("Error Occurred");
         });
+    }
 
-
-        // start to fix here
-
-    };
-    
+    function exitForm(classToAdd,value,td) {
+                if (value !== "on") {
+                    // get the value of the parent
+                    // remove the input entry keyed
+                    $(this).remove();
+                    // set the newly entered value and class to the td component
+                    td.html(value);
+                    td.addClass(classToAdd);
+                    // get the data type of td
+                    var type=td.data("type");
+                    // send the pk + value + data type to server
+                    sendToServer(td.data("id"),value,type);
+                }
+    }
 
     function exitForm(classToAdd,value,td) {
         if (value !== "on") {
