@@ -209,5 +209,5 @@ class CompoundPriorityView(View):
     def get(self, request, *args, **kwargs):
         task_id = request.GET.get('task_id')
         task = Tasks.objects.get(id=task_id)
-        compound_priority = task.compound_priority  # replace this with the actual field name
+        compound_priority = task.compound_priority
         return JsonResponse({'compound_priority': compound_priority})

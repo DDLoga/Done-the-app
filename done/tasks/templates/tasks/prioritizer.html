@@ -69,7 +69,7 @@
                   <input type="checkbox" class="input-data form-control completion-checkbox">
                 {% endif %}
               </td>
-              <td class="tbl-cell centered" data-id="{{ task.id }}" data-type="compound">{{ task.compound_priority }}</td>
+              <td class="tbl-cell centered task-priority" id="compound-priority-{{ task.id }}" data-type="compound">{{ task.compound_priority }}</td>
               {% comment %} <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td> {% endcomment %}
               <td class="priority tbl-cell centered" id="task-priority" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
               <td class="editable tbl-cell" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>

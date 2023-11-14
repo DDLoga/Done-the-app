@@ -322,6 +322,20 @@ $(document).ready(function() {
 
         .done(function(response){
             console.log(response);
+
+            // update the compound priority dynamically on the page
+            if (type === 'priority' && !isChecked) {
+                var task_id = id;
+                // call a view that pull the compound priority from the database
+                fetch(`/compound_priority/?task_id=${task_id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        var compoundPriority = data.compound_priority;
+                        document.getElementById('compound-priority-'+id).textContent = compoundPriority;
+                    });
+                };
+
+
         })
 
         .fail(function(){
@@ -330,18 +344,7 @@ $(document).ready(function() {
 
 
         // start to fix here
-        if (type === 'priority') {
-            console.log('task priority event triggered');
-            var task_id = this.dataset.id;  // replace this with the correct way to get the task ID
-            console.log('task id is: ' + task_id);
-            fetch(`/compound_priority/?task_id=${task_id}`)
-                .then(response => response.json())
-                .then(data => {
-                    var compoundPriority = data.compound_priority;
-                    console.log('compound priority is: ' + compoundPriority);
-                    document.getElementById('compound-priority').textContent = compoundPriority;
-                });
-            };
+
     };
     
 
