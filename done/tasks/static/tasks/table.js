@@ -6,6 +6,7 @@ $(document).ready(function() {
     // Hide both divs on page load
     $('#task-table-div').hide();
     $('#project-table-div').hide();
+    $('#delete-btn').hide();
 
 
     const hideDivs = () => {
@@ -27,6 +28,7 @@ $(document).ready(function() {
     // Add event listener for change event on the radio buttons
     $('input[type=radio][name=input-type]').change(function() {
         hideDivs();
+        $('#delete-btn').show();
         if (this.id == 'project-radio') {
             $('#project-table-div').show();
             applyColResizable('.project-table_component');
@@ -293,22 +295,39 @@ $(document).ready(function() {
     // HANDLE THE TASK/PROJECT DELETE BUTTON
     $('button[name="action"]').click(function(event) {
         event.preventDefault();
+        var isChecked = $("#project-radio").is(":checked");
+        var serverUrl;
     
-        var checkedItems = $('#task-table-div .completion-checkbox:checked').map(function() {
+        if (isChecked) {
+            console.log("project radio checked")
+            // Set serverUrl to a specific value when the radio button is checked
+            serverUrl = delete_completed_projects;
+            table_id = '#project-table-div';
+            completed_items = '#project-table-div';
+        } else {
+            console.log("task radio checked")
+            // If the radio button is unchecked, you can clear or set it to another value
+            serverUrl = delete_completed_tasks;
+            table_id = '#task-table-div';
+            completed_items = '#task-table-div';
+        }
+
+        var checkedItems = $(table_id + ' .completion-checkbox:checked').map(function() {
             return $(this).data('id');
             // return $(this).val();
         }).get();
-        console.log(checkedItems);
+        console.log('searching for: ', (table_id + ' .completion-checkbox:checked'))
+        console.log("checked items: ", checkedItems);
 
         $.ajax({
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            url: '/delete-completed-tasks/',  // Replace with your Django view URL
+            url: serverUrl,  // Replace with your Django view URL
             type: 'POST',
             data: {
                 'checked_items': checkedItems,
             },
             success: function() {
-                $('#task-table-div .completion-checkbox:checked').closest('tr').hide();
+                $(completed_items + ' .completion-checkbox:checked').closest('tr').hide();
             }
         });
     });

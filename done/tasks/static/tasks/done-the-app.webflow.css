@@ -434,7 +434,7 @@ body {
 }
 
 .submit-btn {
-  width: 160px;
+  width: auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   background-color: #06f;
@@ -671,7 +671,7 @@ body {
 }
 
 .frame-427318912 {
-  width: 160px;
+  width: auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   background-color: #06f;

@@ -109,9 +109,9 @@
           <tr class="rendered-row">
               <td class="tbl-cell centered" data-id="{{ project.id }}" data-type="complete">
                 {% if project.project_complete %}
-                  <input type="checkbox" class="input-data form-control completion-checkbox" checked>
+                  <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox" checked>
                 {% else %}
-                  <input type="checkbox" class="input-data form-control completion-checkbox">
+                  <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox">
                 {% endif %}
               </td>
               <td class="priority tbl-cell centered" data-id="{{ project.id }}" data-type="priority">{{ project.project_priority }}</td>
@@ -123,7 +123,7 @@
       </table>
     </div>
 
-    <div class="frame-427318914">
+    <div class="frame-427318914" id="delete-btn">
       <div class="frame-427318912">
         <button type="submit" name="action" value="pocess" class="submit-btn w-button">Delete completed items</button>
       </div>
@@ -140,6 +140,8 @@
     var compound_priority_url = "{% url 'compound_priority' %}";
     var api_tasks_url = "{% url 'api_tasks' %}";
     var contextUrl = "{% url 'prioritizer' %}";
+    var delete_completed_tasks = "{% url 'delete_completed_tasks' %}";
+    var delete_completed_projects = "{% url 'delete_completed_projects' %}";
     var contextOptions = {{ context_options_list|safe }};
     var assigneeOptions = {{ assignee_options_list|safe}}
   </script>
