@@ -15,4 +15,6 @@ urlpatterns = [
     path('save_projects/', views.save_projects, name='save_projects'),
     path('compound_priority/', CompoundPriorityView.as_view(), name='compound_priority'),
     path('api/tasks/', views.api_tasks_compound_priorities, name='api_tasks'),
+    path('delete-completed-tasks/', views.delete_completed_tasks, name='delete_completed_tasks'),
+    path('delete-completed-projects/', views.delete_completed_projects, name='delete_completed_projects'),
 ]

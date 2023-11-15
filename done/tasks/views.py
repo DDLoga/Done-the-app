@@ -205,6 +205,24 @@ def save_projects(request):
     project.save()
     return JsonResponse({"success":"Updated"})
 
+# delete completed tasks
+@csrf_exempt
+def delete_completed_tasks(request):
+    checked_items = request.POST.getlist('checked_items[]')
+    print(request.POST)
+    print(checked_items)
+    Tasks.objects.filter(pk__in=checked_items).delete()
+    return JsonResponse({'status': 'success'})
+
+# delete completed projects
+@csrf_exempt
+def delete_completed_projects(request):
+    checked_items = request.POST.getlist('checked_items')
+    Projects.objects.filter(pk__in=checked_items).delete()
+    return JsonResponse({'status': 'success'})
+
+
+
 
 
 def api_tasks_compound_priorities(request):

@@ -290,8 +290,32 @@ $(document).ready(function() {
     handleRadioChange('#project-radio', '#project-completion-filter');
     handleRadioChange('#task-radio', '#task-completion-filter');
 
+    // HANDLE THE TASK/PROJECT DELETE BUTTON
+    $('button[name="action"]').click(function(event) {
+        event.preventDefault();
+    
+        var checkedItems = $('#task-table-div .completion-checkbox:checked').map(function() {
+            return $(this).data('id');
+            // return $(this).val();
+        }).get();
+        console.log(checkedItems);
+
+        $.ajax({
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            url: '/delete-completed-tasks/',  // Replace with your Django view URL
+            type: 'POST',
+            data: {
+                'checked_items': checkedItems,
+            },
+            success: function() {
+                $('#task-table-div .completion-checkbox:checked').closest('tr').hide();
+            }
+        });
+    });
 
 
+
+    
     // ////////////////////////////////////////////// FUNCTIONS //////////////////////////////////////////////////////
     // Function to filter the table
     function filterTableByCompletion(selectedValue) {
