@@ -74,6 +74,13 @@ def NewTaskOrganizerSubmitTask(request):
         form = NewTaskOrganizerTaskForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()                                             # This saves the data to the database
+            # set the value of compound priority
+            task = Tasks.objects.get(pk=object_id)
+            # parent_priority = task.parent.project_priority
+            calculated_compound_priority = task_priority_dict(task.priority) * 100/3
+            task.compound_priority = calculated_compound_priority
+            task.save()
+            
 
 
 
@@ -152,8 +159,12 @@ def save_tasks(request):
 
     if type == "priority":
         task.priority = value                  # set the priority value in the task instance
-        parent_priority = task.parent.project_priority      # get the parent priority value
-        calculated_compound_priority = project_priority_dict(parent_priority) * task_priority_dict(task.priority) * 100/3
+        # if parent_priority = task.parent.project_priority returns an error then replace project_priority_dict(parent_priority) with 1
+        if task.parent == None:
+            calculated_compound_priority = task_priority_dict(value) * 100/3
+        else:
+            parent_priority = task.parent.project_priority      # get the parent priority value
+            calculated_compound_priority = project_priority_dict(parent_priority) * task_priority_dict(task.priority) * 100/3
         task.compound_priority = calculated_compound_priority
 
     if type == "name":
