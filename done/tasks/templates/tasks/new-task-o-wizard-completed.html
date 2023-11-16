@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block data-wf %}data-wf-page="652b53b37568770d043d1279" data-wf-site="652482ea837db348b1939c93"{% endblock data-wf %}
+{% block title %}new task organizer wizard{% endblock title %}
+{% load widget_tweaks %}
+{% block content %}
+
+
+  <div class="main-section">
+    <!-- NEW TASK ORGANIZER HEADER -->
+    <div class="w-form">
+      <form id="wf-form-selector" name="wf-form-selector" data-name="selector" method="post" data-wf-page-id="652b53b37568770d043d1279" data-wf-element-id="4ba501e2-0b49-e4b5-74ba-597dd9c33121">
+        <div class="nto-header-div">
+          <div class="nto-hrd-div">
+            <div class="nto-hdr">
+              <div class="done-logo-small">DONE</div>
+              <div class="hdr-2">New Task Organizer</div>
+            </div>
+            <div class="nto-prj-slctr-div">
+
+            </div>
+          </div>
+          {% comment %} <div class="nto-inpt-slct-div">
+            <div class="menu-hdr-div">
+              <label for="" class="menu-hdr-grey">What is it?</label>
+            </div>
+            <label data-w-id="c5e5cd09-74e5-ca46-3c8a-03692abc5541" class="radio-btn-field w-radio">
+              <input type="radio" id="task" name="input-type" value="task" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input">
+              <span class="menu-txt w-form-label" for="task">A Task</span>
+            </label>
+            <label data-w-id="c5e5cd09-74e5-ca46-3c8a-03692abc5545" class="radio-btn-field w-radio">
+              <input type="radio" id="project-2" name="input-type" value="project" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input">
+              <span class="menu-txt w-form-label" for="project-2">A Project</span>
+            </label>
+            <label data-w-id="c5e5cd09-74e5-ca46-3c8a-03692abc5549" class="radio-btn-field w-radio">
+              <input type="radio" id="not-actionable" name="input-type" value="not actionable" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input">
+              <span class="radio-button-label w-form-label" for="not-actionable">Non Actionable</span>
+            </label>
+          </div> {% endcomment %}
+        </div>
+      </form>
+      <div class="w-form-done">
+        <div>Thank you! Your submission has been received!</div>
+      </div>
+      <div class="w-form-fail">
+        <div>Oops! Something went wrong while submitting the form.</div>
+      </div>
+    </div>
+
+    <div class="quick_task_entry_form_block w-form">
+      <div class="quick_task_entry_form_success">
+        <div class="quick_task_entry_form_successtext">All new entries processed!<br>Go to Prioritizer to get clarity on what to start with.</div>
+      </div>
+    </div>
+
+  </div>
+
+  {% endblock content %}

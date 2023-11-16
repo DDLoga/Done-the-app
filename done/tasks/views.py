@@ -34,33 +34,36 @@ def QuickTaskEntryView(request):
 
 def NewTaskOrganizerWelcome(request):
 
-    task_qty = Tasks.objects.filter(new_task=1).count()             # count the total amount of new entries
-    new_task_name = Tasks.objects.filter(new_task=1)[0].name        # get the entry name to proceed
-    
-    initial_data_task = {'name': new_task_name}                     # autofill with entry name to proceed
-    projects = Projects.objects.all()                               # get the list of existing projects
-    initial_data_project = {'project_name': new_task_name}          # autofill with entry name to proceed
-    object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
-    obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
-    form = NewTaskOrganizerTaskForm(
-        initial=initial_data_task,
-        instance=obj)                                               # display task form with auto filled data
-    form_task = NewTaskOrganizerTaskForm()                          # used in default screen and non actionable screen
-    form_project = NewTaskOrganizerProjectForm(
-        initial=initial_data_project,
-        instance=obj)                                               # display project form with auto filled data
-    project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
-    
-    return render(request, 'tasks/new-task-o-wizard.html', {
-        'form': form,
-        'form_task': form_task,
-        'form_project': form_project,
-        'task_qty': task_qty,
-        'new_task_name': new_task_name,
-        'projects' : projects,
-        'count': project.count(),
-        'project': project,
-    }) 
+    try:
+        task_qty = Tasks.objects.filter(new_task=1).count()             # count the total amount of new entries
+        new_task_name = Tasks.objects.filter(new_task=1)[0].name        # get the entry name to proceed
+        
+        initial_data_task = {'name': new_task_name}                     # autofill with entry name to proceed
+        projects = Projects.objects.all()                               # get the list of existing projects
+        initial_data_project = {'project_name': new_task_name}          # autofill with entry name to proceed
+        object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
+        obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
+        form = NewTaskOrganizerTaskForm(
+            initial=initial_data_task,
+            instance=obj)                                               # display task form with auto filled data
+        form_task = NewTaskOrganizerTaskForm()                          # used in default screen and non actionable screen
+        form_project = NewTaskOrganizerProjectForm(
+            initial=initial_data_project,
+            instance=obj)                                               # display project form with auto filled data
+        project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
+        
+        return render(request, 'tasks/new-task-o-wizard.html', {
+            'form': form,
+            'form_task': form_task,
+            'form_project': form_project,
+            'task_qty': task_qty,
+            'new_task_name': new_task_name,
+            'projects' : projects,
+            'count': project.count(),
+            'project': project,
+        }) 
+    except IndexError:
+        return render(request, 'tasks/new-task-o-wizard-completed.html')
 
 def NewTaskOrganizerSubmitTask(request):
     form = NewTaskOrganizerTaskForm()                               # initialize variable ???
