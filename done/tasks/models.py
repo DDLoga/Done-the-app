@@ -1,12 +1,15 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 
 class Assignee(models.Model):
     name = models.CharField(max_length=20)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     
 
 class Context(models.Model):
     name = models.CharField(max_length=20)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.name
@@ -26,6 +29,7 @@ class Projects(models.Model):
         ("Ns", "Not Started"),
         ("Wa", "Wait for"),
     ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     project_priority = models.CharField(max_length=1, choices=PRIORITIES, null=True, blank=True)
     project_status = models.CharField(max_length=2, choices=STATUSES)
     project_complete = models.BooleanField(default=False)
@@ -51,6 +55,7 @@ class Tasks(models.Model):
         ("Ns", "Not Started"),
         ("Wa", "Wait for"),
     ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     priority = models.CharField(max_length=1, choices=PRIORITIES, null=True, blank=True)
     status = models.CharField(max_length=2, choices=STATUSES, default='Ns')
     complete = models.BooleanField(default=False)

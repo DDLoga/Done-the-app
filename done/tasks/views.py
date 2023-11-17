@@ -8,10 +8,14 @@ from django.core import serializers
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
 
 def home(request):
     return render(request, 'tasks/index.html')
 
+@login_required
 def QuickTaskEntryView(request):
     quick_task_entry = QuickTaskEntry()
 
@@ -32,6 +36,7 @@ def QuickTaskEntryView(request):
 
     return render(request, 'tasks/quick-task-entry.html', {'quick_task_entry': quick_task_entry})
 
+@login_required
 def NewTaskOrganizerWelcome(request):
 
     try:
@@ -65,6 +70,7 @@ def NewTaskOrganizerWelcome(request):
     except IndexError:
         return render(request, 'tasks/new-task-o-wizard-completed.html')
 
+@login_required
 def NewTaskOrganizerSubmitTask(request):
     form = NewTaskOrganizerTaskForm()                               # initialize variable ???
     object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
@@ -86,6 +92,7 @@ def NewTaskOrganizerSubmitTask(request):
 
     return render(request, 'tasks/new-task-o-wizard.html')
 
+@login_required
 def NewTaskOrganizerSubmitProject(request):
     form_project = NewTaskOrganizerProjectForm()
     form_task = NewTaskOrganizerTaskForm()
@@ -111,6 +118,7 @@ def NewTaskOrganizerSubmitProject(request):
     
     return render(request, 'tasks/new-task-o-wizard.html')
 
+@login_required
 def NewTaskOrganizerDelete(request):
     object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
     obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
@@ -119,6 +127,7 @@ def NewTaskOrganizerDelete(request):
         obj.delete()
     return render(request, 'tasks/new-task-o-wizard.html')
 
+@login_required
 def project_filter_results_view(request):
     query = request.GET.get('search', '')
     form = NewTaskOrganizerTaskForm()
@@ -130,6 +139,7 @@ def project_filter_results_view(request):
     context = {'project': project, 'count': project.count(), 'form':form}
     return render(request, 'tasks/project_filter_results.html', context)
 
+@login_required
 def Prioritizer(request):
     all_tasks=Tasks.objects.all()
     all_projects=Projects.objects.all()
@@ -146,7 +156,7 @@ def Prioritizer(request):
                 'context_options_list':context_options_list,
                 'assignee_options_list':assignee_options_list})
 
-# TESTS
+@login_required
 @csrf_exempt
 def save_tasks(request):
     id=request.POST.get('id','')
@@ -189,6 +199,7 @@ def save_tasks(request):
     task.save()
     return JsonResponse({"success":"Updated"})
 
+@login_required
 @csrf_exempt
 def save_projects(request):
     id=request.POST.get('id','')
@@ -220,6 +231,7 @@ def save_projects(request):
     return JsonResponse({"success":"Updated"})
 
 # delete completed tasks
+@login_required
 @csrf_exempt
 def delete_completed_tasks(request):
     checked_items = request.POST.getlist('checked_items[]')
@@ -227,6 +239,7 @@ def delete_completed_tasks(request):
     return JsonResponse({'status': 'success'})
 
 # delete completed projects
+@login_required
 @csrf_exempt
 def delete_completed_projects(request):
     checked_items = request.POST.getlist('checked_items[]')
@@ -236,7 +249,7 @@ def delete_completed_projects(request):
 
 
 
-
+@login_required
 def api_tasks_compound_priorities(request):
     tasks = Tasks.objects.all()
     tasks_serialized = serializers.serialize('json', tasks)
