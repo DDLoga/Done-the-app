@@ -94,20 +94,45 @@
             </div>
           </div>
         </div>
-        <div class="tab-div">
-          <div class="tab-div-round">
-            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
-            <div class="side-nemu-txt-div">
-              <div class="side-menu-text">
-                <a href="{% url 'socialaccount_connections' %}">Sign in with Google</a>
-              </div>
+
+      </div>
+
+      <div class="slider-btn">
+        <div class="slider-icon">&lt;</div>
+      </div>
+
+      <footer class="tab-div nav-hdr bottom">
+        <!-- display the username -->
+        {% if user.is_authenticated %}
+        <div class="tab-div-round">
+          <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+          <div class="side-nemu-txt-div">
+            <div class="side-menu-text">
+              Logged in as {{ user.username }}
             </div>
           </div>
         </div>
-      </div>
-      <footer class="slider-btn">
-        <div class="slider-icon">&lt;</div>
+        <div class="tab-div-round">
+          <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+          <div class="side-nemu-txt-div">
+            <div class="side-menu-text">
+              <a href="{% url 'socialaccount_connections' %}">Logout</a>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="tab-div-round">
+          <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+          <div class="side-nemu-txt-div">
+            <div class="side-menu-text">
+              <a href="{% url 'socialaccount_connections' %}">Login</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
       </footer>
+
     </div>
   <div class="content-div-5">
     {% block content %}

@@ -48,7 +48,11 @@
 
     <div class="quick_task_entry_form_block w-form">
       <div class="quick_task_entry_form_success">
-        <div class="quick_task_entry_form_successtext">All new entries processed!<br>Go to Prioritizer to get clarity on what to start with.</div>
+        <div class="quick_task_entry_form_successtext">No remaining new entries.
+          <br>Enter new imputs in the <a href="{% url 'QuickTaskEntry' %}">quick task entry tab</a>
+          <br>or
+          <br>go to the <a href="{% url 'prioritizer' %}"> Prioritizer</a> to get clarity what has been processed.
+        </div>
       </div>
     </div>
 

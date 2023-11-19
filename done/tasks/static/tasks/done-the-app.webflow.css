@@ -169,10 +169,11 @@ body {
 }
 
 .quick_task_entry_form_successtext {
-  color: #fff;
+  color: #d5d8df;
   font-size: 23px;
   font-weight: 300;
   line-height: 50px;
+  text-align: center;
 }
 
 .nto-hrd-div {
@@ -809,6 +810,12 @@ body {
   padding-left: 12px;
   display: flex;
 }
+
+.tab-div.bottom {
+  position: absolute;
+  bottom: 80px;
+}
+
 
 .icon-bg {
   width: 29px;

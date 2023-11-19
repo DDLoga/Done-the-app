@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Signup</title>
+    </head>
+    <body>
+        <h1>My custom   Sign Up</h1>
+
+        <p>
+            Already have an account? Then please <a href="{{ login_url }}">sign in</a>.
+        </p>
+
+        <form method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            <p>
+                <label for="id_username">Username:</label>
+                <input type="text" name="username" placeholder="Username" autocomplete="username" minlength="1" maxlength="150" required="" id="id_username">
+            </p>
+
+            <p>
+                <label for="id_email">Email (optional):</label>
+                <input type="email" name="email" placeholder="Email address" autocomplete="email" maxlength="320" id="id_email">
+            </p>
+
+            <p>
+                <label for="id_password1">Password:</label>
+                <input type="password" name="password1" placeholder="Password" autocomplete="new-password" required="" id="id_password1">
+                    <span class="helptext"></span>
+            </p>
+            
+            <ul>
+                <li>Your password can’t be too similar to your other personal information.</li>
+                <li>Your password must contain at least 8 characters.</li>
+                <li>Your password can’t be a commonly used password.</li>
+                <li>Your password can’t be entirely numeric.</li>
+            </ul>
+
+
+            <p>
+                <label for="id_password2">Password (again):</label>
+                <input type="password" name="password2" placeholder="Password (again)" autocomplete="new-password" required="" id="id_password2">
+            </p>
+
+            
+            <input type="hidden" name="next" value="/accounts/social/connections/">
+            <button type="submit">Sign Up</button>
+        </form>
+
+        <hr>
+
+        <h2>Or use a third-party</h2>
+        <ul>
+            <li>
+            <a title="Google" href="/accounts/google/login/?process=login&amp;next=%2Faccounts%2Fsocial%2Fconnections%2F">Google</a>
+            </li>
+        </ul>
+    </body>
+</html>

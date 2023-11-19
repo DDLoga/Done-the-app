@@ -29,6 +29,7 @@ def QuickTaskEntryView(request):
                 if t != "":                                         #skip empty entries
                     task_name = Tasks(name=t)                       #set the task description into name
                     print(task_name)
+                    task_name.user = request.user                   #set the user
                     task_name.save()
                 else:
                     print("there is a problem the form is not valid")
@@ -40,14 +41,14 @@ def QuickTaskEntryView(request):
 def NewTaskOrganizerWelcome(request):
 
     try:
-        task_qty = Tasks.objects.filter(new_task=1).count()             # count the total amount of new entries
-        new_task_name = Tasks.objects.filter(new_task=1)[0].name        # get the entry name to proceed
+        task_qty = Tasks.objects.filter(new_task=1, user=request.user).count()             # count the total amount of new entries
+        new_task_name = Tasks.objects.filter(new_task=1, user=request.user)[0].name        # get the entry name to proceed
         
         initial_data_task = {'name': new_task_name}                     # autofill with entry name to proceed
-        projects = Projects.objects.all()                               # get the list of existing projects
+        projects = Projects.objects.filter(user=request.user)                              # get the list of existing projects
         initial_data_project = {'project_name': new_task_name}          # autofill with entry name to proceed
-        object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
-        obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
+        object_id = Tasks.objects.filter(new_task=1, user=request.user)[0].pk             # get the primary key of the entry to proceed
+        obj = Tasks.objects.get(pk=object_id, user=request.user)                           # get the instance of the entry to proceed
         form = NewTaskOrganizerTaskForm(
             initial=initial_data_task,
             instance=obj)                                               # display task form with auto filled data
@@ -55,6 +56,8 @@ def NewTaskOrganizerWelcome(request):
         form_project = NewTaskOrganizerProjectForm(
             initial=initial_data_project,
             instance=obj)                                               # display project form with auto filled data
+        # filter the 'parent' field queryset to only include projects related to the currently logged-in user
+        form.fields['parent'].queryset = Projects.objects.filter(user=request.user)
         project = form.fields['parent'].queryset                        #call the choices list of the 'parent' field
         
         return render(request, 'tasks/new-task-o-wizard.html', {
@@ -73,18 +76,20 @@ def NewTaskOrganizerWelcome(request):
 @login_required
 def NewTaskOrganizerSubmitTask(request):
     form = NewTaskOrganizerTaskForm()                               # initialize variable ???
-    object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
-    obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
+    object_id = Tasks.objects.filter(new_task=1, user=request.user)[0].pk             # get the primary key of the entry to proceed
+    obj = Tasks.objects.get(pk=object_id, user=request.user)                           # get the instance of the entry to proceed
     
     if request.method == 'POST':
         form = NewTaskOrganizerTaskForm(request.POST, instance=obj)
         if form.is_valid():
+            form.user = request.user
             form.save()                                             # This saves the data to the database
             # set the value of compound priority
-            task = Tasks.objects.get(pk=object_id)
+            task = Tasks.objects.get(pk=object_id, user=request.user)
             # parent_priority = task.parent.project_priority
             calculated_compound_priority = task_priority_dict(task.priority) * 100/3
             task.compound_priority = calculated_compound_priority
+            task.user = request.user
             task.save()
             
 
@@ -105,23 +110,29 @@ def NewTaskOrganizerSubmitProject(request):
             print(f"Field: {field_name}, Value: {field_value}")
         
         if form_project.is_valid():
-            form_project.save()
+            project_instance = form_project.save(commit=False)
+            project_instance.user = request.user
+            project_instance.save()
 
         # #add task with project as parent/below is not working. need to get the task name and save it to a new entry in Task model with related parent.
         # # it's saving the same task name in both Task and Project Model
-            form_task.save()
-            last_entry = Tasks.objects.last()
-            last_entry.parent = Projects.objects.last()
+            task_instance = form_task.save(commit=False)
+            task_instance.user = request.user
+            task_instance.save()
+            
+            last_entry = Tasks.objects.filter(user=request.user).last()
+            last_entry.parent = Projects.objects.filter(user=request.user).last()
             last_entry.new_task = False
+            last_entry.user = request.user
             last_entry.save()
-            Tasks.objects.filter(new_task=1)[0].delete()
+            Tasks.objects.filter(new_task=1, user=request.user)[0].delete()
     
     return render(request, 'tasks/new-task-o-wizard.html')
 
 @login_required
 def NewTaskOrganizerDelete(request):
-    object_id = Tasks.objects.filter(new_task=1)[0].pk              # get the primary key of the entry to proceed
-    obj = Tasks.objects.get(pk=object_id)                           # get the instance of the entry to proceed
+    object_id = Tasks.objects.filter(new_task=1, user=request.user)[0].pk              # get the primary key of the entry to proceed
+    obj = Tasks.objects.get(pk=object_id, user=request.user)                          # get the instance of the entry to proceed
     if request.method == 'POST':
         print('delete tag detected')
         obj.delete()
@@ -141,8 +152,8 @@ def project_filter_results_view(request):
 
 @login_required
 def Prioritizer(request):
-    all_tasks=Tasks.objects.all()
-    all_projects=Projects.objects.all()
+    all_tasks = Tasks.objects.filter(user=request.user)
+    all_projects=Projects.objects.filter(user=request.user)
     context_options = Context.objects.values_list('name', flat=True)
     context_options_list = list(context_options)
     assignee_options = Assignee.objects.values_list('name', flat=True)
@@ -162,7 +173,7 @@ def save_tasks(request):
     id=request.POST.get('id','')
     type=request.POST.get('type','')
     value=request.POST.get('value','')
-    task=Tasks.objects.get(id=id)
+    task = Tasks.objects.get(id=id, user=request.user)
         
     if type=="complete":
         task.complete=value
@@ -196,6 +207,7 @@ def save_tasks(request):
         assignee_instance, created = Assignee.objects.get_or_create(name=value)
         task.assignee = assignee_instance
 
+    task.user = request.user
     task.save()
     return JsonResponse({"success":"Updated"})
 
@@ -205,7 +217,7 @@ def save_projects(request):
     id=request.POST.get('id','')
     type=request.POST.get('type','')
     value=request.POST.get('value','')
-    project=Projects.objects.get(id=id)
+    project = Projects.objects.get(id=id, user=request.user)
         
     if type=="complete":
         project.project_complete=value
@@ -213,12 +225,13 @@ def save_projects(request):
     if type == "priority":
         project.project_priority = value
         # get the list of tasks related to the project
-        tasks = Tasks.objects.filter(parent=project)
+        tasks = Tasks.objects.filter(parent=project, user=request.user)
         # update the priority of each task
         for task in tasks:
             # get the task priority value
             calculated_compound_priority = project_priority_dict(value) * task_priority_dict(task.priority) * 100/3
             task.compound_priority = calculated_compound_priority
+            task.user = request.user
             task.save()
 
     if type == "name":
@@ -227,6 +240,7 @@ def save_projects(request):
     if type == "deadline":
         project.project_deadline = value
 
+    project.user = request.user
     project.save()
     return JsonResponse({"success":"Updated"})
 
@@ -235,7 +249,7 @@ def save_projects(request):
 @csrf_exempt
 def delete_completed_tasks(request):
     checked_items = request.POST.getlist('checked_items[]')
-    Tasks.objects.filter(pk__in=checked_items).delete()
+    Tasks.objects.filter(pk__in=checked_items, user=request.user).delete()
     return JsonResponse({'status': 'success'})
 
 # delete completed projects
@@ -243,7 +257,7 @@ def delete_completed_tasks(request):
 @csrf_exempt
 def delete_completed_projects(request):
     checked_items = request.POST.getlist('checked_items[]')
-    Projects.objects.filter(pk__in=checked_items).delete()
+    Projects.objects.filter(pk__in=checked_items, user=request.user).delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -251,7 +265,7 @@ def delete_completed_projects(request):
 
 @login_required
 def api_tasks_compound_priorities(request):
-    tasks = Tasks.objects.all()
+    tasks = Tasks.objects.filter(user=request.user)
     tasks_serialized = serializers.serialize('json', tasks)
     tasks_list = json.loads(tasks_serialized)
     return JsonResponse(tasks_list, safe=False)
@@ -261,7 +275,7 @@ def api_tasks_compound_priorities(request):
 class CompoundPriorityView(View):
     def get(self, request, *args, **kwargs):
         task_id = request.GET.get('task_id')
-        task = Tasks.objects.get(id=task_id)
+        task = Tasks.objects.get(id=task_id, user=request.user)
         compound_priority = task.compound_priority
         return JsonResponse({'compound_priority': compound_priority})
     
