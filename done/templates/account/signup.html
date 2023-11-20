@@ -1,60 +1,109 @@
-<html>
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Signup</title>
-    </head>
-    <body>
-        <h1>My custom   Sign Up</h1>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sign Up{% endblock title %}
+{% load widget_tweaks %}
+{% block content %}
 
-        <p>
-            Already have an account? Then please <a href="{{ login_url }}">sign in</a>.
-        </p>
+<!-- main div -->
+  <div class="log-in-div">
 
-        <form method="post" action="{% url 'account_signup' %}">
-            {% csrf_token %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-            <p>
-                <label for="id_username">Username:</label>
-                <input type="text" name="username" placeholder="Username" autocomplete="username" minlength="1" maxlength="150" required="" id="id_username">
-            </p>
+    <!-- title -->
+    <div class="log-in-hdr">
+      <div class="log-in-hdr-bold">Sign</div>
+      <div class="log-in-hdr-light">Up</div>
+    </div>
 
-            <p>
-                <label for="id_email">Email (optional):</label>
-                <input type="email" name="email" placeholder="Email address" autocomplete="email" maxlength="320" id="id_email">
-            </p>
+    <!-- form div -->
+    <div class="w-form">
 
-            <p>
-                <label for="id_password1">Password:</label>
-                <input type="password" name="password1" placeholder="Password" autocomplete="new-password" required="" id="id_password1">
-                    <span class="helptext"></span>
-            </p>
-            
-            <ul>
-                <li>Your password can’t be too similar to your other personal information.</li>
-                <li>Your password must contain at least 8 characters.</li>
-                <li>Your password can’t be a commonly used password.</li>
-                <li>Your password can’t be entirely numeric.</li>
-            </ul>
+      <form method="post" class="log-in-form-div" action="{% url 'account_signup' %}" data-redirect="/">
+        {% csrf_token %}
+
+        <!-- username field-->
+        <div class="log-in-fieldline-div">
+          <div class="log-in-lbl-div">
+            <div class="log-in-lbl">Username</div>
+          </div>
+          <div class="log-in-field-div">
+            <input type="text" class="log-in-field w-input" name="username" placeholder="Username" autocomplete="username" maxlength="150" required="" id="id_username">
+          </div>
+        </div>
+
+        <!-- password entry -->
+        <div class="log-in-fieldline-div">
+          <div class="log-in-lbl-div">
+            <div class="log-in-lbl">Password</div>
+          </div>
+          <div class="log-in-field-div">
+            <input type="password" class="log-in-field w-input" name="password1" placeholder="Password" autocomplete="new-password" required="" id="id_password1">
+          </div>
+        </div>
+
+        <!-- password confirm -->
+        <div class="log-in-fieldline-div">
+          <div class="log-in-lbl-div">
+            <div class="log-in-lbl">Password</div>
+          </div>
+          <div class="log-in-field-div">
+            <input type="password" class="log-in-field w-input" name="password2" placeholder="Password (again)" autocomplete="new-password" required="" id="id_password2">
+          </div>
+        </div>
+
+        <!-- hint div -->
+        <div class="log-in-hint-div">
+          <div class="log-in-hint-txt">Already have an account? Then please </div>
+          <a href="{% url 'socialaccount_connections' %}" class="log-in-hint-link">sign in</a>
+          <div class="log-in-hint-txt">first.</div>
+        </div>
+
+        <!-- submit button -->
+        <input type="hidden" name="next" value="{% url 'home' %}">
+        <input type="submit" value="Submit" data-wait="Please wait..." class="log-in-btn w-button">
+      </form>
+
+      <!-- done and fail divs -->
+      <div class="w-form-done">
+        <div>Thank you! Your submission has been received!</div>
+      </div>
+      <div class="w-form-fail">
+        <div>
+          <ul>
+            <li>Your password can’t be too similar to your other personal information.</li>
+            <li>Your password must contain at least 8 characters.</li>
+            <li>Your password can’t be a commonly used password.</li>
+            <li>Your password can’t be entirely numeric.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- separator -->
+    <div class="log-in-separator-div"><img src="{% static 'tasks/Vectors-Wrapper_5.svg' %}" loading="lazy" width="540" height="2" alt="" class="log-in-separator"></div>
+    <div class="log-in-txt-div">
+      <div class="log-in-txt">Or Sign in with</div>
+    </div>
+
+    <!-- google button -->
+    <div class="log-in-social-btn-div">
+      {% comment %} <a href="/accounts/google/login/?process=login&amp;next=%2Faccounts%2Fsocial%2Fconnections%2F" target="_blank" class="log-in-social-btn"> {% endcomment %}
+      <a href="/accounts/google/login/" target="_blank" class="log-in-social-btn">
+        <div class="log-in-imgmargin">
+          <div class="log-in-logo-google">
+            <div class="log-in-logo-google-fill"><img src="{% static 'tasks/Vectors-Wrapper_4.svg' %}" loading="lazy" width="16" height="16" alt="" class="log-in-logo-google-svg"></div>
+          </div>
+        </div>
+        <div class="log-in-logo-google-txt-div">
+          <div class="log-in-logo-google-txt">Google</div>
+        </div>
+      </a>
 
 
-            <p>
-                <label for="id_password2">Password (again):</label>
-                <input type="password" name="password2" placeholder="Password (again)" autocomplete="new-password" required="" id="id_password2">
-            </p>
 
-            
-            <input type="hidden" name="next" value="/accounts/social/connections/">
-            <button type="submit">Sign Up</button>
-        </form>
 
-        <hr>
+    </div>
 
-        <h2>Or use a third-party</h2>
-        <ul>
-            <li>
-            <a title="Google" href="/accounts/google/login/?process=login&amp;next=%2Faccounts%2Fsocial%2Fconnections%2F">Google</a>
-            </li>
-        </ul>
-    </body>
-</html>
+    <!-- separator -->
+    <div class="log-in-separator-div"><img src="{% static 'tasks/Vectors-Wrapper_5.svg' %}" loading="lazy" width="540" height="2" alt="" class="log-in-separator"></div>
+  </div>
+{% endblock content %}

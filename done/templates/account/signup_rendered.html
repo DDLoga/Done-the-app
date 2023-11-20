@@ -3,6 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
 </head>
+
 <body>
     <h1>My custom   Sign Up</h1>
 
@@ -13,6 +14,7 @@
     <form method="post" action="/accounts/signup/">
         <input type="hidden" name="csrfmiddlewaretoken" value="TelzR6LmeCUWZcdqo9rAMsnbYWRBQQvj1EufSOA30j8qFIAUDV5O8CeHrY85JH0X">
         <input type="hidden" name="next" value="/accounts/social/connections/">
+        
         <p>
             <label for="id_username">Username:</label>
             <input type="text" name="username" placeholder="Username" autocomplete="username" minlength="1" maxlength="150" required="" id="id_username">
