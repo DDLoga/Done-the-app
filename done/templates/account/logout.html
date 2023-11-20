@@ -1,27 +1,29 @@
-{% extends "account/base_manage.html" %}
-{% load allauth i18n %}
-{% block head_title %}
-    {% trans "Sign Out" %}
-{% endblock head_title %}
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Log Out?{% endblock title %}
+{% load widget_tweaks %}
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign Out" %}
-    {% endelement %}
-    <p>{% trans 'Are you sure you want to sign out babe?' %}</p>
-    {% url 'account_logout' as action_url %}
-    {% element form method="post" action=action_url no_visible_fields=True %}
-        {% slot body %}
-            {% csrf_token %}
-            {% if redirect_field_value %}
-                <input type="hidden"
-                       name="{{ redirect_field_name }}"
-                       value="{{ redirect_field_value }}" />
-            {% endif %}
-        {% endslot %}
-        {% slot actions %}
-            {% element button type="submit" %}
-                {% trans 'Sign Out' %}
-            {% endelement %}
-        {% endslot %}
-    {% endelement %}
+
+
+  <div class="log-in-div">
+    <div class="log-in-hdr">
+      <div class="log-in-hdr-bold">Log</div>
+      <div class="log-in-hdr-light">Out</div>
+    </div>
+    <div class="w-form">
+      <form method="post" class="log-in-form-div" action='{% url "account_logout" %}' data-redirect="/">
+        <div class="log-in-hint-div">
+          <div class="log-in-hint-txt">Are you sure you want to log Out? </div>
+        </div>
+        {% csrf_token %}
+        <input type="submit" value="Submit" data-wait="Please wait..." class="log-in-btn w-button">
+      </form>
+      <div class="w-form-done">
+        <div>Thank you! Your submission has been received!</div>
+      </div>
+      <div class="w-form-fail">
+        <div>Invalid username or password</div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
