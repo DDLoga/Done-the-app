@@ -66,7 +66,7 @@
           <div class="tab-div-round">
             <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
             <div class="side-nemu-txt-div">
-              <div class="side-menu-text">next tab comming soon</div>
+              <div class="side-menu-text">Context (soon)</div>
             </div>
           </div>
         </div>
@@ -74,11 +74,11 @@
           <div class="tab-div-round">
             <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
             <div class="side-nemu-txt-div">
-              <div class="side-menu-text">next tab comming ...</div>
+              <div class="side-menu-text">Resource (soon)</div>
             </div>
           </div>
         </div>
-        <div class="tab-div">
+        {% comment %} <div class="tab-div">
           <div class="tab-div-round">
             <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
             <div class="side-nemu-txt-div">
@@ -93,7 +93,7 @@
               <div class="side-menu-text">...</div>
             </div>
           </div>
-        </div>
+        </div> {% endcomment %}
 
       </div>
 
@@ -105,7 +105,7 @@
         <!-- display the username -->
         {% if user.is_authenticated %}
         <div class="tab-div-round">
-          <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
+          {% comment %} <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div> {% endcomment %}
           <div class="side-nemu-txt-div">
             <div class="side-menu-text">
               Logged in as {{ user.username }}
@@ -116,7 +116,6 @@
           <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
           <div class="side-nemu-txt-div">
             <div class="side-menu-text">
-              {% comment %} <a href="{% url 'socialaccount_connections' %}">Logout</a> {% endcomment %}
               <a href="{% url 'account_logout' %}">Logout</a>
             </div>
           </div>

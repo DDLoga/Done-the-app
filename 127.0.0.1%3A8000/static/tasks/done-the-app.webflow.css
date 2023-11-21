@@ -636,10 +636,10 @@ body {
 }
 
 .tbl-hdr.asc:after {
-  content: " ▲";
+  content: " â–²";
 }
 .tbl-hdr.desc:after {
-  content: " ▼";
+  content: " â–¼";
 }
 
 .tbl-cell {
@@ -813,8 +813,8 @@ body {
 
 .tab-div.bottom {
   position: absolute;
-  bottom: 90px;
-  grid-row-gap: 20px;
+  bottom: 80px;
+  margin-top: 200px;
 }
 
 
