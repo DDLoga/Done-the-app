@@ -1,81 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Log In with Google{% endblock title %}
 
-{% load i18n %}
-{% load allauth %}
-{% load i18n %}
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>
-            {% block head_title %}
-            {% endblock head_title %}
-        </title>
-        {% block extra_head %}
-        {% endblock extra_head %}
-    </head>
-    <body>
-        {% block body %}
-            {% if messages %}
-                <div>
-                    <strong>{% trans "Messages:" %}</strong>
-                    <ul>
-                        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            <div>
-                <strong>{% trans "Menu:" %}</strong>
-                <ul>
-                    {% if user.is_authenticated %}
-                        <li>
-                            <a href="{% url 'account_email' %}">{% trans "Change Email" %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <a href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-            {% block content %}
-            {% if process == "connect" %}
-                {% element h1 %}
-                    {% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}
-                {% endelement %}
-                <p>
-                    {% blocktrans with provider.name as provider %}You are about to connect a new third-party account from {{ provider }}.{% endblocktrans %}
-                </p>
-            {% else %}
-                {% element h1 %}
-                    {% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}
-                {% endelement %}
-                <p>
-                    {% blocktrans with provider.name as provider %}You are about to sign in using a third-party account from {{ provider }}. AND THAT'S JUST...WOW!{% endblocktrans %}
-                </p>
-            {% endif %}
-            {% element form method="post" no_visible_fields=True %}
-                {% slot actions %}
-                    {% csrf_token %}
-                    {% element button type="submit" %}
-                        {% trans "Continue" %}
-                    {% endelement %}
-                {% endslot %}
-            {% endelement %}
-        {% endblock content %}
-        
-        {% endblock body %}
-        {% block extra_body %}
-        {% endblock extra_body %}
-    </body>
+
+    {% block content %}
+    <div class="log-in-div">
+        <div class="log-in-hdr">
+            <div class="log-in-hdr-bold">Sign</div>
+            <div class="log-in-hdr-light">In</div>
+            <br>
+            <div class="log-in-hdr-light">With</div>
+            <div class="log-in-hdr-bold">Google</div>
+        </div>
+
+
+        <div class="log-in-hint-div">
+            <div class="log-in-hint-txt">You are about to sign in using a third-party account from Google </div>
+        </div>
+
+        <form method="post" action="">
+            {% csrf_token %}
+            <button class="log-in-btn w-button" type="submit">Continue</button>
+        </form>
+    </div>
+    {% block webflow_js %}
+    {% comment %} disable the webflow JS which conflicts with this page {% endcomment %}
+    {% endblock webflow_js %}
+
+    {% endblock content %}
+
 </html>
-
-
-
-

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Log In with Google{% endblock title %}
+
+
+    {% block content %}
+    <div class="log-in-div">
+        <div class="log-in-hdr">
+            <div class="log-in-hdr-bold">Congratulations!</div>
+        </div>
+
+
+        <div class="log-in-hint-div">
+            <div class="log-in-hint-txt">You are now Logged in as {{ user.username }} </div>
+        </div>
+
+    </div>
+    {% block webflow_js %}
+    {% comment %} disable the webflow JS which conflicts with this page {% endcomment %}
+    {% endblock webflow_js %}
+
+    {% endblock content %}
+
+</html>
