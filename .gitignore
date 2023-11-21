@@ -1,6 +1,5 @@
 127.0.0.1%3A8000/
 .vscode/
-db.sqlite3
-__pycache__/
+done\db.sqlite3
 env/
-.env
+done\done\.env
