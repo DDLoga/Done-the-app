@@ -1,5 +1,5 @@
 127.0.0.1%3A8000/
 .vscode/
-done\db.sqlite3
 env/
-done\done\.env
+done/done/.env
+done/db.sqlite3
