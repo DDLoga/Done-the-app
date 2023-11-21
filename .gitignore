@@ -1,3 +1,6 @@
-done/db.sqlite3
-127.0.0.1%3A8000\*
-.vscode\*
+127.0.0.1%3A8000/
+.vscode/
+db.sqlite3
+__pycache__/
+env/
+.env
