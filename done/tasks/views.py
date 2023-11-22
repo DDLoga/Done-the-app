@@ -13,8 +13,15 @@ from django.contrib.auth.models import User
 
 
 def home(request):
-    return render(request, 'tasks/index.html')
-
+    # if user is authenticated, redirect to the prioritizer
+    if request.user.is_authenticated:
+        return render(request, 'tasks/index.html')
+    else:
+        return render(request, 'account/login.html')
+    
+def sorry(request):
+    return render(request, 'sorry.html')
+    
 @login_required
 def QuickTaskEntryView(request):
     quick_task_entry = QuickTaskEntry()

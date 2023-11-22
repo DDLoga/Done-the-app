@@ -4,6 +4,7 @@ from .views import CompoundPriorityView
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('sorry/', views.sorry, name='sorry'),
     path('QuickTaskEntry/', views.QuickTaskEntryView, name="QuickTaskEntry"),
     path('new-task-organizer/submit-task/', views.NewTaskOrganizerSubmitTask, name="NewTaskOrganizerSubmitTask"),
     path('new-task-organizer/', views.NewTaskOrganizerWelcome, name="NewTaskOrganizerWelcome"),

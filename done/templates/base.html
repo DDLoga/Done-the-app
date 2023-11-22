@@ -78,23 +78,6 @@
             </div>
           </div>
         </div>
-        {% comment %} <div class="tab-div">
-          <div class="tab-div-round">
-            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
-            <div class="side-nemu-txt-div">
-              <div class="side-menu-text">next tab ...</div>
-            </div>
-          </div>
-        </div>
-        <div class="tab-div">
-          <div class="tab-div-round">
-            <div class="icon-bg"><img src="{% static 'tasks/Vectors-Wrapper_3.svg' %}" loading="lazy" width="14.934459686279297" height="18" alt="" class="prio-icon"></div>
-            <div class="side-nemu-txt-div">
-              <div class="side-menu-text">...</div>
-            </div>
-          </div>
-        </div> {% endcomment %}
-
       </div>
 
       <div class="slider-btn">
@@ -144,6 +127,12 @@
     <script src="{% static 'tasks/webflow.js' %}" id="url"></script>
     {% endblock webflow_js %}
     <script src="{% static 'tasks/side-menu.js' %}" id="url"></script>
+    <script>
+      if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+        // Redirect to another page or show a message
+        window.location.href = "/sorry";
+      }
+    </script>
     {% block custom_js %}{% endblock custom_js %}
   </body>
 </html>
