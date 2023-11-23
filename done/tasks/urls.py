@@ -18,4 +18,7 @@ urlpatterns = [
     path('api/tasks/', views.api_tasks_compound_priorities, name='api_tasks'),
     path('delete-completed-tasks/', views.delete_completed_tasks, name='delete_completed_tasks'),
     path('delete-completed-projects/', views.delete_completed_projects, name='delete_completed_projects'),
+    path('contexts/', views.contexts, name='contexts'),
+    path('update_context/', views.update_context, name='update_context'),
+    path('add_context/', views.add_context, name='add_context'),
 ]

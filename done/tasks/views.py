@@ -175,6 +175,37 @@ def Prioritizer(request):
                 'assignee_options_list':assignee_options_list})
 
 @login_required
+def contexts(request):
+    context = Context.objects.filter(user=request.user)
+    # print the name of the user
+    print(request.user)
+    # print the list of contexts
+    print(context)
+    return render(request, 'tasks/contexts.html', {'context': context})
+
+@csrf_exempt
+def update_context(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+        context = Context.objects.get(id=id)
+        setattr(context, field, value)
+        context.save()
+        return JsonResponse({'status': 'success'}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def add_context(request):
+    if request.method == 'POST':
+        context = Context(name='New context', description='New description')
+        context.user = request.user
+        context.save()
+        return JsonResponse({'name': context.name, 'description': context.description}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+@login_required
 @csrf_exempt
 def save_tasks(request):
     id=request.POST.get('id','')
@@ -267,9 +298,6 @@ def delete_completed_projects(request):
     Projects.objects.filter(pk__in=checked_items, user=request.user).delete()
     return JsonResponse({'status': 'success'})
 
-
-
-
 @login_required
 def api_tasks_compound_priorities(request):
     tasks = Tasks.objects.filter(user=request.user)
@@ -278,8 +306,9 @@ def api_tasks_compound_priorities(request):
     return JsonResponse(tasks_list, safe=False)
 
 
-# return the priority value of a task upon change (works with JS file)
+
 class CompoundPriorityView(View):
+    # return the priority value of a task upon change (works with JS file)
     def get(self, request, *args, **kwargs):
         task_id = request.GET.get('task_id')
         task = Tasks.objects.get(id=task_id, user=request.user)
