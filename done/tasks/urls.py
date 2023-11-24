@@ -21,4 +21,5 @@ urlpatterns = [
     path('contexts/', views.contexts, name='contexts'),
     path('update_context/', views.update_context, name='update_context'),
     path('add_context/', views.add_context, name='add_context'),
+    path('delete_context/', views.delete_context, name='delete_context'),
 ]

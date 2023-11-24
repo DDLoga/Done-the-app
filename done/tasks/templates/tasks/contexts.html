@@ -10,7 +10,7 @@
           <div class="hdr-2">Priorizer</div>
         </div>
         <div>
-          <a href="#" class="cntx-btn w-button">Delete selected</a>
+          <a href="#" class="cntx-btn delete-btn w-button">Delete selected</a>
         </div>
       </div>
       <div class="tbl-frame">
@@ -24,7 +24,7 @@
           </thead>
           <tbody class="task-table_body">
             {% for cntx in context %}
-              <tr class="task-table_row">
+              <tr class="task-table_row" data-id="{{ cntx.id }}">
                 <td class="tbl-cell centered">
                   <input type="checkbox" name="myCheckbox">
                 </td>
@@ -32,13 +32,6 @@
                 <td class="tbl-cell" contenteditable="True" data-id="{{ cntx.id }}" data-field="description">{{ cntx.description }}</td>
               </tr>
             {% endfor %}
-            {% comment %} <tr class="task-table_row">
-              <td class="tbl-cell centered">
-                <input type="checkbox" name="myCheckbox">
-              </td>
-              <td class="tbl-cell centered">Cell</td>
-              <td class="tbl-cell">Cell</td>
-            </tr> {% endcomment %}
             <tr class="task-table_row add-row">
               <td class="tbl-cell centered"> </td>
               <td class="tbl-cell centered italic">add a context<a href="#" class="cntx-btn add w-button">+</a>

@@ -733,6 +733,10 @@ body {
 	line-height: 0;
 }
 
+.cntx-btn.delete-btn {
+	margin-right: 50px;
+}
+
 .text-7 {
 	color: #fdfdfb;
 	text-align: center;

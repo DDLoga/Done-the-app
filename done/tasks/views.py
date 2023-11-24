@@ -35,7 +35,6 @@ def QuickTaskEntryView(request):
             for t in task_single:
                 if t != "":                                         #skip empty entries
                     task_name = Tasks(name=t)                       #set the task description into name
-                    print(task_name)
                     task_name.user = request.user                   #set the user
                     task_name.save()
                 else:
@@ -113,9 +112,7 @@ def NewTaskOrganizerSubmitProject(request):
         #save the project
         form_project = NewTaskOrganizerProjectForm(request.POST)
         form_task = NewTaskOrganizerTaskForm(request.POST)
-        for field_name, field_value in request.POST.items():
-            print(f"Field: {field_name}, Value: {field_value}")
-        
+
         if form_project.is_valid():
             project_instance = form_project.save(commit=False)
             project_instance.user = request.user
@@ -141,7 +138,6 @@ def NewTaskOrganizerDelete(request):
     object_id = Tasks.objects.filter(new_task=1, user=request.user)[0].pk              # get the primary key of the entry to proceed
     obj = Tasks.objects.get(pk=object_id, user=request.user)                          # get the instance of the entry to proceed
     if request.method == 'POST':
-        print('delete tag detected')
         obj.delete()
     return render(request, 'tasks/new-task-o-wizard.html')
 
@@ -177,10 +173,6 @@ def Prioritizer(request):
 @login_required
 def contexts(request):
     context = Context.objects.filter(user=request.user)
-    # print the name of the user
-    print(request.user)
-    # print the list of contexts
-    print(context)
     return render(request, 'tasks/contexts.html', {'context': context})
 
 @csrf_exempt
@@ -202,6 +194,14 @@ def add_context(request):
         context.user = request.user
         context.save()
         return JsonResponse({'name': context.name, 'description': context.description}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def delete_context(request):
+    if request.method == 'POST':
+        selected = request.POST.getlist('selected[]')
+        Context.objects.filter(id__in=selected, user=request.user).delete()
+        return JsonResponse({'status': 'success'}, status=200)
     return JsonResponse({'status': 'error'}, status=400)
 
 
