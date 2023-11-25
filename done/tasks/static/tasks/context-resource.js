@@ -15,8 +15,9 @@ $(document).ready(function(){
             console.log('id is: ' +id);
             console.log('field is: ' +field);
             console.log('value is: ' +value);
+            console.log('update url is: ' +updateUrl);
             $.ajax({
-                url: '/update_context/',
+                url: updateUrl,
                 type: 'POST',
                 data: {
                     'id': id,
@@ -44,7 +45,7 @@ $(document).ready(function(){
         // get the last ID in the table
         var lastRowId = $('table.task-table_component tr:last').data('id');
         $.ajax({
-            url: '/add_context/',
+            url: addUrl,
             type: 'POST',
             data: {
                 'csrfmiddlewaretoken': csrftoken
@@ -63,7 +64,7 @@ $(document).ready(function(){
         });
     });
 
-    // delete a context
+    // show delete button when a checkbox is checked
     $('table input[type="checkbox"]').change(function() {
         if ($('table input[type="checkbox"]:checked').length > 0) {
             $('.delete-btn').show();
@@ -72,6 +73,7 @@ $(document).ready(function(){
         }
     });
 
+    // delete a context
     $('.delete-btn').click(function(e) {
         console.log("delete button clicked");
         e.preventDefault();
@@ -81,7 +83,7 @@ $(document).ready(function(){
         });
         console.log(selected);
         $.ajax({
-            url: '/delete_context/',
+            url: deleteUrl,
             type: 'POST',
             data: {
                 'selected': selected,

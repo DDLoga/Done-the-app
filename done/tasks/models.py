@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator
 
 class Assignee(models.Model):
     name = models.CharField(max_length=20)
+    description = models.CharField(max_length=200, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
 

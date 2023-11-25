@@ -204,6 +204,42 @@ def delete_context(request):
         return JsonResponse({'status': 'success'}, status=200)
     return JsonResponse({'status': 'error'}, status=400)
 
+@login_required
+def assignees(request):
+    assignee = Assignee.objects.filter(user=request.user)
+    return render(request, 'tasks/assignees.html', {'assignee': assignee})
+
+@csrf_exempt
+def update_assignee(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+        assignee = Assignee.objects.get(id=id)
+        setattr(assignee, field, value)
+        assignee.save()
+        return JsonResponse({'status': 'success'}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def add_assignee(request):
+    if request.method == 'POST':
+        assignee = Assignee(name='New assignee', description='New description')
+        assignee.user = request.user
+        assignee.save()
+        return JsonResponse({'name': assignee.name, 'description': assignee.description}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def delete_assignee(request):
+    if request.method == 'POST':
+        selected = request.POST.getlist('selected[]')
+        Assignee.objects.filter(id__in=selected, user=request.user).delete()
+        return JsonResponse({'status': 'success'}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+
 
 @login_required
 @csrf_exempt

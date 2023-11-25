@@ -22,4 +22,8 @@ urlpatterns = [
     path('update_context/', views.update_context, name='update_context'),
     path('add_context/', views.add_context, name='add_context'),
     path('delete_context/', views.delete_context, name='delete_context'),
+    path('assignees/', views.assignees, name='assignees'),
+    path('update_assignee/', views.update_assignee, name='update_assignee'),
+    path('add_assignee/', views.add_assignee, name='add_assignee'),
+    path('delete_assignee/', views.delete_assignee, name='delete_assignee'),
 ]
