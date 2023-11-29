@@ -26,4 +26,6 @@ urlpatterns = [
     path('update_assignee/', views.update_assignee, name='update_assignee'),
     path('add_assignee/', views.add_assignee, name='add_assignee'),
     path('delete_assignee/', views.delete_assignee, name='delete_assignee'),
+    path('table_task/', views.table_task, name='table_task'),
+    path('table_project/', views.table_project, name='table_project'),
 ]

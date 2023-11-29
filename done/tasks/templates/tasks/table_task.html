@@ -1,0 +1,45 @@
+<div id='task-table-div' class="tbl-frame">
+    <table class="task-table_component">
+      <thead class="task-table_head">
+        <tr class="task-table_row">
+          <th class="tbl-hdr" data-sort="completion" style="width: 110px;">
+            <div class="filter-dropdown">
+              <select class="filter-select" id="task-completion-filter">
+                  <option value="">All</option>
+                  <option value='false'>Done</option>
+                  <option value='true'>Active</option>
+              </select>
+            </div>
+          </th>
+          <th class="tbl-hdr" data-sort="compound" style="width: 110px;">Compound <br>Priority</th>
+          <th class="tbl-hdr" data-sort="priority" style="width: 72px;">Priority</th>
+          <th class="tbl-hdr" data-sort="name" style="width: 272px;">Name</th>
+          <th class="tbl-hdr" data-sort="effort" style="width: 87px;">Effort</th>
+          <th class="tbl-hdr" data-sort="context" style="width: 87px;">Context</th>
+          <th class="tbl-hdr" data-sort="deadline" style="width: 87px;">Deadline</th>
+          <th class="tbl-hdr" data-sort="assignee" style="width: 110px;">Assignee</th>
+        </tr>
+      </thead>
+
+        {% for task in tasks %}
+        <tr class="rendered-row">
+            <td class="tbl-cell centered" data-id="{{ task.id }}" data-type="complete">
+              {% if task.complete %}
+                <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox" checked>
+              {% else %}
+                <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox">
+              {% endif %}
+            </td>
+            <td class="tbl-cell centered task-priority" id="compound-priority-{{ task.id }}" data-type="compound">{{ task.compound_priority }}</td>
+            {% comment %} <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td> {% endcomment %}
+            <td class="priority tbl-cell centered" id="task-priority" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
+            <td class="editable tbl-cell" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
+            <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="effort">{{ task.effort }}</td>
+            <td class="context tbl-cell centered" data-id="{{ task.id }}" data-type="context">{{ task.context.name }}</td>
+            <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="deadline">{{ task.deadline|date:"j M" }}</td>
+            <td class="assignee tbl-cell centered" data-id="{{ task.id }}" data-type="assignee">{{ task.assignee.name }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>

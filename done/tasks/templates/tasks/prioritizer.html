@@ -17,111 +17,47 @@
           </div>
           <div class="nto-inpt-slct-div horizontal single-line">
             <label data-w-id="89f1164f-914e-c1bf-ad36-09a1e20dd40a" class="project-radio radio-btn-field w-radio">
-              <input type="radio" id="project-radio" name="input-type" value="project" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input">
+              <input 
+                type="radio" 
+                id="project-radio" 
+                name="input-type" 
+                value="project" 
+                data-name="input type" 
+                class="w-form-formradioinput radio-btn w-radio-input" 
+                hx-get="/table_project/" 
+                hx-trigger="change" 
+                hx-target="#table-container"> 
               <span class="menu-txt w-form-label" for="project-2">Projects</span>
             </label>
             <label data-w-id="89f1164f-914e-c1bf-ad36-09a1e20dd40e" class="task-radio radio-btn-field w-radio">
-              <input type="radio" id="task-radio" name="input-type" value="not actionable" data-name="input type" class="w-form-formradioinput radio-btn w-radio-input">
+              <input 
+                type="radio" 
+                id="task-radio" 
+                name="input-type" 
+                value="not actionable" 
+                data-name="input type" 
+                class="w-form-formradioinput radio-btn w-radio-input" 
+                hx-get="/table_task/" 
+                hx-trigger="change" 
+                hx-target="#table-container">
               <span class="radio-button-label w-form-label" for="not-actionable">Tasks</span>
             </label>
           </div>
         </div>
       </form>
-      <div class="w-form-done">
-        <div>Thank you! Your submission has been received!</div>
-      </div>
-      <div class="w-form-fail">
-        <div>Oops! Something went wrong while submitting the form.</div>
-      </div>
     </div>
-    {% comment %} <div data-w-id="0ad156d8-e1d7-1bb0-dce7-4d0941c0a634" class="hint-block"> {% endcomment %}
-    <div id='hint-div' class="hint-block">
+
+    <div 
+      id='hint-div' 
+      class="hint-block">
       <div class="project-name">choose Projects of Task table</div>
     </div>
-    {% comment %} <div data-w-id="e5de06c0-062f-37c2-782f-937d60c8eb3a" class="tbl-frame"> {% endcomment %}
-    <div id='task-table-div' class="tbl-frame">
-      <table class="task-table_component">
-        <thead class="task-table_head">
-          <tr class="task-table_row">
-            <th class="tbl-hdr" data-sort="completion" style="width: 110px;">
-              <div class="filter-dropdown">
-                <select class="filter-select" id="task-completion-filter">
-                    <option value="">All</option>
-                    <option value='false'>Done</option>
-                    <option value='true'>Active</option>
-                </select>
-              </div>
-            </th>
-            <th class="tbl-hdr" data-sort="compound" style="width: 110px;">Compound <br>Priority</th>
-            <th class="tbl-hdr" data-sort="priority" style="width: 72px;">Priority</th>
-            <th class="tbl-hdr" data-sort="name" style="width: 272px;">Name</th>
-            <th class="tbl-hdr" data-sort="effort" style="width: 87px;">Effort</th>
-            <th class="tbl-hdr" data-sort="context" style="width: 87px;">Context</th>
-            <th class="tbl-hdr" data-sort="deadline" style="width: 87px;">Deadline</th>
-            <th class="tbl-hdr" data-sort="assignee" style="width: 110px;">Assignee</th>
-          </tr>
-        </thead>
 
-          {% for task in tasks %}
-          <tr class="rendered-row">
-              <td class="tbl-cell centered" data-id="{{ task.id }}" data-type="complete">
-                {% if task.complete %}
-                  <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox" checked>
-                {% else %}
-                  <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox">
-                {% endif %}
-              </td>
-              <td class="tbl-cell centered task-priority" id="compound-priority-{{ task.id }}" data-type="compound">{{ task.compound_priority }}</td>
-              {% comment %} <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td> {% endcomment %}
-              <td class="priority tbl-cell centered" id="task-priority" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
-              <td class="editable tbl-cell" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
-              <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="effort">{{ task.effort }}</td>
-              <td class="context tbl-cell centered" data-id="{{ task.id }}" data-type="context">{{ task.context.name }}</td>
-              <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-type="deadline">{{ task.deadline|date:"j M" }}</td>
-              <td class="assignee tbl-cell centered" data-id="{{ task.id }}" data-type="assignee">{{ task.assignee.name }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% comment %} <div data-w-id="702bb6ac-73de-582a-b6b8-eae4ff24e7c1" class="tbl-frame"> {% endcomment %}
-    <div id='project-table-div' class="tbl-frame">
-      <table class="project-table_component">
-        <thead class="task-table_head">
-          <tr class="task-table_row">
-            <th class="tbl-hdr" data-sort="completion" style="width: 100px;">
-              <div class="filter-dropdown">
-                <select class="filter-select" id="project-completion-filter">
-                  <option value="">All</option>
-                  <option value='false'>Done</option>
-                  <option value='true'>Active</option>
-                </select>
-              </div>
-            </th>
-            <th class="tbl-hdr " data-sort="priority" style="width: 100px;">Priority</th>
-            <th class="tbl-hdr" data-sort="name" style="width: 500px;">Name</th>
-            <th class="tbl-hdr" data-sort="deadline" style="width: 100px;">Deadline</th>
-          </tr>
-        </thead>
-        <tbody class="task-table_body">
 
-          {% for project in projects %}
-          <tr class="rendered-row">
-              <td class="tbl-cell centered" data-id="{{ project.id }}" data-type="complete">
-                {% if project.project_complete %}
-                  <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox" checked>
-                {% else %}
-                  <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox">
-                {% endif %}
-              </td>
-              <td class="priority tbl-cell centered" data-id="{{ project.id }}" data-type="priority">{{ project.project_priority }}</td>
-              <td class="editable tbl-cell" data-id="{{ project.id }}" data-type="name">{{ project.project_name }}</td>
-              <td class="editable tbl-cell centered" data-id="{{ project.id }}" data-type="deadline">{{ project.project_deadline|date:"j M" }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div id="table-container">
+      {% comment %} HTMX will display the proper table {% endcomment %}
     </div>
+
 
     <div class="frame-427318914" id="delete-btn">
       <div class="frame-427318912">
@@ -145,7 +81,7 @@
     var contextOptions = {{ context_options_list|safe }};
     var assigneeOptions = {{ assignee_options_list|safe}}
   </script>
-  <script src="{% static 'tasks/table.js' %}" id="url"></script>
+  {% comment %} <script src="{% static 'tasks/table.js' %}" id="url"></script> {% endcomment %}
   <script src="{% static 'tasks/colResizable-1.6.min.js' %}" id="url"></script>
   
   {% endblock custom_js %}

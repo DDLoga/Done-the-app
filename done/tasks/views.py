@@ -155,8 +155,8 @@ def project_filter_results_view(request):
 
 @login_required
 def Prioritizer(request):
-    all_tasks = Tasks.objects.filter(user=request.user)
-    all_projects=Projects.objects.filter(user=request.user)
+    # all_tasks = Tasks.objects.filter(user=request.user)
+    # all_projects=Projects.objects.filter(user=request.user)
     context_options = Context.objects.values_list('name', flat=True)
     context_options_list = list(context_options)
     assignee_options = Assignee.objects.values_list('name', flat=True)
@@ -165,8 +165,32 @@ def Prioritizer(request):
 
     return render(request,
                 "tasks/prioritizer.html",
+                {'context_options_list':context_options_list,
+                'assignee_options_list':assignee_options_list})
+    
+@login_required
+def table_task(request):
+    all_tasks = Tasks.objects.filter(user=request.user)
+    context_options = Context.objects.values_list('name', flat=True)
+    context_options_list = list(context_options)
+    assignee_options = Assignee.objects.values_list('name', flat=True)
+    assignee_options_list = list(assignee_options)
+    return render(request,
+                'tasks/table_task.html',
                 {'tasks':all_tasks,
-                'projects':all_projects,
+                'context_options_list':context_options_list,
+                'assignee_options_list':assignee_options_list})
+
+@login_required
+def table_project(request):
+    all_projects=Projects.objects.filter(user=request.user)
+    context_options = Context.objects.values_list('name', flat=True)
+    context_options_list = list(context_options)
+    assignee_options = Assignee.objects.values_list('name', flat=True)
+    assignee_options_list = list(assignee_options)
+    return render(request,
+                'tasks/table_project.html',
+                {'projects':all_projects,
                 'context_options_list':context_options_list,
                 'assignee_options_list':assignee_options_list})
 
