@@ -1,5 +1,5 @@
 <div id='project-table-div' class="tbl-frame">
-    <table class="project-table_component">
+    <table class="project-table_component table_component">
       <thead class="task-table_head">
         <tr class="task-table_row">
           <th class="tbl-hdr" data-sort="completion" style="width: 100px;">
@@ -27,9 +27,9 @@
                 <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox">
               {% endif %}
             </td>
-            <td class="priority tbl-cell centered" data-id="{{ project.id }}" data-type="priority">{{ project.project_priority }}</td>
-            <td class="editable tbl-cell" data-id="{{ project.id }}" data-type="name">{{ project.project_name }}</td>
-            <td class="editable tbl-cell centered" data-id="{{ project.id }}" data-type="deadline">{{ project.project_deadline|date:"j M" }}</td>
+            <td class="priority tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-type="priority">{{ project.project_priority }}</td>
+            <td class="editable tbl-cell" contenteditable="True" data-id="{{ project.id }}" data-type="name">{{ project.project_name }}</td>
+            <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-type="deadline">{{ project.project_deadline|date:"j M" }}</td>
         </tr>
         {% endfor %}
       </tbody>

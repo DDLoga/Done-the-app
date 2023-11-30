@@ -15,6 +15,8 @@
               <div class="hdr-2">Priorizer</div>
             </div>
           </div>
+
+
           <div class="nto-inpt-slct-div horizontal single-line">
             <label data-w-id="89f1164f-914e-c1bf-ad36-09a1e20dd40a" class="project-radio radio-btn-field w-radio">
               <input 
@@ -43,13 +45,13 @@
               <span class="radio-button-label w-form-label" for="not-actionable">Tasks</span>
             </label>
           </div>
+
+
         </div>
       </form>
     </div>
 
-    <div 
-      id='hint-div' 
-      class="hint-block">
+    <div id='hint-div' class="hint-block">
       <div class="project-name">choose Projects of Task table</div>
     </div>
 
@@ -81,9 +83,8 @@
     var contextOptions = {{ context_options_list|safe }};
     var assigneeOptions = {{ assignee_options_list|safe}}
   </script>
-  {% comment %} <script src="{% static 'tasks/table.js' %}" id="url"></script> {% endcomment %}
-  <script src="{% static 'tasks/colResizable-1.6.min.js' %}" id="url"></script>
-  
+  <script src="{% static 'tasks/table_v1.js' %}" id="url"></script>
+  <script src="{% static 'tasks/colResizable-1.6.min.js' %}" id="url"></script>  
   {% endblock custom_js %}
   
   {% comment %} required to send to server {% endcomment %}
