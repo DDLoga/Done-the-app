@@ -30,19 +30,8 @@ $(document).ready(function() {
     });
 
     ///////////////////////////////////////////////////////////////////////////////// CRUD SECTION /////////////////////////////////////////////////////////////////////////////////
-    $(document).on('click', '.editable', function() {
-        $(this).find('.date-input').show();
-        $(this).find('.date-display').hide();
-    });
-    
-
-    $(document).on('change', '.date-input', function() {
-        var value = $(this).val();
-        var id = $(this).parent().data('id');
-        var field = $(this).parent().data('field');
-        var self = $(this);
-
-        // Send AJAX request to server to update database
+    // update funtion 
+    function updateProject(id, field, value, successCallback) {
         $.ajax({
             url: updateUrl,
             type: 'POST',
@@ -50,58 +39,53 @@ $(document).ready(function() {
                 'id': id,
                 'field': field,
                 'value': value,
-                'csrfmiddlewaretoken': csrftoken  // Replace with your CSRF token
+                'csrfmiddlewaretoken': csrftoken
             },
-            success: function(response) {
-                var formattedDate = new Date(value);
-
-                // Update span element with new date and show it
-                var dateDisplay = self.siblings('.date-display');
-                dateDisplay.text(formattedDate.getDate() + ' ' + formattedDate.toLocaleString('default', { month: 'short' }));
-                dateDisplay.show();
-
-                // Hide date picker
-                self.hide();
-                
-            },
+            success: successCallback,
             error: function(response) {
                 console.log("error");
                 console.log(response);
             }
         });
+    }
+
+    // show/hide date picker
+    $(document).on('click', '.editable', function() {
+        $(this).find('.date-input').show();
+        $(this).find('.date-display').hide();
     });
 
+    // update date
+    $(document).on('change', '.date-input', function() {
+        var value = $(this).val();
+        var id = $(this).parent().data('id');
+        var field = $(this).parent().data('field');
+        var self = $(this);
 
+        updateProject(id, field, value, function(response) {
+            var formattedDate = new Date(value);
 
+            // Update span element with new date and show it
+            var dateDisplay = self.siblings('.date-display');
+            dateDisplay.text(formattedDate.getDate() + ' ' + formattedDate.toLocaleString('default', { month: 'short' }));
+            dateDisplay.show();
 
-    // update existing context
+            // Hide date picker
+            self.hide();
+        });
+    });
+
+    // update text
     $(document).on('blur keypress', 'td[contenteditable="True"]', function(e) {
         if (e.type === 'focusout' || e.keyCode == 13) {
             e.preventDefault();
             var id = $(this).data('id');
             var field = $(this).data('field');
             var value = $(this).text();
-            console.log('id is: ' +id);
-            console.log('field is: ' +field);
-            console.log('value is: ' +value);
-            console.log('update url is: ' +updateUrl);
-            $.ajax({
-                url: updateUrl,
-                type: 'POST',
-                data: {
-                    'id': id,
-                    'field': field,
-                    'value': value,
-                    'csrfmiddlewaretoken': csrftoken
-                },
-                success: function(response) {
-                    console.log("success");
-                    console.log(response);
-                },
-                error: function(response) {
-                    console.log("error");
-                    console.log(response);
-                }
+
+            updateProject(id, field, value, function(response) {
+                console.log("success");
+                console.log(response);
             });
         }
     });
