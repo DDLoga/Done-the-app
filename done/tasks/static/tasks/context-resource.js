@@ -1,5 +1,4 @@
 $(document).ready(function(){
-    console.log("context-resource.js loaded");
 
     $('.delete-btn').hide();
     $('table').colResizable();

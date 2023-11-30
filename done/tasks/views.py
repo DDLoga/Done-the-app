@@ -366,6 +366,20 @@ def api_tasks_compound_priorities(request):
     return JsonResponse(tasks_list, safe=False)
 
 
+@csrf_exempt
+def update_projects(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+        projects = Projects.objects.get(id=id)
+        setattr(projects, field, value)
+        projects.save()
+        return JsonResponse({'status': 'success'}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+
 
 class CompoundPriorityView(View):
     # return the priority value of a task upon change (works with JS file)

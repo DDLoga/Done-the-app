@@ -21,25 +21,29 @@
         </tr>
       </thead>
 
-        {% for task in tasks %}
-        <tr class="rendered-row">
-            <td class="tbl-cell centered" data-id="{{ task.id }}" data-type="complete">
-              {% if task.complete %}
-                <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox" checked>
-              {% else %}
-                <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox">
-              {% endif %}
-            </td>
-            <td class="tbl-cell centered task-priority" id="compound-priority-{{ task.id }}" data-type="compound">{{ task.compound_priority }}</td>
-            {% comment %} <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td> {% endcomment %}
-            <td class="priority tbl-cell centered" contenteditable="True" id="task-priority" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
-            <td class="editable tbl-cell" contenteditable="True" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
-            <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="effort">{{ task.effort }}</td>
-            <td class="context tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="context">{{ task.context.name }}</td>
-            <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="deadline">{{ task.deadline|date:"j M" }}</td>
-            <td class="assignee tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="assignee">{{ task.assignee.name }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+      {% for task in tasks %}
+      <tr class="rendered-row" data-id="{{ task.id }}">
+        <td class="tbl-cell centered" data-id="{{ task.id }}" data-type="complete">
+          {% if task.complete %}
+            <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox" checked>
+          {% else %}
+            <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox">
+          {% endif %}
+        </td>
+        <td class="tbl-cell centered task-priority" id="compound-priority-{{ task.id }}" data-type="compound">{{ task.compound_priority }}</td>
+        {% comment %} <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td> {% endcomment %}
+        <td class="priority tbl-cell centered" contenteditable="True" id="task-priority" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
+        <td class="editable tbl-cell" contenteditable="True" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
+        <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="effort">{{ task.effort }}</td>
+        <td class="context tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="context">{{ task.context.name }}</td>
+        <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="deadline">{{ task.deadline|date:"j M" }}</td>
+        <td class="assignee tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="assignee">{{ task.assignee.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  var csrftoken = '{{ csrf_token }}';
+</script>

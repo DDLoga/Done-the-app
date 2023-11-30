@@ -28,4 +28,5 @@ urlpatterns = [
     path('delete_assignee/', views.delete_assignee, name='delete_assignee'),
     path('table_task/', views.table_task, name='table_task'),
     path('table_project/', views.table_project, name='table_project'),
+    path('update_projects/', views.update_projects, name='update_projects'),
 ]

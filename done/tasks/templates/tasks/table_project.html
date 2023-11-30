@@ -18,20 +18,31 @@
       </thead>
       <tbody class="task-table_body">
 
-        {% for project in projects %}
-        <tr class="rendered-row">
-            <td class="tbl-cell centered" data-id="{{ project.id }}" data-type="complete">
-              {% if project.project_complete %}
-                <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox" checked>
-              {% else %}
-                <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox">
-              {% endif %}
-            </td>
-            <td class="priority tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-type="priority">{{ project.project_priority }}</td>
-            <td class="editable tbl-cell" contenteditable="True" data-id="{{ project.id }}" data-type="name">{{ project.project_name }}</td>
-            <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-type="deadline">{{ project.project_deadline|date:"j M" }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+      {% for project in projects %}
+      <tr class="rendered-row" data-id="{{ task.id }}">
+        <td class="tbl-cell centered" data-id="{{ project.id }}" data-type="complete">
+          {% if project.project_complete %}
+            <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox" checked>
+          {% else %}
+            <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox">
+          {% endif %}
+        </td>
+        <td class="priority tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-field="project_priority">{{ project.project_priority }}</td>
+        <td class="editable tbl-cell" contenteditable="True" data-id="{{ project.id }}" data-field="project_name">{{ project.project_name }}</td>
+        {% comment %} <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-field="project_deadline">{{ project.project_deadline|date:"j M" }} </td> {% endcomment %}
+        <td class="editable tbl-cell centered" data-id="{{ project.id }}" data-field="deadline">
+          <span class="date-display">{{ project.project_deadline|date:"j M" }} </span>
+          <input type="date" class="date-input" style="display: none;" value="{{ project.project_deadline|date:'Y-m-d' }}">
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% block custom_js %}
+  <script>
+    var csrftoken = '{{ csrf_token }}';
+    var updateUrl = "{% url 'update_projects' %}";
+  </script>
+{% endblock custom_js %}
