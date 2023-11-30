@@ -30,7 +30,7 @@
         <td class="priority tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-field="project_priority">{{ project.project_priority }}</td>
         <td class="editable tbl-cell" contenteditable="True" data-id="{{ project.id }}" data-field="project_name">{{ project.project_name }}</td>
         {% comment %} <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-field="project_deadline">{{ project.project_deadline|date:"j M" }} </td> {% endcomment %}
-        <td class="editable tbl-cell centered" data-id="{{ project.id }}" data-field="deadline">
+        <td class="editable tbl-cell centered" data-id="{{ project.id }}" data-field="project_deadline">
           <span class="date-display">{{ project.project_deadline|date:"j M" }} </span>
           <input type="date" class="date-input" style="display: none;" value="{{ project.project_deadline|date:'Y-m-d' }}">
         </td>
