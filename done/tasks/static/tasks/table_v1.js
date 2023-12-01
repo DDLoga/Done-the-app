@@ -2,7 +2,7 @@
 $(document).ready(function() {
 
 
-    ///////////////////////////////////////////////////////////////////////////////// HIDE/SHOW DEFINITIONS /////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////// HIDE/SHOW SECTIONS ON LOAD/////////////////////////////////////////////////////////////////////////////////
         // HIDE THE DELETE BUTTON ON LOAD
         $('#delete-btn').hide();
 
@@ -30,7 +30,7 @@ $(document).ready(function() {
     });
 
     ///////////////////////////////////////////////////////////////////////////////// CRUD SECTION /////////////////////////////////////////////////////////////////////////////////
-    // update funtion 
+    // UPDATE FUNCTION DEFINITION
     function updateProject(id, field, value, successCallback) {
         $.ajax({
             url: updateUrl,
@@ -49,13 +49,13 @@ $(document).ready(function() {
         });
     }
 
-    // show/hide date picker
+    // SHOW/HIDE DATE PICKER ON CLICK
     $(document).on('click', '.editable', function() {
         $(this).find('.date-input').show();
         $(this).find('.date-display').hide();
     });
 
-    // update date
+    // DATE UPDATE
     $(document).on('change', '.date-input', function() {
         var value = $(this).val();
         var id = $(this).parent().data('id');
@@ -75,7 +75,7 @@ $(document).ready(function() {
         });
     });
 
-    // update text
+    // TEXT UPDATE
     $(document).on('blur keypress', 'td[contenteditable="True"]', function(e) {
         if (e.type === 'focusout' || e.keyCode == 13) {
             e.preventDefault();
@@ -89,4 +89,47 @@ $(document).ready(function() {
             });
         }
     });
+
+    // PRIORITY UPDATE
+    // create a list of priorities pulled from the models.py to populate the dropdown menu
+    $(document).on('click', '.priority', function() {
+        var id = $(this).data('id');
+        var field = $(this).data('field');
+        var currentValue = $(this).text();
+        var self = $(this);
+    
+        // Create select element
+        var select = $('<select class="priority-select"></select>');
+        select.data('id', id);
+        select.data('field', field);
+    
+        // Populate select options
+        $.each(PRIORITIES, function(index, value) {
+            var option = $('<option></option>').val(value[0]).text(value[1]);
+            if (value[0] === currentValue) {
+                option.prop('selected', true);
+            }
+            select.append(option);
+        });
+    
+        // Replace td with select
+        self.replaceWith(select);
+    });
+    
+    $(document).on('change', '.priority-select', function() {
+        var value = $(this).val();
+        var id = $(this).data('id');
+        var field = $(this).data('field');
+        var self = $(this);
+    
+        updateProject(id, field, value, function(response) {
+            // Replace select with td
+            var td = $('<td class="priority tbl-cell centered" contenteditable="True"></td>');
+            td.data('id', id);
+            td.data('field', field);
+            td.text(value);
+            self.replaceWith(td);
+        });
+    });
+
 });

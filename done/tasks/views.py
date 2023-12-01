@@ -155,18 +155,17 @@ def project_filter_results_view(request):
 
 @login_required
 def Prioritizer(request):
-    # all_tasks = Tasks.objects.filter(user=request.user)
-    # all_projects=Projects.objects.filter(user=request.user)
     context_options = Context.objects.values_list('name', flat=True)
     context_options_list = list(context_options)
     assignee_options = Assignee.objects.values_list('name', flat=True)
     assignee_options_list = list(assignee_options)
-    # task_form = Task_Form()
+    print(Projects.PRIORITIES)
 
     return render(request,
                 "tasks/prioritizer.html",
                 {'context_options_list':context_options_list,
-                'assignee_options_list':assignee_options_list})
+                'assignee_options_list':assignee_options_list,
+                'priorities': Projects.PRIORITIES})
     
 @login_required
 def table_task(request):
