@@ -91,7 +91,7 @@ $(document).ready(function() {
     });
 
     // PRIORITY UPDATE
-    // create a list of priorities pulled from the models.py to populate the dropdown menu
+    // Show dropdown on click
     $(document).on('click', '.priority', function() {
         var id = $(this).data('id');
         var field = $(this).data('field');
@@ -102,11 +102,23 @@ $(document).ready(function() {
         var select = $('<select class="priority-select"></select>');
         select.data('id', id);
         select.data('field', field);
+
+        // Add CSS styles to the dropdown
+        select.css({
+            'color': 'white',
+            'border': 'none',
+            'padding': '5px',
+            'font-size': '14px',
+            'border-radius': '5px',
+            'display': 'block',
+            'margin': 'auto'
+        });
     
         // Populate select options
+        var PRIORITIES = ['A', 'B', 'C', 'D'];
         $.each(PRIORITIES, function(index, value) {
-            var option = $('<option></option>').val(value[0]).text(value[1]);
-            if (value[0] === currentValue) {
+            var option = $('<option></option>').val(value).text(value);
+            if (value === currentValue) {
                 option.prop('selected', true);
             }
             select.append(option);
@@ -116,6 +128,7 @@ $(document).ready(function() {
         self.replaceWith(select);
     });
     
+    // Update priority on change
     $(document).on('change', '.priority-select', function() {
         var value = $(this).val();
         var id = $(this).data('id');
@@ -131,5 +144,86 @@ $(document).ready(function() {
             self.replaceWith(td);
         });
     });
+
+    // DELETE FUNCTION DEFINITION
+    function deleteProject(id, successCallback) {
+        $.ajax({
+            url: deleteUrl,
+            type: 'POST',
+            data: {
+                'id': id,
+                'csrfmiddlewaretoken': csrftoken
+            },
+            success: successCallback,
+            error: function(response) {
+                console.log("error");
+                console.log(response);
+            }
+        });
+    }
+
+    $(document).on('click', '.completion-checkbox', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var self = $(this);
+    
+        // Create modal dialog
+        var dialog = $('<div></div>').html('Do you want to delete the selected project?');
+        dialog.dialog({
+            title: 'Confirm Deletion',
+            modal: true,
+            buttons: {
+                'Yes': function() {
+                    deleteProject(id);  // Call deleteProject function
+                    $(this).dialog('close');
+                },
+                'No': function() {
+                    self.prop('checked', false);  // Uncheck checkbox
+                    $(this).dialog('close');
+                }
+            },
+            create: function() {
+                // Style the dialog box
+                $(this).closest('.ui-dialog')
+                    .find('.ui-dialog-titlebar')
+                    .css({
+                        'background-color': '#2F3B52',
+                        'color': '#FFFFFF',
+                        'border': 'none',
+                        'border-radius': '10px 10px 0 0',
+                        'box-shadow': '0px 2px 10px rgba(0, 0, 0, 0.1)'
+                    });
+                $(this).closest('.ui-dialog')
+                    .find('.ui-dialog-content')
+                    .css({
+                        'background-color': '#3F4C6B',
+                        'color': '#FFFFFF',
+                        'display': 'flex',
+                        'justify-content': 'center',
+                        'align-items': 'center'
+                    });
+                $(this).closest('.ui-dialog')
+                    .find('.ui-dialog-buttonpane')
+                    .css({
+                        'background-color': '#3F4C6B',
+                        'color': '#FFFFFF',
+                        'border-radius': '0 0 10px 10px',
+                        'display': 'flex',
+                        'justify-content': 'center'
+                    });
+                $(this).closest('.ui-dialog')
+                    .find('.ui-button')
+                    .css({
+                        'background-color': '#0078D7',
+                        'color': '#FFFFFF',
+                        'border': 'none',
+                        'border-radius': '5px',
+                        'box-shadow': '0px 2px 5px rgba(0, 0, 0, 0.1)'
+                    });
+            }
+        });
+    });
+
+
 
 });

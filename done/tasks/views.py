@@ -164,8 +164,7 @@ def Prioritizer(request):
     return render(request,
                 "tasks/prioritizer.html",
                 {'context_options_list':context_options_list,
-                'assignee_options_list':assignee_options_list,
-                'priorities': Projects.PRIORITIES})
+                'assignee_options_list':assignee_options_list})
     
 @login_required
 def table_task(request):

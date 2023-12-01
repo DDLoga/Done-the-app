@@ -79,16 +79,17 @@
     var api_tasks_url = "{% url 'api_tasks' %}";
     var contextUrl = "{% url 'prioritizer' %}";
     var delete_completed_tasks = "{% url 'delete_completed_tasks' %}";
-    var delete_completed_projects = "{% url 'delete_completed_projects' %}";
     var contextOptions = {{ context_options_list|safe }};
     var assigneeOptions = {{ assignee_options_list|safe}}
   </script>
   <script src="{% static 'tasks/table_v1.js' %}" id="url"></script>
-  <script src="{% static 'tasks/colResizable-1.6.min.js' %}" id="url"></script>  
+  <script src="{% static 'tasks/colResizable-1.6.min.js' %}" id="url"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>  
   {% endblock custom_js %}
   
   {% comment %} required to send to server {% endcomment %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
   <script src="https://cdn.rawgit.com/alvaro-prieto/colResizable/master/colResizable-1.6.min.js"></script>
   
 

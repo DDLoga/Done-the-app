@@ -43,6 +43,6 @@
   <script>
     var csrftoken = '{{ csrf_token }}';
     var updateUrl = "{% url 'update_projects' %}";
-    var PRIORITIES = {{ priorities|safe }};
+    var deleteUrl = "{% url 'delete_completed_projects' %}";
   </script>
 {% endblock custom_js %}
