@@ -184,35 +184,50 @@ $(document).ready(function() {
             },
             create: function() {
                 // Style the dialog box
-                $(this).closest('.ui-dialog')
-                    .find('.ui-dialog-titlebar')
+                var dialog = $(this).closest('.ui-dialog');
+                dialog.find('.ui-dialog-titlebar')
                     .css({
                         'background-color': '#2F3B52',
                         'color': '#FFFFFF',
                         'border': 'none',
                         'border-radius': '10px 10px 0 0',
-                        'box-shadow': '0px 2px 10px rgba(0, 0, 0, 0.1)'
+                        'box-shadow': '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                        'display': 'flex',
+                        'justify-content': 'space-between',
+                        'padding-left' : '10px',
+                        'padding-right' : '10px',
+                        'height': '30px',
+                        'align-items': 'center'
                     });
-                $(this).closest('.ui-dialog')
-                    .find('.ui-dialog-content')
+                dialog.find('.ui-dialog-content')
                     .css({
                         'background-color': '#3F4C6B',
                         'color': '#FFFFFF',
                         'display': 'flex',
                         'justify-content': 'center',
-                        'align-items': 'center'
+                        'align-items': 'center',
+                        'padding-left' : '10px',
+                        'padding-right' : '10px'
                     });
-                $(this).closest('.ui-dialog')
-                    .find('.ui-dialog-buttonpane')
+                dialog.find('.ui-dialog-buttonpane')
                     .css({
                         'background-color': '#3F4C6B',
                         'color': '#FFFFFF',
                         'border-radius': '0 0 10px 10px',
                         'display': 'flex',
-                        'justify-content': 'center'
+                        'justify-content': 'center',
+                        'height': '30px'
                     });
-                $(this).closest('.ui-dialog')
-                    .find('.ui-button')
+                dialog.find('.ui-dialog-buttonset .ui-button').first()
+                    .css({
+                        'background-color': '#0078D7',
+                        'color': '#FFFFFF',
+                        'border': 'none',
+                        'border-radius': '5px',
+                        'box-shadow': '0px 2px 5px rgba(0, 0, 0, 0.1)',
+                        'margin-right': '10px'
+                    });
+                dialog.find('.ui-dialog-buttonset .ui-button').last()
                     .css({
                         'background-color': '#0078D7',
                         'color': '#FFFFFF',
@@ -220,6 +235,9 @@ $(document).ready(function() {
                         'border-radius': '5px',
                         'box-shadow': '0px 2px 5px rgba(0, 0, 0, 0.1)'
                     });
+                // Change the text of the close button to 'X'
+                dialog.find('.ui-dialog-titlebar-close')
+                    .text('X');
             }
         });
     });
