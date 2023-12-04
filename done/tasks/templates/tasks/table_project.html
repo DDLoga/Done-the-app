@@ -27,7 +27,7 @@
             <input type="checkbox" data-id="{{ project.id }}" class="input-data form-control completion-checkbox">
           {% endif %}
         </td>
-        <td class="priority tbl-cell centered" contenteditable="True" data-id="{{ project.id }}" data-field="project_priority">{{ project.project_priority }}</td>
+        <td class="priority tbl-cell centered" data-id="{{ project.id }}" data-field="project_priority">{{ project.project_priority }}</td>
         <td class="editable tbl-cell" contenteditable="True" data-id="{{ project.id }}" data-field="project_name">{{ project.project_name }}</td>
         <td class="editable tbl-cell centered" data-id="{{ project.id }}" data-field="project_deadline">
           <span class="date-display">{{ project.project_deadline|date:"j M" }} </span>

@@ -159,7 +159,6 @@ def Prioritizer(request):
     context_options_list = list(context_options)
     assignee_options = Assignee.objects.values_list('name', flat=True)
     assignee_options_list = list(assignee_options)
-    print(Projects.PRIORITIES)
 
     return render(request,
                 "tasks/prioritizer.html",
@@ -352,9 +351,12 @@ def delete_completed_tasks(request):
 @login_required
 @csrf_exempt
 def delete_completed_projects(request):
-    checked_items = request.POST.getlist('checked_items[]')
-    Projects.objects.filter(pk__in=checked_items, user=request.user).delete()
-    return JsonResponse({'status': 'success'})
+    if request.method == 'POST':
+        checked_items = request.POST.getlist('id')
+        Projects.objects.filter(pk__in=checked_items, user=request.user).delete()
+        return JsonResponse({'status': 'success'}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+
 
 @login_required
 def api_tasks_compound_priorities(request):

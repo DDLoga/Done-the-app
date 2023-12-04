@@ -32,6 +32,7 @@ $(document).ready(function() {
     ///////////////////////////////////////////////////////////////////////////////// CRUD SECTION /////////////////////////////////////////////////////////////////////////////////
     // UPDATE FUNCTION DEFINITION
     function updateProject(id, field, value, successCallback) {
+        console.log("updateProject function triggered");
         $.ajax({
             url: updateUrl,
             type: 'POST',
@@ -92,12 +93,13 @@ $(document).ready(function() {
 
     // PRIORITY UPDATE
     // Show dropdown on click
+    var isMouseInDropdown = false;
     $(document).on('click', '.priority', function() {
         var id = $(this).data('id');
         var field = $(this).data('field');
         var currentValue = $(this).text();
         var self = $(this);
-    
+
         // Create select element
         var select = $('<select class="priority-select"></select>');
         select.data('id', id);
@@ -113,36 +115,75 @@ $(document).ready(function() {
             'display': 'block',
             'margin': 'auto'
         });
-    
+
+        // Bind hover function to dropdown menu
+        select.hover(
+            function() {
+                // Mouse enter
+                isMouseInDropdown = true;
+            },
+            function() {
+                // Mouse leave
+                isMouseInDropdown = false;
+            }
+        );
+
         // Populate select options
-        var PRIORITIES = ['A', 'B', 'C', 'D'];
-        $.each(PRIORITIES, function(index, value) {
+        var PRIORITIES = ['-','A', 'B', 'C', 'D'];
+        $.each(PRIORITIES, function(_, value) {
             var option = $('<option></option>').val(value).text(value);
             if (value === currentValue) {
                 option.prop('selected', true);
             }
             select.append(option);
         });
-    
+
         // Replace td with select
         self.replaceWith(select);
+
+        // Open the dropdown menu
+        select.show().focus();
     });
-    
-    // Update priority on change
-    $(document).on('change', '.priority-select', function() {
-        var value = $(this).val();
-        var id = $(this).data('id');
-        var field = $(this).data('field');
-        var self = $(this);
-    
-        updateProject(id, field, value, function(response) {
-            // Replace select with td
-            var td = $('<td class="priority tbl-cell centered" contenteditable="True"></td>');
-            td.data('id', id);
-            td.data('field', field);
-            td.text(value);
-            self.replaceWith(td);
-        });
+
+    // Update priority on change or blur
+    var originalValue;
+
+    $(document).on('focus', '.priority-select', function() {
+        console.log("focus triggered");
+        // Store the original value when the dropdown menu is opened
+        originalValue = $(this).val();
+        console.log('originalValue: ' + originalValue); 
+    });
+
+    $(document).on('focusout change', '.priority-select', function() {
+        if (!isMouseInDropdown) {
+            console.log("focusout/change triggered");
+            var value = $(this).val();
+            var id = $(this).data('id');
+            var field = $(this).data('field');
+            var self = $(this);
+            console.log('focusout/change value: ' + value);
+
+            if (value !== originalValue) {
+                // If the value has changed, trigger the updateProject function
+                console.log('value changed - POST triggered');
+                updateProject(id, field, value, function(response) {
+                    // Replace select with td
+                    var td = $('<td class="priority tbl-cell centered"></td>');
+                    td.data('id', id);
+                    td.data('field', field);
+                    td.text(value);
+                    self.replaceWith(td);
+                });
+            } else {
+                // If the value has not changed, remove the dropdown menu and display the original value
+                var td = $('<td class="priority tbl-cell centered"></td>');
+                td.data('id', id);
+                td.data('field', field);
+                td.text(originalValue);
+                self.replaceWith(td);
+            }
+        }
     });
 
     // DELETE FUNCTION DEFINITION
@@ -154,7 +195,14 @@ $(document).ready(function() {
                 'id': id,
                 'csrfmiddlewaretoken': csrftoken
             },
-            success: successCallback,
+            success: function() {
+                // Check if successCallback is a function before calling it
+                if (typeof successCallback === 'function') {
+                    successCallback();
+                }
+                // Trigger htmx request to reload the table
+                htmx.trigger('#project-radio', 'change');
+            },
             error: function(response) {
                 console.log("error");
                 console.log(response);
@@ -162,8 +210,8 @@ $(document).ready(function() {
         });
     }
 
+    // create a dialog box to confirm deletion
     $(document).on('click', '.completion-checkbox', function(e) {
-        e.preventDefault();
         var id = $(this).data('id');
         var self = $(this);
     
@@ -183,61 +231,8 @@ $(document).ready(function() {
                 }
             },
             create: function() {
-                // Style the dialog box
-                var dialog = $(this).closest('.ui-dialog');
-                dialog.find('.ui-dialog-titlebar')
-                    .css({
-                        'background-color': '#2F3B52',
-                        'color': '#FFFFFF',
-                        'border': 'none',
-                        'border-radius': '10px 10px 0 0',
-                        'box-shadow': '0px 2px 10px rgba(0, 0, 0, 0.1)',
-                        'display': 'flex',
-                        'justify-content': 'space-between',
-                        'padding-left' : '10px',
-                        'padding-right' : '10px',
-                        'height': '30px',
-                        'align-items': 'center'
-                    });
-                dialog.find('.ui-dialog-content')
-                    .css({
-                        'background-color': '#3F4C6B',
-                        'color': '#FFFFFF',
-                        'display': 'flex',
-                        'justify-content': 'center',
-                        'align-items': 'center',
-                        'padding-left' : '10px',
-                        'padding-right' : '10px'
-                    });
-                dialog.find('.ui-dialog-buttonpane')
-                    .css({
-                        'background-color': '#3F4C6B',
-                        'color': '#FFFFFF',
-                        'border-radius': '0 0 10px 10px',
-                        'display': 'flex',
-                        'justify-content': 'center',
-                        'height': '30px'
-                    });
-                dialog.find('.ui-dialog-buttonset .ui-button').first()
-                    .css({
-                        'background-color': '#0078D7',
-                        'color': '#FFFFFF',
-                        'border': 'none',
-                        'border-radius': '5px',
-                        'box-shadow': '0px 2px 5px rgba(0, 0, 0, 0.1)',
-                        'margin-right': '10px'
-                    });
-                dialog.find('.ui-dialog-buttonset .ui-button').last()
-                    .css({
-                        'background-color': '#0078D7',
-                        'color': '#FFFFFF',
-                        'border': 'none',
-                        'border-radius': '5px',
-                        'box-shadow': '0px 2px 5px rgba(0, 0, 0, 0.1)'
-                    });
                 // Change the text of the close button to 'X'
-                dialog.find('.ui-dialog-titlebar-close')
-                    .text('X');
+                $(this).closest('.ui-dialog').find('.ui-dialog-titlebar-close').text('X');
             }
         });
     });
