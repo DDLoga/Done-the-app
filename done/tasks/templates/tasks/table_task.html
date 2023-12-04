@@ -30,20 +30,27 @@
             <input type="checkbox" data-id="{{ task.id }}" class="input-data form-control completion-checkbox">
           {% endif %}
         </td>
-        <td class="tbl-cell centered task-priority" id="compound-priority-{{ task.id }}" data-type="compound">{{ task.compound_priority }}</td>
-        {% comment %} <td class="priority tbl-cell centered" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td> {% endcomment %}
-        <td class="priority tbl-cell centered" contenteditable="True" id="task-priority" data-id="{{ task.id }}" data-type="priority">{{ task.priority }}</td>
-        <td class="editable tbl-cell" contenteditable="True" data-id="{{ task.id }}" data-type="name">{{ task.name }}</td>
-        <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="effort">{{ task.effort }}</td>
-        <td class="context tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="context">{{ task.context.name }}</td>
-        <td class="editable tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="deadline">{{ task.deadline|date:"j M" }}</td>
-        <td class="assignee tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-type="assignee">{{ task.assignee.name }}</td>
+        <td class="tbl-cell centered task-priority" id="compound-priority-{{ task.id }}" data-field="compound">{{ task.compound_priority }}</td>
+        <td class="priority tbl-cell centered" contenteditable="True" id="task-priority" data-id="{{ task.id }}" data-field="priority">{{ task.priority }}</td>
+        <td class="editable tbl-cell" contenteditable="True" data-id="{{ task.id }}" data-field="name">{{ task.name }}</td>
+        <td class="editable-effort tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-field="effort">{{ task.effort }}</td>
+        <td class="context tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-field="context">{{ task.context.name }}</td>
+        <td class="editable tbl-cell centered" data-id="{{ task.id }}" data-field="deadline">
+          <span class="date-display">{{ task.deadline|date:"j M" }}</span>
+          <input type="date" class="date-input" style="display: none;" value="{{ task.deadline|date:'Y-m-d' }}">
+        </td>
+        <td class="assignee tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-field="assignee">{{ task.assignee.name }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
-<script>
-  var csrftoken = '{{ csrf_token }}';
-</script>
+{% block custom_js %}
+  <script>
+    var csrftoken = '{{ csrf_token }}';
+    var updateUrl = "{% url 'update_tasks' %}";
+    var contextOptions = {{ context_options_list|safe }};
+    var assigneeOptions = {{ assignee_options_list|safe}}
+  </script>
+{% endblock custom_js %}

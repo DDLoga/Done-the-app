@@ -28,8 +28,13 @@ $(document).ready(function() {
 
     ///////////////////////////////////////////////////////////////////////////////// CRUD FUNCTIONS DEFINITIONS /////////////////////////////////////////////////////////////////////////////////
     // UPDATE FUNCTION DEFINITION
-    function updateProject(id, field, value, successCallback) {
-        console.log("updateProject function triggered");
+    function updateItem(id, field, value, successCallback) {
+        console.log("updateItem function triggered");
+        console.log("id: " + id);
+        console.log("field: " + field);
+        console.log("value: " + value);
+        console.log("updateUrl: " + updateUrl);
+        console.log('successCallback: ' + successCallback);
         $.ajax({
             url: updateUrl,
             type: 'POST',
@@ -71,6 +76,14 @@ $(document).ready(function() {
         });
     }
 
+    function createDropdown(taskId, options, dropdownClass, dropdownId) {
+        var selectHtml = '<select id="' + dropdownId + taskId + '" class="' + dropdownClass + ' custom-select">';
+        for (var i = 0; i < options.length; i++) {
+            selectHtml += '<option value="' + options[i] + '">' + options[i] + '</option>';
+        }
+        selectHtml += '</select>';
+        return selectHtml;
+    }
     ///////////////////////////////////////////////////////////////////////////////// CONTENT UPDATE DEFINITION /////////////////////////////////////////////////////////////////////////////////
     // DATE UPDATE
     $(document).on('change', '.date-input', function() {
@@ -79,7 +92,7 @@ $(document).ready(function() {
         var field = $(this).parent().data('field');
         var self = $(this);
 
-        updateProject(id, field, value, function(response) {
+        updateItem(id, field, value, function(response) {
             var formattedDate = new Date(value);
 
             // Update span element with new date and show it
@@ -105,11 +118,23 @@ $(document).ready(function() {
             var id = $(this).data('id');
             var field = $(this).data('field');
             var value = $(this).text();
-
-            updateProject(id, field, value, function(response) {
+            console.log("value: " + value);
+            console.log("id: " + id);
+            console.log("field: " + field);
+            updateItem(id, field, value, function(response) {
                 console.log("success");
                 console.log(response);
             });
+        }
+    });
+
+    // EFFORT VALUE - DATA VALIDATION TO BE A NUMBER
+    $(document).on('blur', '.editable-effort', function() {
+        var value = $(this).text();
+        if (isNaN(value)) {
+            alert("Please enter a number");
+            $(this).text('');
+            $(this).focus();
         }
     });
 
@@ -171,9 +196,9 @@ $(document).ready(function() {
         var self = $(this);
 
         if (value !== originalValue) {
-            // If the value has changed, trigger the updateProject function
+            // If the value has changed, trigger the updateItem function
             console.log('value changed - POST triggered');
-            updateProject(id, field, value, function(response) {
+            updateItem(id, field, value, function(response) {
                 // Replace select with td
                 var td = $('<td class="priority tbl-cell centered"></td>');
                 td.data('id', id);
@@ -190,6 +215,22 @@ $(document).ready(function() {
             self.replaceWith(td);
         }
     });
+
+    // CREATE A CONTEXT DROP DOWN MENU ON CLICK
+    $(document).on("click", ".context", function() {
+        var taskId = $(this).data("id");
+        var options = contextOptions
+        var dropdownClass = "input-data-context form-control"
+        var dropdownId = 'context-select-'
+
+        // Create a <select> element with <option> elements
+        var selectHtml = createDropdown(taskId, options, dropdownClass, dropdownId);
+
+        // Append the <select> element to the table cell
+        $(this).html(selectHtml);
+        $(this).removeClass("context");
+    });
+
 
     ///////////////////////////////////////////////////////////////////////////////// DELETE DEFINITION /////////////////////////////////////////////////////////////////////////////////
     // create a dialog box to confirm deletion

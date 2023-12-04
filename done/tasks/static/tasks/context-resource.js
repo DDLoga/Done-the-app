@@ -42,7 +42,6 @@ $(document).ready(function(){
         // remove the add row from the table
         var selectedRow = $('.add-row').detach();
         // get the last ID in the table
-        var lastRowId = $('table.task-table_component tr:last').data('id');
         $.ajax({
             url: addUrl,
             type: 'POST',
@@ -50,9 +49,8 @@ $(document).ready(function(){
                 'csrfmiddlewaretoken': csrftoken
             },
             success: function(response) {
-                lastRow = lastRowId + 1;
                 $('table').append(
-                    '<tr class="task-table_row" data-id="' + lastRow + '"><td class="tbl-cell centered"><input type="checkbox" name="myCheckbox"><td class="tbl-cell cntx-name" contenteditable="True" data-id="' + lastRow + '" data-field="name">' + response.name + '</td><td class="tbl-cell" contenteditable="True" data-id="' + lastRow + '" data-field="description">' + response.description + '</td></tr>'
+                    '<tr class="task-table_row" data-id="' + response.id + '"><td class="tbl-cell centered"><input type="checkbox" name="myCheckbox"><td class="tbl-cell cntx-name" contenteditable="True" data-id="' + response.id + '" data-field="name">' + response.name + '</td><td class="tbl-cell" contenteditable="True" data-id="' + response.id + '" data-field="description">' + response.description + '</td></tr>'
                     );
                 // recreate the add row
                 $('table').append(selectedRow);

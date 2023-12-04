@@ -214,7 +214,8 @@ def add_context(request):
         context = Context(name='New context', description='New description')
         context.user = request.user
         context.save()
-        return JsonResponse({'name': context.name, 'description': context.description}, status=200)
+        context_id = context.pk
+        return JsonResponse({'name': context.name, 'description': context.description, 'id': context_id}, status=200)
     return JsonResponse({'status': 'error'}, status=400)
 
 @csrf_exempt
@@ -248,7 +249,8 @@ def add_assignee(request):
         assignee = Assignee(name='New assignee', description='New description')
         assignee.user = request.user
         assignee.save()
-        return JsonResponse({'name': assignee.name, 'description': assignee.description}, status=200)
+        assignee_id = assignee.pk
+        return JsonResponse({'name': assignee.name, 'description': assignee.description, 'id' : assignee_id}, status=200)
     return JsonResponse({'status': 'error'}, status=400)
 
 @csrf_exempt
@@ -393,6 +395,24 @@ def add_project(request):
         project_id = project.pk
         return JsonResponse({'name': project.project_name, 'project_id': project_id}, status=200)
     return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def update_tasks(request):
+    try:
+        if request.method == 'POST':
+            id = request.POST.get('id')
+            field = request.POST.get('field')
+            value = request.POST.get('value')
+            tasks = Tasks.objects.get(id=id)
+            setattr(tasks, field, value)
+            tasks.save()
+            return JsonResponse({'status': 'success'}, status=200)
+        return JsonResponse({'status': 'error'}, status=400)
+    except Exception as e:
+        error_message = str(e)
+        print(error_message)
+        return JsonResponse({'status': 'error'}, status=400)
+
 
 
 class CompoundPriorityView(View):

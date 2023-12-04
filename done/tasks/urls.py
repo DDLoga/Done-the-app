@@ -30,4 +30,5 @@ urlpatterns = [
     path('table_project/', views.table_project, name='table_project'),
     path('update_projects/', views.update_projects, name='update_projects'),
     path('add_project/', views.add_project, name='add_project'),
+    path('update_tasks/', views.update_tasks, name='update_tasks'),
 ]
