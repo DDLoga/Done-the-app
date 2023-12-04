@@ -368,17 +368,31 @@ def api_tasks_compound_priorities(request):
 
 @csrf_exempt
 def update_projects(request):
+    try:
+        if request.method == 'POST':
+            id = request.POST.get('id')
+            field = request.POST.get('field')
+            value = request.POST.get('value')
+            projects = Projects.objects.get(id=id)
+            setattr(projects, field, value)
+            projects.save()
+            return JsonResponse({'status': 'success'}, status=200)
+        return JsonResponse({'status': 'error'}, status=400)
+    except Exception as e:
+        error_message = str(e)
+        print(error_message)
+        return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def add_project(request):
     if request.method == 'POST':
-        id = request.POST.get('id')
-        field = request.POST.get('field')
-        value = request.POST.get('value')
-        projects = Projects.objects.get(id=id)
-        setattr(projects, field, value)
-        projects.save()
-        return JsonResponse({'status': 'success'}, status=200)
+        project = Projects(project_name='New Project Name')
+        project.user = request.user
+        project.save()
+        # get the pk of the new project
+        project_id = project.pk
+        return JsonResponse({'name': project.project_name, 'project_id': project_id}, status=200)
     return JsonResponse({'status': 'error'}, status=400)
-
-
 
 
 class CompoundPriorityView(View):

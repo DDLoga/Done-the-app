@@ -35,6 +35,12 @@
         </td>
       </tr>
       {% endfor %}
+      <tr class="task-table_row add-row">
+        <td class="tbl-cell centered"> </td>
+        <td class="tbl-cell centered"> </td>
+        <td class="tbl-cell centered italic">add a project<a href="#" class="content-btn add w-button">+</a></td>
+        <td class="tbl-cell"> </td>
+      </tr>
     </tbody>
   </table>
 </div>
@@ -44,5 +50,6 @@
     var csrftoken = '{{ csrf_token }}';
     var updateUrl = "{% url 'update_projects' %}";
     var deleteUrl = "{% url 'delete_completed_projects' %}";
+    var addUrl = "{% url 'add_project' %}";
   </script>
 {% endblock custom_js %}
