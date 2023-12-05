@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse
 from django.views import View
 from tasks.models import Projects, Tasks
@@ -155,22 +155,14 @@ def project_filter_results_view(request):
 
 @login_required
 def Prioritizer(request):
-    context_options = Context.objects.values_list('name', flat=True)
-    context_options_list = list(context_options)
-    assignee_options = Assignee.objects.values_list('name', flat=True)
-    assignee_options_list = list(assignee_options)
-
-    return render(request,
-                "tasks/prioritizer.html",
-                {'context_options_list':context_options_list,
-                'assignee_options_list':assignee_options_list})
+    return render(request,"tasks/prioritizer.html")
     
 @login_required
 def table_task(request):
     all_tasks = Tasks.objects.filter(user=request.user)
-    context_options = Context.objects.values_list('name', flat=True)
+    context_options = Context.objects.filter(user=request.user).values_list('name', flat=True)
     context_options_list = list(context_options)
-    assignee_options = Assignee.objects.values_list('name', flat=True)
+    assignee_options = Assignee.objects.filter(user=request.user).values_list('name', flat=True)
     assignee_options_list = list(assignee_options)
     return render(request,
                 'tasks/table_task.html',
@@ -398,20 +390,28 @@ def add_project(request):
 
 @csrf_exempt
 def update_tasks(request):
-    try:
-        if request.method == 'POST':
-            id = request.POST.get('id')
-            field = request.POST.get('field')
-            value = request.POST.get('value')
-            tasks = Tasks.objects.get(id=id)
-            setattr(tasks, field, value)
-            tasks.save()
-            return JsonResponse({'status': 'success'}, status=200)
-        return JsonResponse({'status': 'error'}, status=400)
-    except Exception as e:
-        error_message = str(e)
-        print(error_message)
-        return JsonResponse({'status': 'error'}, status=400)
+    print(request.POST)
+    # try:
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+        print('received id, field, value as: ', id, field, value)
+        tasks = Tasks.objects.get(id=id)
+        
+        
+        if field == 'context':
+            value = get_object_or_404(Context, name=value)  # replace 'name' with the field you use to identify a Context instance
+        
+        
+        setattr(tasks, field, value)
+        tasks.save()
+        return JsonResponse({'status': 'success'}, status=200)
+    return JsonResponse({'status': 'error'}, status=400)
+    # except Exception as e:
+    #     error_message = str(e)
+    #     print(error_message)
+    #     return JsonResponse({'status': 'error'}, status=400)
 
 
 

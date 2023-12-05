@@ -1,7 +1,6 @@
 // once the document is fully loaded
 $(document).ready(function() {
 
-
     ///////////////////////////////////////////////////////////////////////////////// HIDE/SHOW SECTIONS ON LOAD/////////////////////////////////////////////////////////////////////////////////
     // HIDE/SHOW HINT DIV AND DELETE BUTTON WHILE CHANGING THE INPUT TYPE
     $('input[type=radio][name=input-type]').change(function() {
@@ -29,7 +28,7 @@ $(document).ready(function() {
     ///////////////////////////////////////////////////////////////////////////////// CRUD FUNCTIONS DEFINITIONS /////////////////////////////////////////////////////////////////////////////////
     // UPDATE FUNCTION DEFINITION
     function updateItem(id, field, value, successCallback) {
-        console.log("updateItem function triggered");
+        console.log("update to server function triggered");
         console.log("id: " + id);
         console.log("field: " + field);
         console.log("value: " + value);
@@ -110,9 +109,6 @@ $(document).ready(function() {
             var id = $(this).data('id');
             var field = $(this).data('field');
             var value = $(this).text();
-            console.log("value: " + value);
-            console.log("id: " + id);
-            console.log("field: " + field);
             updateItem(id, field, value, function(response) {
                 console.log("success");
                 console.log(response);
@@ -138,11 +134,11 @@ $(document).ready(function() {
         var self = $(this);
 
         // Create select element
-        var select = $('<select class="priority-select"></select>');
+        var select = $('<select class="priority-dropdown"></select>');
         select.data('id', id);
         select.data('field', field);
 
-        // Add CSS styles to the dropdown
+        // Add CSS styles to the priority-dropdown
         select.css({
             'color': 'white',
             'border': 'none',
@@ -167,21 +163,19 @@ $(document).ready(function() {
         // Replace td with select
         self.replaceWith(select);
 
-        // Open the dropdown menu
+        // Open the priority-dropdown menu
         select.show().focus();
     });
 
     // PRIORITY UPDATE - GET THE EXISTING PRIORITY VALUE
     var originalValue;
-    $(document).on('focus', '.priority-select', function() {
-        console.log("focus triggered");
-        // Store the original value when the dropdown menu is opened
+    $(document).on('focus', '.priority-dropdown', function() {
+        // Store the original value when the priority-dropdown menu is opened
         originalValue = $(this).val();
-        console.log('originalValue: ' + originalValue); 
     });
 
     // PRIORITY UPDATE - UPDATE THE PRIORITY VALUE IF CHANGE DETECTED
-    $(document).on('focusout change', '.priority-select', function() {
+    $(document).on('focusout change', '.priority-dropdown', function() {
         var value = $(this).val();
         var id = $(this).data('id');
         var field = $(this).data('field');
@@ -189,7 +183,6 @@ $(document).ready(function() {
 
         if (value !== originalValue) {
             // If the value has changed, trigger the updateItem function
-            console.log('value changed - POST triggered');
             updateItem(id, field, value, function(response) {
                 // Replace select with td
                 var td = $('<td class="priority tbl-cell centered"></td>');
@@ -199,7 +192,7 @@ $(document).ready(function() {
                 self.replaceWith(td);
             });
         } else {
-            // If the value has not changed, remove the dropdown menu and display the original value
+            // If the value has not changed, remove the priority-dropdown menu and display the original value
             var td = $('<td class="priority tbl-cell centered"></td>');
             td.data('id', id);
             td.data('field', field);
@@ -211,17 +204,22 @@ $(document).ready(function() {
     //EXPERIMENT ON CONTEXT MENU CREATION//////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIORITY UPDATE - CREATE DROP DOWN MENU ON CLICK
     $(document).on('click', '.context', function() {
+        console.log("click on context triggered");
         var id = $(this).data('id');
         var field = $(this).data('field');
         var currentValue = $(this).text();
         var self = $(this);
+        console.log("id: " + id);
+        console.log("field: " + field);
+        console.log("currentValue: " + currentValue);
 
         // Create select element
-        var select = $('<select class="priority-select"></select>');
+        var select = $('<select class="context-dropdown"></select>');
         select.data('id', id);
         select.data('field', field);
 
-        // Add CSS styles to the dropdown
+
+        // Add CSS styles to the priority-dropdown
         select.css({
             'color': 'white',
             'border': 'none',
@@ -234,8 +232,7 @@ $(document).ready(function() {
 
 
         // Populate select options
-        var PRIORITIES = ['-','A', 'B', 'C', 'D'];
-        $.each(PRIORITIES, function(_, value) {
+        $.each(contextOptions, function(_, value) {
             var option = $('<option></option>').val(value).text(value);
             if (value === currentValue) {
                 option.prop('selected', true);
@@ -246,40 +243,44 @@ $(document).ready(function() {
         // Replace td with select
         self.replaceWith(select);
 
-        // Open the dropdown menu
+        // Open the priority-dropdown menu
         select.show().focus();
     });
 
-    // PRIORITY UPDATE - GET THE EXISTING PRIORITY VALUE
+    // CONTEXT UPDATE - GET THE EXISTING CONTEXT VALUE
     var originalValue;
-    $(document).on('focus', '.priority-select', function() {
+    $(document).on('focus', '.context-dropdown', function() {
         console.log("focus triggered");
-        // Store the original value when the dropdown menu is opened
+        // Store the original value when the priority-dropdown menu is opened
         originalValue = $(this).val();
         console.log('originalValue: ' + originalValue); 
     });
 
-    // PRIORITY UPDATE - UPDATE THE PRIORITY VALUE IF CHANGE DETECTED
-    $(document).on('focusout change', '.priority-select', function() {
+    // CONTEXT UPDATE - UPDATE THE CONTEXT VALUE IF CHANGE DETECTED
+    $(document).on('focusout change', '.context-dropdown', function() {
+        console.log("focusout triggered");
         var value = $(this).val();
         var id = $(this).data('id');
         var field = $(this).data('field');
         var self = $(this);
+        console.log("value: " + value);
+        console.log("id: " + id);
+        console.log("field: " + field);
 
         if (value !== originalValue) {
             // If the value has changed, trigger the updateItem function
             console.log('value changed - POST triggered');
             updateItem(id, field, value, function(response) {
                 // Replace select with td
-                var td = $('<td class="priority tbl-cell centered"></td>');
+                var td = $('<td class="context tbl-cell centered"></td>');
                 td.data('id', id);
                 td.data('field', field);
                 td.text(value);
                 self.replaceWith(td);
             });
         } else {
-            // If the value has not changed, remove the dropdown menu and display the original value
-            var td = $('<td class="priority tbl-cell centered"></td>');
+            // If the value has not changed, remove the priority-dropdown menu and display the original value
+            var td = $('<td class="context tbl-cell centered"></td>');
             td.data('id', id);
             td.data('field', field);
             td.text(originalValue);
