@@ -327,7 +327,7 @@ body {
 	align-items: flex-start;
 	padding: 20px 25px;
 	display: flex;
-	overflow: auto;
+	/* overflow: auto; */
 }
 
 .nto-project-fltr {
@@ -482,7 +482,7 @@ body {
 	font-weight: 400;
 	line-height: 29.5px;
 	display: block;
-	overflow: auto;
+	/* overflow: auto; */
 }
 
 .form {
@@ -570,7 +570,7 @@ body {
 	align-items: flex-start;
 	padding: 20px 25px;
 	display: flex;
-	overflow: auto;
+	/* overflow: auto; */
 }
 
 .nto-proj-lst-div {
@@ -586,7 +586,7 @@ body {
 	align-items: flex-start;
 	padding: 20px 25px;
 	display: flex;
-	overflow: auto;
+	/* overflow: auto; */
 }
 
 .not-proj-nxt-act-div {
@@ -602,7 +602,7 @@ body {
 	align-items: flex-start;
 	padding: 20px 25px;
 	display: flex;
-	overflow: auto;
+	/* overflow: auto; */
 }
 
 .form-btn-bar {
@@ -611,9 +611,8 @@ body {
 }
 
 .tbl-frame {
-	width: 80%;
+	width: 90%;
 	height: 531px;
-	max-width: 979px;
 	grid-column-gap: 34px;
 	grid-row-gap: 34px;
 	background-color: #2f324e;
@@ -623,6 +622,11 @@ body {
 	align-items: flex-start;
 	display: flex;
 	overflow: auto;
+}
+
+#table-container {
+    display: flex;
+    justify-content: center;
 }
 
 .tbl-hdr {
@@ -974,13 +978,13 @@ body {
 	align-self: auto;
 	align-items: flex-start;
 	display: block;
-	overflow: scroll;
+	/* overflow: scroll; */
 	box-shadow: 0 4px 6px rgba(9, 11, 25, .5);
 }
 
-.body-2 {
+/* .body-2 {
 	overflow: auto;
-}
+} */
 
 .slider-btn {
 	z-index: auto;
@@ -1459,4 +1463,14 @@ body {
 
 .ui-dialog .ui-dialog-titlebar-close {
     content: 'X';
+}
+
+.priority-dropdown, .context-dropdown, .assignee-dropdown {
+    color: white;
+    border: none;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 5px;
+    display: block;
+    margin: auto;
 }

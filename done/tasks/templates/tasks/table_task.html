@@ -39,7 +39,7 @@
           <span class="date-display">{{ task.deadline|date:"j M" }}</span>
           <input type="date" class="date-input" style="display: none;" value="{{ task.deadline|date:'Y-m-d' }}">
         </td>
-        <td class="assignee tbl-cell centered" contenteditable="True" data-id="{{ task.id }}" data-field="assignee">{{ task.assignee.name }}</td>
+        <td class="assignee tbl-cell centered" data-id="{{ task.id }}" data-field="assignee">{{ task.assignee.name }}</td>
       </tr>
       {% endfor %}
     </tbody>

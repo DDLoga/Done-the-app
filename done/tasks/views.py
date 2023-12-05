@@ -403,6 +403,8 @@ def update_tasks(request):
         if field == 'context':
             value = get_object_or_404(Context, name=value)  # replace 'name' with the field you use to identify a Context instance
         
+        if field == 'assignee':
+            value = get_object_or_404(Assignee, name=value)  # replace 'name' with the field you use to identify a Context instance
         
         setattr(tasks, field, value)
         tasks.save()
