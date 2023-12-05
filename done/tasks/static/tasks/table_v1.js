@@ -76,14 +76,6 @@ $(document).ready(function() {
         });
     }
 
-    function createDropdown(taskId, options, dropdownClass, dropdownId) {
-        var selectHtml = '<select id="' + dropdownId + taskId + '" class="' + dropdownClass + ' custom-select">';
-        for (var i = 0; i < options.length; i++) {
-            selectHtml += '<option value="' + options[i] + '">' + options[i] + '</option>';
-        }
-        selectHtml += '</select>';
-        return selectHtml;
-    }
     ///////////////////////////////////////////////////////////////////////////////// CONTENT UPDATE DEFINITION /////////////////////////////////////////////////////////////////////////////////
     // DATE UPDATE
     $(document).on('change', '.date-input', function() {
@@ -216,20 +208,89 @@ $(document).ready(function() {
         }
     });
 
-    // CREATE A CONTEXT DROP DOWN MENU ON CLICK
-    $(document).on("click", ".context", function() {
-        var taskId = $(this).data("id");
-        var options = contextOptions
-        var dropdownClass = "input-data-context form-control"
-        var dropdownId = 'context-select-'
+    //EXPERIMENT ON CONTEXT MENU CREATION//////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIORITY UPDATE - CREATE DROP DOWN MENU ON CLICK
+    $(document).on('click', '.context', function() {
+        var id = $(this).data('id');
+        var field = $(this).data('field');
+        var currentValue = $(this).text();
+        var self = $(this);
 
-        // Create a <select> element with <option> elements
-        var selectHtml = createDropdown(taskId, options, dropdownClass, dropdownId);
+        // Create select element
+        var select = $('<select class="priority-select"></select>');
+        select.data('id', id);
+        select.data('field', field);
 
-        // Append the <select> element to the table cell
-        $(this).html(selectHtml);
-        $(this).removeClass("context");
+        // Add CSS styles to the dropdown
+        select.css({
+            'color': 'white',
+            'border': 'none',
+            'padding': '5px',
+            'font-size': '14px',
+            'border-radius': '5px',
+            'display': 'block',
+            'margin': 'auto'
+        });
+
+
+        // Populate select options
+        var PRIORITIES = ['-','A', 'B', 'C', 'D'];
+        $.each(PRIORITIES, function(_, value) {
+            var option = $('<option></option>').val(value).text(value);
+            if (value === currentValue) {
+                option.prop('selected', true);
+            }
+            select.append(option);
+        });
+
+        // Replace td with select
+        self.replaceWith(select);
+
+        // Open the dropdown menu
+        select.show().focus();
     });
+
+    // PRIORITY UPDATE - GET THE EXISTING PRIORITY VALUE
+    var originalValue;
+    $(document).on('focus', '.priority-select', function() {
+        console.log("focus triggered");
+        // Store the original value when the dropdown menu is opened
+        originalValue = $(this).val();
+        console.log('originalValue: ' + originalValue); 
+    });
+
+    // PRIORITY UPDATE - UPDATE THE PRIORITY VALUE IF CHANGE DETECTED
+    $(document).on('focusout change', '.priority-select', function() {
+        var value = $(this).val();
+        var id = $(this).data('id');
+        var field = $(this).data('field');
+        var self = $(this);
+
+        if (value !== originalValue) {
+            // If the value has changed, trigger the updateItem function
+            console.log('value changed - POST triggered');
+            updateItem(id, field, value, function(response) {
+                // Replace select with td
+                var td = $('<td class="priority tbl-cell centered"></td>');
+                td.data('id', id);
+                td.data('field', field);
+                td.text(value);
+                self.replaceWith(td);
+            });
+        } else {
+            // If the value has not changed, remove the dropdown menu and display the original value
+            var td = $('<td class="priority tbl-cell centered"></td>');
+            td.data('id', id);
+            td.data('field', field);
+            td.text(originalValue);
+            self.replaceWith(td);
+        }
+    }); 
+
+
+
+
+
 
 
     ///////////////////////////////////////////////////////////////////////////////// DELETE DEFINITION /////////////////////////////////////////////////////////////////////////////////
