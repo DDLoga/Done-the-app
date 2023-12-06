@@ -50,6 +50,8 @@
   <script>
     var csrftoken = '{{ csrf_token }}';
     var updateUrl = "{% url 'update_tasks' %}";
+    var compound_priority_url = "{% url 'compound_priority' %}";
+    var api_tasks_url = "{% url 'api_tasks' %}";
     var contextOptions = {{ context_options_list|safe }};
     var assigneeOptions = {{ assignee_options_list|safe}}
   </script>

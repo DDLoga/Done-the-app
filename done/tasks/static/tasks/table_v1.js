@@ -25,7 +25,9 @@ $(document).ready(function() {
         applyColResizable('.table_component');
     });
 
-    ///////////////////////////////////////////////////////////////////////////////// CRUD FUNCTIONS DEFINITIONS /////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                          UPDATE AND DELETE FUNCTIONS                                                                                      //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // UPDATE FUNCTION DEFINITION
     function updateItem(id, field, value, successCallback) {
         console.log("update to server function triggered");
@@ -48,7 +50,37 @@ $(document).ready(function() {
                 console.log("error");
                 console.log(response);
             }
-        });
+        })
+
+        .done(function(response){
+            // identify if we are on the project page or the task page
+            var isChecked = $("#project-radio").is(":checked");
+            if (field === 'priority' && !isChecked) {
+                var task_id = id;
+                // call a view that pull the compound priority from the database and update the task
+                fetch(compound_priority_url+`?task_id=${task_id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        var compoundPriority = data.compound_priority;
+                        document.getElementById('compound-priority-'+id).textContent = compoundPriority;
+                    });
+                    
+            } else if (field === 'priority' && isChecked) {
+                // call a view that pull the completion percentage from the database and update all tasks
+                // fetch('/api/tasks/')
+                fetch(api_tasks_url) 
+                    .then(response => response.json())
+                    .then(tasks => {
+                        tasks.forEach(task => {
+                            var tdElement = document.getElementById('compound-priority-' + task.pk);
+                            if (tdElement) {
+                                tdElement.textContent = task.fields.compound_priority;
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }})
+
     }
 
     // DELETE FUNCTION DEFINITION
@@ -75,7 +107,9 @@ $(document).ready(function() {
         });
     }
 
-    ///////////////////////////////////////////////////////////////////////////////// CONTENT UPDATE DEFINITION /////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                          CONTENT UPDATE DEFINITIONS                                                                                       //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // DATE UPDATE
     $(document).on('change', '.date-input', function() {
         var value = $(this).val();
@@ -126,6 +160,39 @@ $(document).ready(function() {
         }
     });
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                          PRIORITY, CONTEXT AND ASSIGNEE DROPDOWNS MENU                                                                   //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Priority Update - on click listener that fires the handleClick function
+    $(document).on('click', '.priority', function() {
+        handleClick('priority', ['-','A', 'B', 'C', 'D']);
+    });
+    
+    // Context Update - on click listener that fires the handleClick function
+    $(document).on('click', '.context', function() {
+        handleClick('context', contextOptions);
+    });
+
+    // Assignee Update - on click listener that fires the handleClick function
+    $(document).on('click', '.assignee', function() {
+        handleClick('assignee', assigneeOptions);
+    });
+
+    // collect the id, field and current value of the className and fire the createDropdown function to insert the dropdown
+    function handleClick(className, options) {
+        $(document).on('click', '.' + className, function() {
+            var id = $(this).data('id');
+            var field = $(this).data('field');
+            var currentValue = $(this).text();
+            var self = $(this);
+
+            var select = createDropdown(id, field, currentValue, options, className + '-dropdown');
+
+            self.replaceWith(select);
+            select.show().focus();
+        });
+    }
+
     function createDropdown(id, field, currentValue, options, dropdownClass, dropdownTag) {
         var select = $('<select class="' + dropdownClass + '"></select>');
         select.data('id', id);
@@ -150,58 +217,47 @@ $(document).ready(function() {
         td.text(value);
         self.replaceWith(td);
     }
-    
-    // Priority Update
-    $(document).on('click', '.priority', function() {
-        var id = $(this).data('id');
-        var field = $(this).data('field');
-        var currentValue = $(this).text();
-        var self = $(this);
-    
-        var select = createDropdown(id, field, currentValue, ['-','A', 'B', 'C', 'D'], 'priority-dropdown');
-        self.replaceWith(select);
-        select.show().focus();
-    });
-    
-    // Context Update
-    $(document).on('click', '.context', function() {
-        var id = $(this).data('id');
-        var field = $(this).data('field');
-        var currentValue = $(this).text();
-        var self = $(this);
-    
-        var select = createDropdown(id, field, currentValue, contextOptions, 'context-dropdown');
-        self.replaceWith(select);
-        select.show().focus();
+
+    // listening on focus on dropdowns and fire the function below
+    $(document).on('focus', '.priority-dropdown, .context-dropdown, .assignee-dropdown', function() {
+        handleDropdownFocus($(this));
     });
 
-    // Assignee Update
-    $(document).on('click', '.assignee', function() {
-        var id = $(this).data('id');
-        var field = $(this).data('field');
-        var currentValue = $(this).text();
-        var self = $(this);
-    
-        var select = createDropdown(id, field, currentValue, assigneeOptions, 'assignee-dropdown');
-        self.replaceWith(select);
-        select.show().focus();
-    });
-
-
-    
+    // function who stores the original value of the dropdown to originalValue variable
     function handleDropdownFocus(select) {
         originalValue = select.val();
     }
 
+    // listening on change and focusout on dropdowns and fire the function below
+    var changedRecently = false;
+
+    $(document).on('change', '.priority-dropdown, .context-dropdown, .assignee-dropdown', function() {
+        console.log("dropdown changed");
+        changedRecently = true;
+        handleDropdownChange($(this));
+    });
+
+    $(document).on('focusout', '.priority-dropdown, .context-dropdown, .assignee-dropdown', function() {
+        if (!changedRecently) {
+            console.log("dropdown focused out");
+            handleDropdownChange($(this));
+        }
+        changedRecently = false;
+    });
+    
+    // function who handles the change of the dropdown.
     function handleDropdownChange(select) {
+        // collect the value, id and field of the dropdown
         var value = select.val();
         var id = select.data('id');
         var field = select.data('field');
 
+        // If the value is different from the original value, it calls the updateItem function and then the replaceElementWithTd function
         if (value !== originalValue) {
             updateItem(id, field, value, function(response) {
                 replaceElementWithTd(select, id, field, value);
             });
+        // If the value is the same, it replaces the dropdown with a standard html element
         } else {
             var td = $('<td class="' + field + ' tbl-cell centered"></td>');
             td.data('id', id);
@@ -211,15 +267,11 @@ $(document).ready(function() {
         }
     }
 
-    $(document).on('focus', '.priority-dropdown, .context-dropdown, .assignee-dropdown', function() {
-        handleDropdownFocus($(this));
-    });
 
-    $(document).on('focusout change', '.priority-dropdown, .context-dropdown, .assignee-dropdown', function() {
-        console.log("dropdown changed or focused out");
-        handleDropdownChange($(this));
-    });
-    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                          COMPOUND PRIORITY CALCULATION AND HANDLING                                                                      //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 

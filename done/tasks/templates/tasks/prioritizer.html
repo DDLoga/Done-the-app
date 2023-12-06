@@ -70,12 +70,11 @@
   <script> 
     var taskServerUrl = "{% url 'save_tasks' %}";
     var projectServerUrl = "{% url 'save_projects' %}";
-    var compound_priority_url = "{% url 'compound_priority' %}";
-    var api_tasks_url = "{% url 'api_tasks' %}";
     var contextUrl = "{% url 'prioritizer' %}";
     var delete_completed_tasks = "{% url 'delete_completed_tasks' %}";
-
   </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
   <script src="{% static 'tasks/table_v1.js' %}" id="url"></script>
   <script src="{% static 'tasks/colResizable-1.6.min.js' %}" id="url"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>  
