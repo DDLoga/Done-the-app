@@ -50,36 +50,38 @@ $(document).ready(function() {
                 console.log("error");
                 console.log(response);
             }
-        })
+        });
 
-        .done(function(response){
-            // identify if we are on the project page or the task page
-            var isChecked = $("#project-radio").is(":checked");
-            if (field === 'priority' && !isChecked) {
-                var task_id = id;
-                // call a view that pull the compound priority from the database and update the task
-                fetch(compound_priority_url+`?task_id=${task_id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        var compoundPriority = data.compound_priority;
-                        document.getElementById('compound-priority-'+id).textContent = compoundPriority;
-                    });
+        // .done(function(response){
+        //     // identify if we are on the project page or the task page
+        //     var isChecked = $("#project-radio").is(":checked");
+        //     console.log("isChecked: " + isChecked);
+        //     if (field === 'priority' && !isChecked) {
+        //         var task_id = id;
+        //         console.log("task_id: " + task_id);
+        //         // call a view that pull the compound priority from the database and update the task
+        //         fetch(compound_priority_url+`?task_id=${task_id}`)
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 var compoundPriority = data.compound_priority;
+        //                 document.getElementById('compound-priority-'+id).textContent = compoundPriority;
+        //             });
                     
-            } else if (field === 'priority' && isChecked) {
-                // call a view that pull the completion percentage from the database and update all tasks
-                // fetch('/api/tasks/')
-                fetch(api_tasks_url) 
-                    .then(response => response.json())
-                    .then(tasks => {
-                        tasks.forEach(task => {
-                            var tdElement = document.getElementById('compound-priority-' + task.pk);
-                            if (tdElement) {
-                                tdElement.textContent = task.fields.compound_priority;
-                            }
-                        });
-                    })
-                    .catch(error => console.error('Error:', error));
-            }})
+        //     } else if (field === 'priority' && isChecked) {
+        //         // call a view that pull the completion percentage from the database and update all tasks
+        //         // fetch('/api/tasks/')
+        //         fetch(api_tasks_url) 
+        //             .then(response => response.json())
+        //             .then(tasks => {
+        //                 tasks.forEach(task => {
+        //                     var tdElement = document.getElementById('compound-priority-' + task.pk);
+        //                     if (tdElement) {
+        //                         tdElement.textContent = task.fields.compound_priority;
+        //                     }
+        //                 });
+        //             })
+        //             .catch(error => console.error('Error:', error));
+        //     }})
 
     }
 
@@ -228,16 +230,16 @@ $(document).ready(function() {
         originalValue = select.val();
     }
 
-    // listening on change and focusout on dropdowns and fire the function below
+    // listening on change and focusout on dropdowns and fire the function below (excluding priorities dropdown)
     var changedRecently = false;
 
-    $(document).on('change', '.priority-dropdown, .context-dropdown, .assignee-dropdown', function() {
+    $(document).on('change', '.context-dropdown, .assignee-dropdown', function() {
         console.log("dropdown changed");
         changedRecently = true;
         handleDropdownChange($(this));
     });
 
-    $(document).on('focusout', '.priority-dropdown, .context-dropdown, .assignee-dropdown', function() {
+    $(document).on('focusout', '.context-dropdown, .assignee-dropdown', function() {
         if (!changedRecently) {
             console.log("dropdown focused out");
             handleDropdownChange($(this));
@@ -273,6 +275,79 @@ $(document).ready(function() {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    $(document).on('change', '.priority-dropdown', function() {
+        console.log("priority dropdown changed");
+        changedRecently = true;
+        handlePriorityDropdownChange($(this));
+    });
+
+    $(document).on('focusout', '.priority-dropdown', function() {
+        if (!changedRecently) {
+            console.log("priority dropdown focused out");
+            handlePriorityDropdownChange($(this));
+        }
+        changedRecently = false;
+    });
+
+    function handlePriorityDropdownChange(select) {
+        // collect the value, id and field of the dropdown
+        var value = select.val();
+        var id = select.data('id');
+        var type = select.data('field');
+        var field = select.data('field');
+
+        var isChecked = $("#project-radio").is(":checked");
+        var serverUrl;
+    
+        if (isChecked) {
+            // Set serverUrl to a specific value when the radio button is checked
+            serverUrl = projectServerUrl;
+        } else {
+            // If the radio button is unchecked, you can clear or set it to another value
+            serverUrl = taskServerUrl;
+        }
+        
+        $.ajax({
+            // serverUrl is rendered on the html page
+            url:serverUrl,
+            type:"POST",
+            data:{id:id,type:type,value:value},
+        })
+
+        .done(function(response){
+            // update the compound priority dynamically on the page
+            if (type === 'priority' && !isChecked) {
+                var task_id = id;
+                // call a view that pull the compound priority from the database and update the task
+                fetch(compound_priority_url+`?task_id=${task_id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        var compoundPriority = data.compound_priority;
+                        document.getElementById('compound-priority-'+id).textContent = compoundPriority;
+                    });
+                    
+            } else if (type === 'priority' && isChecked) {
+                // call a view that pull the completion percentage from the database and update all tasks
+                // fetch('/api/tasks/')
+                fetch(api_tasks_url) 
+                    .then(response => response.json())
+                    .then(tasks => {
+                        tasks.forEach(task => {
+                            var tdElement = document.getElementById('compound-priority-' + task.pk);
+                            if (tdElement) {
+                                tdElement.textContent = task.fields.compound_priority;
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+            replaceElementWithTd(self, id, field, value)
+        })
+
+        .fail(function(){
+            console.log("Error Occurred");
+        });
+    }
 
 
 
