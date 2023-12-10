@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.forms.models import model_to_dict
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 def home(request):
@@ -425,3 +427,47 @@ class CompoundPriorityView(View):
         compound_priority = task.compound_priority
         return JsonResponse({'compound_priority': compound_priority})
     
+
+
+
+
+
+
+########################################################################################
+
+def user_tasks(request):
+    tasks = Tasks.objects.filter(user=request.user)
+    priorities = dict(Tasks.PRIORITIES)
+    statuses = dict(Tasks.STATUSES)
+    context_names = list(Context.objects.values_list('name', flat=True))
+    assignee_names = list(Assignee.objects.values_list('name', flat=True))
+    return render(request, 'tasks/tasks.html', {'tasks': tasks,
+                                                'priorities': priorities,
+                                                'statuses': statuses,
+                                                'context_names': context_names,
+                                                'assignee_names': assignee_names,
+                                                })
+
+@csrf_exempt
+def update_task_v2(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('id')
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+
+        task = Tasks.objects.get(id=task_id)
+
+        if field in ["name", "effort", "priority", "deadline", 'status','context','assignee']:
+            setattr(task, field, value)
+
+        task.user = request.user
+        task.save()
+
+        return JsonResponse({"status": "success"})
+
+def get_tasks_v2(request):
+    tasks = Tasks.objects.filter(user=request.user)
+    tasks_list = list(tasks.values('id','name','priority','compound_priority','deadline','status','effort','context','assignee','parent'))  # add other fields as needed
+    return JsonResponse({'data': tasks_list})
+
+
