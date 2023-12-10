@@ -80,9 +80,9 @@
         { title: "Deadline", field: "deadline", editor: dateEditor },
         { title: "Status", field: "status", editor: "select", editorParams: {values: statuses} },
         { title: "Effort", field: "effort", editor: "number" },
-        { title: "Context", field: "context", editor: "select", editorParams: {values: contextNames} },
-        { title: "Assignee", field: "assignee", editor: "select", editorParams: {values: assigneeNames} },
-        {title: "Parent", field: "parent", editor: false},
+        { title: "Context", field: 'context__name', editor: "select", editorParams: {values: contextNames} },
+        { title: "Assignee", field: "assignee__name", editor: "select", editorParams: {values: assigneeNames} },
+        {title: "Parent", field: "parent__project_name", editor: false},
       ],
       cellEdited: function(cell) {
         // send the new data to the server
