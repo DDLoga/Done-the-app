@@ -36,6 +36,18 @@
 
 
 <div id="excel-table"></div>
+<button id="add-task-button">+</button>
+<dialog id="add-task-dialog">
+  <form id="add-task-form">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name"><br>
+    <label for="priority">Priority:</label><br>
+    <input type="text" id="priority" name="priority"><br>
+    <!-- Add other fields as needed -->
+    <input type="submit" value="Create Task">
+    <button id="close-dialog" type="button">Close</button>
+  </form>
+</dialog>
 
 <script>
   $(document).ready(function() {
@@ -98,6 +110,32 @@
         });
       }
     });
+
+    // Open the form to create a new task
+    document.getElementById('add-task-button').addEventListener('click', function() {
+      document.getElementById('add-task-dialog').showModal();
+    });
+
+    document.getElementById('close-dialog').addEventListener('click', function() {
+      document.getElementById('add-task-dialog').close();
+    });
+
+    $('#add-task-form').on('submit', function(event) {
+      event.preventDefault();
+
+      $.ajax({
+        url: '/create_task/',  // Replace with the URL of your view
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(response) {
+          document.getElementById('add-task-dialog').close();
+          // Handle the response from the server
+        }
+      });
+    });
+
+
+
   });
 </script>
 {% endblock %}

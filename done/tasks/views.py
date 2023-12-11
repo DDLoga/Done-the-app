@@ -477,3 +477,19 @@ def get_tasks_v2(request):
     return JsonResponse({'data': tasks_list})
 
 
+@csrf_exempt
+def create_task_v2(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        priority = request.POST.get('priority')
+        # Get other fields as needed
+
+        task = Tasks(name=name, priority=priority, user=request.user)
+        # Set other fields as needed
+
+        task.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Task created successfully'})
+
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'})
