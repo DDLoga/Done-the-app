@@ -457,14 +457,20 @@ def update_task_v2(request):
 
         task = Tasks.objects.get(id=task_id)
 
-        if field in ["name", "effort", "priority", "deadline", 'status','context__name','assignee__name']:
+        if field in ["name", "effort", "priority", "deadline", 'status','context__name','assignee__name', 'complete']:
             if field == 'context__name':
                 value = Context.objects.get(name=value)
                 field = 'context'
             if field == 'assignee__name':
                 value = Assignee.objects.get(name=value)
                 field = 'assignee'
+            if field == 'complete':
+                if value == 'true':
+                    value = True
+                else:
+                    value = False
             setattr(task, field, value)
+            print(task), print(field), print(value)
 
         task.user = request.user
         task.save()
@@ -473,9 +479,8 @@ def update_task_v2(request):
 
 def get_tasks_v2(request):
     tasks = Tasks.objects.filter(user=request.user)
-    tasks_list = list(tasks.values('id','name','priority','compound_priority','deadline','status','effort','context__name','assignee__name','parent__project_name'))  # add other fields as needed
+    tasks_list = list(tasks.values('id','name','priority','compound_priority','deadline','status','effort','context__name','assignee__name','parent__project_name', 'complete'))  # add other fields as needed
     return JsonResponse({'data': tasks_list})
-
 
 @csrf_exempt
 def create_task_v2(request):
@@ -493,3 +498,9 @@ def create_task_v2(request):
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+    
+@csrf_exempt
+def delete_completed_tasks(request):
+    if request.method == 'DELETE':
+        Tasks.objects.filter(complete=True).delete()
+        return JsonResponse({'success': True})

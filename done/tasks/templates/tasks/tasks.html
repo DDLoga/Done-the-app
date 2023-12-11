@@ -37,6 +37,7 @@
 
 <div id="excel-table"></div>
 <button id="add-task-button">+</button>
+<button id="delete-task-button">delete completed tasks</button>
 <dialog id="add-task-dialog">
   <form id="add-task-form">
     <label for="name">Name:</label><br>
@@ -52,6 +53,7 @@
 <script>
   $(document).ready(function() {
     // get the priorities list to populate the dropdown menu
+    // these variables will have to be integrated to the html code while removing this script
     var priorities = {{ priorities|safe }};
     var statuses = {{ statuses|safe }};
     var contextNames = {{ context_names|safe }};
@@ -81,6 +83,7 @@
       return input;
     };
 
+    // configuration of the table
     var table = new Tabulator("#excel-table", {
       ajaxURL: "/task-get/",
       ajaxProgressiveLoad: "scroll",
@@ -94,7 +97,8 @@
         { title: "Effort", field: "effort", editor: "number" },
         { title: "Context", field: 'context__name', editor: "select", editorParams: {values: contextNames} },
         { title: "Assignee", field: "assignee__name", editor: "select", editorParams: {values: assigneeNames} },
-        {title: "Parent", field: "parent__project_name", editor: false},
+        { title: "Parent", field: "parent__project_name", editor: false },
+        { title: "Completed", field: "complete", formatter: "tickCross", editor: true },
       ],
       cellEdited: function(cell) {
         // send the new data to the server
@@ -116,25 +120,42 @@
       document.getElementById('add-task-dialog').showModal();
     });
 
+    // Close the form to create a new task
     document.getElementById('close-dialog').addEventListener('click', function() {
       document.getElementById('add-task-dialog').close();
     });
 
+    // Delete the completed tasks
+    document.getElementById('delete-task-button').addEventListener('click', function() {
+      $.ajax({
+          url: '/delete_task/',  // Replace with the URL of your view
+          type: 'DELETE',
+          success: function(response) {
+              // Handle the response from the server
+              if (response.success) {
+                  // If the server successfully deleted the tasks, reload the table
+                  // $('#tasks-table').tabulator('setData');
+                  table.setData("/task-get/");
+              }
+          }
+      });
+    });
+
+    // Submit the form to create a new task
     $('#add-task-form').on('submit', function(event) {
       event.preventDefault();
-
       $.ajax({
         url: '/create_task/',  // Replace with the URL of your view
         type: 'POST',
         data: $(this).serialize(),
         success: function(response) {
+          // close the dialog
           document.getElementById('add-task-dialog').close();
-          // Handle the response from the server
+          // refresh the table
+          table.setData("/task-get/");
         }
       });
     });
-
-
 
   });
 </script>
