@@ -519,11 +519,11 @@ def delete_completed_tasks(request):
 
 def user_projects(request):
     projects = Projects.objects.filter(user=request.user)
-    priorities = dict(Projects.PRIORITIES)
-    statuses = dict(Projects.STATUSES)
+    project_priorities = dict(Projects.PRIORITIES)
+    project_statuses = dict(Projects.STATUSES)
     return render(request, 'tasks/apiV2_projects.html', {'projects': projects,
-                                                'priorities': priorities,
-                                                'statuses': statuses,
+                                                'project_priorities': project_priorities,
+                                                'project_statuses': project_statuses,
                                                 })
 
 @csrf_exempt

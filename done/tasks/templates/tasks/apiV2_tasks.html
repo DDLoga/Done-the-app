@@ -3,24 +3,24 @@
 {% block content %}
 
 <style>
-  .excel-table {
+  .task-table {
     width: 100%;
     border-collapse: collapse;
     color: #fff;
     background-color: #333;
   }
 
-  .excel-table th, .excel-table td {
+  .task-table th, .task-table td {
     border: 1px solid #666;
     padding: 10px;
     text-align: left;
   }
 
-  .excel-table th {
+  .task-table th {
     background-color: #555;
   }
 
-  .excel-table tr:nth-child(even) {
+  .task-table tr:nth-child(even) {
     background-color: #444;
   }
 </style>
@@ -35,7 +35,7 @@
 
 
 
-<div id="excel-table"></div>
+<div id="task-table"></div>
 <button id="add-task-button">+</button>
 <dialog id="add-task-dialog">
   <h2>Add a new task or follow-up task</h2>
@@ -85,7 +85,7 @@
     };
 
     // configuration of the table
-    var table = new Tabulator("#excel-table", {
+    var table = new Tabulator("#task-table", {
       ajaxURL: "/task-get/",
       ajaxProgressiveLoad: "scroll",
       paginationSize: 20,
