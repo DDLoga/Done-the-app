@@ -81,18 +81,34 @@
       return input;
     };
 
-    // configuration of the table     START REVIEW HERE
+    // configuration of the table
+    // variable to enable the highlighting of the row
+    var prevRow = null;
     var table = new Tabulator("#project-table", {
       ajaxURL: "/project-get/",
       ajaxProgressiveLoad: "scroll",
       paginationSize: 20,
       columns: [
-        { title: "Name", field: "project_name", editor: "input" },
+        { title: "Name", field: "project_name", editor: "input"},
         { title: "Priority", field: "project_priority", editor: "select", editorParams: {values: project_priorities} },
         { title: "Deadline", field: "project_deadline", editor: dateEditor },
         { title: "Status", field: "project_status", editor: "select", editorParams: {values: project_statuses} },
         { title: "Completed", field: "project_complete", formatter: "tickCross", editor: true },
       ],
+      // add a listener to the click event that highlight the row
+      cellClick: function(e, cell) {
+        // If there is a previously clicked row, reset its background color
+        if (prevRow) {
+            prevRow.getElement().style.backgroundColor = "";
+        }
+
+        // Highlight the current row
+        cell.getRow().getElement().style.backgroundColor = "#A6A6DF";
+
+        // Update the previously clicked row
+        prevRow = cell.getRow();
+      },
+      // add a listener to the edit event that send the data to the server
       cellEdited: function(cell) {
         // send the new data to the server
         console.log(cell.getField() + " of row " + cell.getRow().getIndex() + " changed to " + cell.getValue());
@@ -132,7 +148,7 @@
                 }
             }
         });
-    }
+      }
     });
 
     // Open the form to create a new task
