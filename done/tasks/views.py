@@ -434,6 +434,8 @@ class CompoundPriorityView(View):
 
 
 ########################################################################################
+# V2 API with tabulator tasks management
+########################################################################################
 
 def user_tasks(request):
     tasks = Tasks.objects.filter(user=request.user)
@@ -441,11 +443,14 @@ def user_tasks(request):
     statuses = dict(Tasks.STATUSES)
     context_names = list(Context.objects.values_list('name', flat=True))
     assignee_names = list(Assignee.objects.values_list('name', flat=True))
-    return render(request, 'tasks/tasks.html', {'tasks': tasks,
+    project_names = list(Projects.objects.filter(project_complete=False, user=request.user).values_list('project_name', flat=True))
+    print(project_names)
+    return render(request, 'tasks/apiV2_tasks.html', {'tasks': tasks,
                                                 'priorities': priorities,
                                                 'statuses': statuses,
                                                 'context_names': context_names,
                                                 'assignee_names': assignee_names,
+                                                'project_names': project_names,
                                                 })
 
 @csrf_exempt
@@ -457,13 +462,16 @@ def update_task_v2(request):
 
         task = Tasks.objects.get(id=task_id)
 
-        if field in ["name", "effort", "priority", "deadline", 'status','context__name','assignee__name', 'complete']:
+        if field in ["name", "effort", "priority", "deadline", 'status','context__name','assignee__name', 'complete','parent__project_name']:
             if field == 'context__name':
                 value = Context.objects.get(name=value)
                 field = 'context'
             if field == 'assignee__name':
                 value = Assignee.objects.get(name=value)
                 field = 'assignee'
+            if field == 'parent__project_name':
+                value = Projects.objects.get(project_name=value)
+                field = 'parent'
             if field == 'complete':
                 if value == 'true':
                     value = True
@@ -503,4 +511,69 @@ def create_task_v2(request):
 def delete_completed_tasks(request):
     if request.method == 'DELETE':
         Tasks.objects.filter(complete=True).delete()
+        return JsonResponse({'success': True})
+    
+########################################################################################
+# V2 API with tabulator project management
+########################################################################################
+
+def user_projects(request):
+    projects = Projects.objects.filter(user=request.user)
+    priorities = dict(Projects.PRIORITIES)
+    statuses = dict(Projects.STATUSES)
+    return render(request, 'tasks/apiV2_projects.html', {'projects': projects,
+                                                'priorities': priorities,
+                                                'statuses': statuses,
+                                                })
+
+@csrf_exempt
+def update_project_v2(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('id')
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+
+        project = Projects.objects.get(id=project_id)
+
+        if field in ["project_name", "project_priority", "project_deadline", 'project_status','project_complete']:
+            if field == 'project_complete':
+                if value == 'true':
+                    value = True
+                else:
+                    value = False
+            setattr(project, field, value)
+            print(project), print(field), print(value)
+
+        project.user = request.user
+        project.save()
+
+        return JsonResponse({"status": "success"})
+
+def get_projects_v2(request):
+    projects = Projects.objects.filter(user=request.user)
+    projects_list = list(projects.values('id','project_name','project_priority','project_deadline','project_status','project_complete'))  # add other fields as needed
+    return JsonResponse({'data': projects_list})
+
+@csrf_exempt
+def create_project_v2(request):
+    if request.method == 'POST':
+        project_name = request.POST.get('project_name')
+        project_priority = request.POST.get('project_priority')
+        # Get other fields as needed
+
+        project = Projects(project_name=project_name, project_priority=project_priority, user=request.user)
+        # Set other fields as needed
+
+        project.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Project created successfully'})
+
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+    
+@csrf_exempt
+def delete_completed_projects(request):
+    print(request)
+    if request.method == 'DELETE':
+        Projects.objects.filter(project_complete=True).delete()
         return JsonResponse({'success': True})

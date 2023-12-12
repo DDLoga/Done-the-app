@@ -31,10 +31,15 @@ urlpatterns = [
     path('update_projects/', views.update_projects, name='update_projects'),
     path('add_project/', views.add_project, name='add_project'),
     path('update_tasks/', views.update_tasks, name='update_tasks'),
-    path('tasks/', views.user_tasks, name='tasks'),
     
+    path('tasks/', views.user_tasks, name='tasks'),
+    path('projects/', views.user_projects, name='projects'),
     path('task-update/', views.update_task_v2, name='update_task'),
+    path('project-update/', views.update_project_v2, name='update_project'),
     path('task-get/', views.get_tasks_v2, name='get_tasks'),
+    path('project-get/', views.get_projects_v2, name='get_projects'),
     path('create_task/', views.create_task_v2, name='create_task'),
+    path('create_project/', views.create_project_v2, name='create_project'),
     path('delete_task/', views.delete_completed_tasks, name='delete_task'),
+    path('delete_project/', views.delete_completed_projects, name='delete_project'),
 ]
