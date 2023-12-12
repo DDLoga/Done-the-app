@@ -85,7 +85,7 @@
     };
 
     // configuration of the table
-    var table = new Tabulator("#task-table", {
+    var task_table = new Tabulator("#task-table", {
       ajaxURL: "/task-get/",
       ajaxProgressiveLoad: "scroll",
       paginationSize: 20,
@@ -132,7 +132,7 @@
                         if (response.success) {
                             // If the server successfully deleted the tasks, reload the table
                             // $('#tasks-table').tabulator('setData');
-                            table.setData("/task-get/");
+                            task_table.setData("/task-get/");
                         }
                     }
                 });
@@ -164,7 +164,7 @@
           // close the dialog
           document.getElementById('add-task-dialog').close();
           // refresh the table
-          table.setData("/task-get/");
+          task_table.setData("/task-get/");
         }
       });
     });

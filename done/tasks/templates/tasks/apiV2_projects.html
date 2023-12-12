@@ -36,7 +36,9 @@
 
 
 <div id="project-table"></div>
-<button id="add-project-button">+</button>
+<button id="add-project-button">+ add a project </button>
+<div id="task-table"></div>
+<button id="add-task-button">+ add a task</button>
 <dialog id="add-project-dialog">
   <h2>Add a new Project or the next project</h2>
   <form id="add-project-form">
@@ -46,9 +48,25 @@
     <input type="text" id="project_priority" name="project_priority"><br>
     <!-- Add other fields as needed -->
     <input type="submit" value="Create Project">
-    <button id="close-dialog" type="button">Close</button>
+    <button id="close-project-dialog" type="button">Close</button>
   </form>
 </dialog>
+<dialog id="add-task-dialog">
+  <h2>Add a new task or follow-up task</h2>
+  <form id="add-task-form">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name"><br>
+    <label for="priority">Priority:</label><br>
+    <input type="text" id="priority" name="priority"><br>
+    <!-- Add other fields as needed -->
+    <input type="submit" value="Create Task">
+    <button id="close-task-dialog" type="button">Close</button>
+  </form>
+</dialog>
+
+
+
+
 
 <script>
   $(document).ready(function() {
@@ -56,6 +74,11 @@
     // these variables will have to be integrated to the html code while removing this script
     var project_priorities = {{ project_priorities|safe }};
     var project_statuses = {{ project_statuses|safe }};
+    var task_priorities = {{ task_priorities|safe }};
+    var task_statuses = {{ task_statuses|safe }};
+    var contextNames = {{ context_names|safe }};
+    var assigneeNames = {{ assignee_names|safe }};
+    var parentNames = {{ project_names|safe }};
     
     
 
@@ -85,7 +108,8 @@
     // configuration of the table
     // variable to enable the highlighting of the row
     var prevRow = null;
-    var table = new Tabulator("#project-table", {
+    var project_filter = null;
+    var project_table = new Tabulator("#project-table", {
       ajaxURL: "/project-get/",
       ajaxProgressiveLoad: "scroll",
       paginationSize: 20,
@@ -98,6 +122,9 @@
       ],
       // add a listener to the click event that highlight the row
       cellClick: function(e, cell) {
+        // set the variable project_table to be the value of the field field: "project_name" of the row
+        project_filter = cell.getRow().getData().project_name;
+        task_table.setData();
         // If there is a previously clicked row, reset its background color
         if (prevRow) {
             prevRow.getElement().style.backgroundColor = "";
@@ -142,7 +169,7 @@
                         if (response.success) {
                             // If the server successfully deleted the projects, reload the table
                             // $('#projects-table').tabulator('setData');
-                            table.setData("/project-get/");
+                            project_table.setData("/project-get/");
                         }
                     }
                 });
@@ -152,18 +179,99 @@
       }
     });
 
-    // Open the form to create a new task
-    document.getElementById('add-project-button').addEventListener('click', function() {
-      document.getElementById('add-project-dialog').showModal();
+    var task_table = new Tabulator("#task-table", {
+      ajaxURL: "/task-get/",
+      ajaxProgressiveLoad: "scroll",
+      paginationSize: 20,
+      columns: [
+        { title: "Name", field: "name", editor: "input" },
+        { title: "Priority", field: "priority", editor: "select", editorParams: {values: task_priorities} },
+        { title: "Compound Priority", field: "compound_priority", editor: "number" },
+        { title: "Deadline", field: "deadline", editor: dateEditor },
+        { title: "Status", field: "status", editor: "select", editorParams: {values: task_statuses} },
+        { title: "Effort", field: "effort", editor: "number" },
+        { title: "Context", field: 'context__name', editor: "select", editorParams: {values: contextNames} },
+        { title: "Assignee", field: "assignee__name", editor: "select", editorParams: {values: assigneeNames} },
+        { title: "Parent", field: "parent__project_name", editor: "select", editorParams: {values: parentNames} },
+        { title: "Completed", field: "complete", formatter: "tickCross", editor: true },
+      ],
+      cellEdited: function(cell) {
+        // send the new data to the server
+        console.log(cell.getField() + " of row " + cell.getRow().getIndex() + " changed to " + cell.getValue());
+        var showAddTaskDialog = false;
+    
+        // Check if the edited cell is the 'complete' field and its new value is true
+        if (cell.getField() == 'complete' && cell.getValue() == true) {
+            // Show the 'add-task-dialog'
+            document.getElementById('add-task-dialog').showModal();
+            showAddTaskDialog = true;
+        }
+    
+        $.ajax({
+            url: "/task-update/",  // replace with the actual path
+            method: "POST",
+            data: {
+                id: cell.getRow().getIndex(),
+                field: cell.getField(),
+                value: cell.getValue()
+            },
+            success: function() {
+                // Trigger the click event listener of the 'delete-task-button' if the 'add-task-dialog' was shown
+                if (showAddTaskDialog) {
+                  $.ajax({
+                    url: '/delete_task/',  // Replace with the URL of your view
+                    type: 'DELETE',
+                    success: function(response) {
+                        // Handle the response from the server
+                        if (response.success) {
+                            // If the server successfully deleted the tasks, reload the table
+                            // $('#tasks-table').tabulator('setData');
+                            task_table.setData("/task-get/");
+                        }
+                    }
+                });
+                }
+            }
+        });
+      },
+      ajaxResponse: function(url, params, response) {
+        // Check if response is an array
+        if (Array.isArray(response)) {
+            // Filter the tasks
+            return response.filter(function(task) {
+                return task.parent__project_name === project_filter;
+            });
+        } else if (response.data && Array.isArray(response.data)) {
+            // If the tasks are inside a 'data' property, filter them
+            return { data: response.data.filter(function(task) {
+                return task.parent__project_name === project_filter;
+            })};
+        } else {
+            // If response is not an array and does not have a 'data' property that is an array, log an error message and return an object with an empty 'data' property
+            console.error('Unexpected response structure');
+            return { data: [] };
+        }
+      },
+
+
     });
 
-    // Close the form to create a new task
-    document.getElementById('close-dialog').addEventListener('click', function() {
-      document.getElementById('add-project-dialog').close();
-    });
+    // Function to add event listeners to the dialog buttons
+    function addDialogEventListeners(openButtonId, closeButtonId, dialogId) {
+      document.getElementById(openButtonId).addEventListener('click', function() {
+        document.getElementById(dialogId).showModal();
+      });
+      document.getElementById(closeButtonId).addEventListener('click', function() {
+        document.getElementById(dialogId).close();
+      });
+    }
+
+    // Use the function to add the event listeners
+    addDialogEventListeners('add-project-button', 'close-project-dialog', 'add-project-dialog');
+    addDialogEventListeners('add-task-button', 'close-task-dialog', 'add-task-dialog');
 
 
-    // Submit the form to create a new task
+    // Submit the form to create a new project
     $('#add-project-form').on('submit', function(event) {
       event.preventDefault();
       $.ajax({
@@ -174,11 +282,43 @@
           // close the dialog
           document.getElementById('add-project-dialog').close();
           // refresh the table
-          table.setData("/project-get/");
+          project_table.setData("/project-get/");
         }
       });
     });
 
+    // Submit the form to create a new task
+    $('#add-task-form').on('submit', function(event) {
+      event.preventDefault();
+
+      // Get the form data
+      var formData = $(this).serializeArray();
+      console.log(formData);
+
+      // Convert the form data to an object
+      var data = {};
+      $.each(formData, function(i, field) {
+        data[field.name] = field.value;
+      });
+      
+
+      // Set the "parent__project_name" field to the value of the "project_filter" variable
+      data.parent__project_name = project_filter;
+      console.log(project_filter)
+      console.log(data);
+
+      $.ajax({
+        url: '/create_task/',  // Replace with the URL of your view
+        type: 'POST',
+        data: data,
+        success: function(response) {
+          // close the dialog
+          document.getElementById('add-task-dialog').close();
+          // refresh the table
+          task_table.setData("/task-get/");
+        }
+      });
+    });
     
   });
 </script>

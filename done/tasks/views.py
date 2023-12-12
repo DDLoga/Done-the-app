@@ -444,7 +444,6 @@ def user_tasks(request):
     context_names = list(Context.objects.values_list('name', flat=True))
     assignee_names = list(Assignee.objects.values_list('name', flat=True))
     project_names = list(Projects.objects.filter(project_complete=False, user=request.user).values_list('project_name', flat=True))
-    print(project_names)
     return render(request, 'tasks/apiV2_tasks.html', {'tasks': tasks,
                                                 'task_priorities': task_priorities,
                                                 'task_statuses': task_statuses,
@@ -495,9 +494,13 @@ def create_task_v2(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         priority = request.POST.get('priority')
+        # collect the parent project name
+        parent_project_name = request.POST.get('parent__project_name')
+        # get the parent project instance
+        parent = Projects.objects.get(project_name=parent_project_name)
         # Get other fields as needed
 
-        task = Tasks(name=name, priority=priority, user=request.user)
+        task = Tasks(name=name, priority=priority, parent=parent, user=request.user)
         # Set other fields as needed
 
         task.save()
@@ -521,9 +524,21 @@ def user_projects(request):
     projects = Projects.objects.filter(user=request.user)
     project_priorities = dict(Projects.PRIORITIES)
     project_statuses = dict(Projects.STATUSES)
+    tasks = Tasks.objects.filter(user=request.user)
+    task_priorities = dict(Tasks.PRIORITIES)
+    task_statuses = dict(Tasks.STATUSES)
+    context_names = list(Context.objects.values_list('name', flat=True))
+    assignee_names = list(Assignee.objects.values_list('name', flat=True))
+    project_names = list(Projects.objects.filter(project_complete=False, user=request.user).values_list('project_name', flat=True))
     return render(request, 'tasks/apiV2_projects.html', {'projects': projects,
                                                 'project_priorities': project_priorities,
                                                 'project_statuses': project_statuses,
+                                                'tasks': tasks,
+                                                'task_priorities': task_priorities,
+                                                'task_statuses': task_statuses,
+                                                'context_names': context_names,
+                                                'assignee_names': assignee_names,
+                                                'project_names': project_names,
                                                 })
 
 @csrf_exempt
