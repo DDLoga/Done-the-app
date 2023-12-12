@@ -439,15 +439,15 @@ class CompoundPriorityView(View):
 
 def user_tasks(request):
     tasks = Tasks.objects.filter(user=request.user)
-    priorities = dict(Tasks.PRIORITIES)
-    statuses = dict(Tasks.STATUSES)
+    task_priorities = dict(Tasks.PRIORITIES)
+    task_statuses = dict(Tasks.STATUSES)
     context_names = list(Context.objects.values_list('name', flat=True))
     assignee_names = list(Assignee.objects.values_list('name', flat=True))
     project_names = list(Projects.objects.filter(project_complete=False, user=request.user).values_list('project_name', flat=True))
     print(project_names)
     return render(request, 'tasks/apiV2_tasks.html', {'tasks': tasks,
-                                                'priorities': priorities,
-                                                'statuses': statuses,
+                                                'task_priorities': task_priorities,
+                                                'task_statuses': task_statuses,
                                                 'context_names': context_names,
                                                 'assignee_names': assignee_names,
                                                 'project_names': project_names,

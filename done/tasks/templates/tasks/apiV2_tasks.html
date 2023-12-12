@@ -54,8 +54,8 @@
   $(document).ready(function() {
     // get the item list to populate the dropdown menu
     // these variables will have to be integrated to the html code while removing this script
-    var priorities = {{ priorities|safe }};
-    var statuses = {{ statuses|safe }};
+    var task_priorities = {{ task_priorities|safe }};
+    var task_statuses = {{ task_statuses|safe }};
     var contextNames = {{ context_names|safe }};
     var assigneeNames = {{ assignee_names|safe }};
     var parentNames = {{ project_names|safe }};
@@ -91,10 +91,10 @@
       paginationSize: 20,
       columns: [
         { title: "Name", field: "name", editor: "input" },
-        { title: "Priority", field: "priority", editor: "select", editorParams: {values: priorities} },
+        { title: "Priority", field: "priority", editor: "select", editorParams: {values: task_priorities} },
         { title: "Compound Priority", field: "compound_priority", editor: "number" },
         { title: "Deadline", field: "deadline", editor: dateEditor },
-        { title: "Status", field: "status", editor: "select", editorParams: {values: statuses} },
+        { title: "Status", field: "status", editor: "select", editorParams: {values: task_statuses} },
         { title: "Effort", field: "effort", editor: "number" },
         { title: "Context", field: 'context__name', editor: "select", editorParams: {values: contextNames} },
         { title: "Assignee", field: "assignee__name", editor: "select", editorParams: {values: assigneeNames} },
