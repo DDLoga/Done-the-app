@@ -441,10 +441,14 @@ def user_tasks(request):
     tasks = Tasks.objects.filter(user=request.user)
     task_priorities = dict(Tasks.PRIORITIES)
     task_statuses = dict(Tasks.STATUSES)
+    project_priorities = dict(Projects.PRIORITIES)
+    project_statuses = dict(Projects.STATUSES)
     context_names = list(Context.objects.values_list('name', flat=True))
     assignee_names = list(Assignee.objects.values_list('name', flat=True))
     project_names = list(Projects.objects.filter(project_complete=False, user=request.user).values_list('project_name', flat=True))
     return render(request, 'tasks/apiV2_tasks.html', {'tasks': tasks,
+                                                'project_priorities': project_priorities,
+                                                'project_statuses': project_statuses,
                                                 'task_priorities': task_priorities,
                                                 'task_statuses': task_statuses,
                                                 'context_names': context_names,
@@ -492,16 +496,21 @@ def get_tasks_v2(request):
 @csrf_exempt
 def create_task_v2(request):
     if request.method == 'POST':
+        print(request.POST)
         name = request.POST.get('name')
         priority = request.POST.get('priority')
-        # collect the parent project name
-        parent_project_name = request.POST.get('parent__project_name')
-        # get the parent project instance
-        parent = Projects.objects.get(project_name=parent_project_name)
-        # Get other fields as needed
+        try:
+            # collect the parent project name
+            parent_project_name = request.POST.get('parent__project_name')
+            # get the parent project instance
+            parent = Projects.objects.get(project_name=parent_project_name)
+            # Get other fields as needed
 
-        task = Tasks(name=name, priority=priority, parent=parent, user=request.user)
-        # Set other fields as needed
+            task = Tasks(name=name, priority=priority, parent=parent, user=request.user)
+            # Set other fields as needed
+        except:
+            task = Tasks(name=name, priority=priority, user=request.user)
+
 
         task.save()
 
