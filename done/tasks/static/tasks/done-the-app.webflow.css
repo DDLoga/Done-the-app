@@ -1474,3 +1474,24 @@ body {
     display: block;
     margin: auto;
 }
+
+.project-table {
+	width: 100%;
+	border-collapse: collapse;
+	color: #fff;
+	background-color: #333;
+}
+
+.project-table th, .project-table td {
+	border: 1px solid #666;
+	padding: 10px;
+	text-align: left;
+}
+
+.project-table th {
+	background-color: #555;
+}
+
+.project-table tr:nth-child(even) {
+	background-color: #444;
+}
