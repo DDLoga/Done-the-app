@@ -43,12 +43,12 @@ $(document).ready(function() {
         project_filter = cell.getRow().getData().project_name;
         task_table.setData();
         // If there is a previously clicked row, reset its background color
-        if (prevRow) {
-            prevRow.getElement().style.backgroundColor = "";
-        }
+        // if (prevRow) {
+        //     prevRow.getElement().style.backgroundColor = "";
+        // }
 
         // Highlight the current row
-        cell.getRow().getElement().style.backgroundColor = "#A6A6DF";
+        cell.getRow().getElement().style.backgroundColor = "#133774";
 
         // Update the previously clicked row
         prevRow = cell.getRow();
@@ -85,7 +85,6 @@ $(document).ready(function() {
                         // Handle the response from the server
                         if (response.success) {
                             // If the server successfully deleted the projects, reload the table
-                            // $('#projects-table').tabulator('setData');
                             project_table.setData("/project-get/");
                         }
                     }
@@ -142,7 +141,6 @@ $(document).ready(function() {
                         // Handle the response from the server
                         if (response.success) {
                             // If the server successfully deleted the tasks, reload the table
-                            // $('#tasks-table').tabulator('setData');
                             task_table.setData("/task-get/");
                         }
                     }
@@ -200,6 +198,7 @@ $(document).ready(function() {
         document.getElementById('add-project-dialog').close();
         // refresh the table
         project_table.setData("/project-get/");
+        // document.getElementById('add-project-form').style.display = 'block';
         }
     });
     });

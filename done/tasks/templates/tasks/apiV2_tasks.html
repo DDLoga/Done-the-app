@@ -1,23 +1,35 @@
 {% extends 'tasks/apiV2_prioritizer.html' %}
-
+{% block pagetitle %}Your Tasks{% endblock pagetitle %}
+{% block switchbutton %}
+  <a href="{% url 'projects' %}" class="submit-btn w-button">Show projects</a>
+{% endblock switchbutton %}
 {% block table %}
 
 
-<h2>Your Tasks</h2>
-<a href="{% url 'projects' %}" class="btn">Show projects</a>
+
+
 
 
 <div id="task-table"></div>
-<button id="add-task-button">+</button>
-<dialog id="add-task-dialog">
-  <h2>Add a new task or follow-up task</h2>
+<button class="submit-btn w-button" id="add-task-button">+</button>
+
+
+
+<dialog class="dial-box-container" id="add-task-dialog">
+  <h2 class='dial-box-hdr'>Add a new task or follow-up task</h2>
   <form id="add-task-form">
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name"><br>
-    <label for="priority">Priority:</label><br>
-    <input type="text" id="priority" name="priority"><br>
-    <input type="submit" value="Create Task">
-    <button id="close-task-dialog" type="button">Close</button>
+    <div class="dial-box-form-field">
+      <label class='dial-box-lbl' for="name">Name:</label>
+      <input class="dial-box-form-input" type="text" id="name" name="name">
+    </div>
+    <div class="dial-box-form-field">
+      <label class='dial-box-lbl' for="priority">Priority:</label>
+      <input class="dial-box-form-input" type="text" id="priority" name="priority">
+    </div>
+    <div class="dial-box-form-field">
+      <input class="submit-btn w-button" type="submit" value="Create Task">
+      <button class="submit-btn w-button" id="close-task-dialog" type="button">Close</button>
+    </div>
   </form>
 </dialog>
 

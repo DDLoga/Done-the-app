@@ -30,16 +30,19 @@ $(document).ready(function() {
         var prevRow = null;
         var project_filter = null;
         var project_table = new Tabulator("#project-table", {
-        ajaxURL: "/project-get/",
-        ajaxProgressiveLoad: "scroll",
-        paginationSize: 20,
-        columns: [
-            { title: "Name", field: "project_name", editor: "input"},
-            { title: "Priority", field: "project_priority", editor: "select", editorParams: {values: project_priorities} },
-            { title: "Deadline", field: "project_deadline", editor: dateEditor },
-            { title: "Status", field: "project_status", editor: "select", editorParams: {values: project_statuses} },
-            { title: "Completed", field: "project_complete", formatter: "tickCross", editor: true },
-        ],
+            layout:"fitData", //fit columns to width of data
+            // theme:"midnight",
+            resizableColumns: true,
+            ajaxURL: "/project-get/",
+            ajaxProgressiveLoad: "scroll",
+            paginationSize: 20,
+            columns: [
+                { title: "Name", field: "project_name", editor: "input"},
+                { title: "Priority", field: "project_priority", editor: "select", editorParams: {values: project_priorities} },
+                { title: "Deadline", field: "project_deadline", editor: dateEditor },
+                { title: "Status", field: "project_status", editor: "select", editorParams: {values: project_statuses} },
+                { title: "Completed", field: "project_complete", formatter: "tickCross", editor: true },
+            ],
         // add a listener to the click event that highlight the row
         cellClick: function(e, cell) {
             // set the variable project_table to be the value of the field field: "project_name" of the row
@@ -51,7 +54,7 @@ $(document).ready(function() {
             }
 
             // Highlight the current row
-            cell.getRow().getElement().style.backgroundColor = "#A6A6DF";
+            cell.getRow().getElement().style.backgroundColor = "#133774";
 
             // Update the previously clicked row
             prevRow = cell.getRow();
@@ -102,21 +105,24 @@ $(document).ready(function() {
 
     // configuration of the task table
     var task_table = new Tabulator("#task-table", {
-    ajaxURL: "/task-get/",
-    ajaxProgressiveLoad: "scroll",
-    paginationSize: 20,
-    columns: [
-        { title: "Name", field: "name", editor: "input" },
-        { title: "Priority", field: "priority", editor: "select", editorParams: {values: task_priorities} },
-        { title: "Compound Priority", field: "compound_priority", editor: "number" },
-        { title: "Deadline", field: "deadline", editor: dateEditor },
-        { title: "Status", field: "status", editor: "select", editorParams: {values: task_statuses} },
-        { title: "Effort", field: "effort", editor: "number" },
-        { title: "Context", field: 'context__name', editor: "select", editorParams: {values: contextNames} },
-        { title: "Assignee", field: "assignee__name", editor: "select", editorParams: {values: assigneeNames} },
-        { title: "Parent", field: "parent__project_name", editor: "select", editorParams: {values: parentNames} },
-        { title: "Completed", field: "complete", formatter: "tickCross", editor: true },
-    ],
+        layout:"fitData", //fit columns to width of data
+        // theme:"midnight",
+        resizableColumns: true,
+        ajaxURL: "/task-get/",
+        ajaxProgressiveLoad: "scroll",
+        paginationSize: 20,
+        columns: [
+            { title: "Name", field: "name", editor: "input" },
+            { title: "Priority", field: "priority", editor: "select", editorParams: {values: task_priorities} },
+            { title: "Compound Priority", field: "compound_priority", editor: "number" },
+            { title: "Deadline", field: "deadline", editor: dateEditor },
+            { title: "Status", field: "status", editor: "select", editorParams: {values: task_statuses} },
+            { title: "Effort", field: "effort", editor: "number" },
+            { title: "Context", field: 'context__name', editor: "select", editorParams: {values: contextNames} },
+            { title: "Assignee", field: "assignee__name", editor: "select", editorParams: {values: assigneeNames} },
+            { title: "Parent", field: "parent__project_name", editor: "select", editorParams: {values: parentNames} },
+            { title: "Completed", field: "complete", formatter: "tickCross", editor: true },
+        ],
     cellEdited: function(cell) {
         // send the new data to the server
         console.log(cell.getField() + " of row " + cell.getRow().getIndex() + " changed to " + cell.getValue());
@@ -147,7 +153,6 @@ $(document).ready(function() {
                         // Handle the response from the server
                         if (response.success) {
                             // If the server successfully deleted the tasks, reload the table
-                            // $('#tasks-table').tabulator('setData');
                             task_table.setData("/task-get/");
                         }
                     }
@@ -202,9 +207,13 @@ $(document).ready(function() {
         data: $(this).serialize(),
         success: function(response) {
         // close the dialog
+        
         document.getElementById('add-project-dialog').close();
+        
         // refresh the table
         project_table.setData("/project-get/");
+
+        
         }
     });
     });
@@ -215,7 +224,6 @@ $(document).ready(function() {
 
     // Get the form data
     var formData = $(this).serializeArray();
-    console.log(formData);
 
     // Convert the form data to an object
     var data = {};
@@ -226,8 +234,6 @@ $(document).ready(function() {
 
     // Set the "parent__project_name" field to the value of the "project_filter" variable
     data.parent__project_name = project_filter;
-    console.log(project_filter)
-    console.log(data);
 
     $.ajax({
         url: '/create_task/',  // Replace with the URL of your view
@@ -238,6 +244,7 @@ $(document).ready(function() {
         document.getElementById('add-task-dialog').close();
         // refresh the table
         task_table.setData("/task-get/");
+        document.getElementById('add-task-form').style.display = 'block';
         }
     });
     });

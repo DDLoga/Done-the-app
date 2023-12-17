@@ -69,7 +69,6 @@ $(document).ready(function() {
                         // Handle the response from the server
                         if (response.success) {
                             // If the server successfully deleted the tasks, reload the table
-                            // $('#tasks-table').tabulator('setData');
                             task_table.setData("/task-get/");
                         }
                     }

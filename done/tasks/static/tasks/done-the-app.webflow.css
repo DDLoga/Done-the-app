@@ -445,10 +445,11 @@ body {
 	grid-column-gap: 10px;
 	grid-row-gap: 10px;
 	background-color: #06f;
-	border-radius: 16px;
+	border-radius: 10px;
 	justify-content: center;
 	align-items: center;
-	display: flex;
+	margin-top: 5px;
+	/* display: flex; */
 }
 
 .submit-btn:hover {
@@ -586,7 +587,7 @@ body {
 	align-items: flex-start;
 	padding: 20px 25px;
 	display: flex;
-	/* overflow: auto; */
+	overflow: scroll;
 }
 
 .not-proj-nxt-act-div {
@@ -1475,7 +1476,57 @@ body {
     margin: auto;
 }
 
-.project-table {
+.tabulator-container {
+    justify-content: left;
+    padding-left: 5%;
+	padding-right: 5%;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.dial-box-hdr {
+    color: #D5D8DF;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 29.5px;
+    text-align: center;
+    margin-bottom: 8px;
+    margin-top: 0px;
+}
+
+.dial-box-lbl {
+	color: #D5D8DF;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 29.5px;
+	text-align: center;
+	margin-bottom: 8px;
+	margin-top: 0px;
+}
+
+.dial-box-container {
+    background-color: #30324E;
+    border-radius: 8px;
+    border-color: #9698A1;
+    border-width: 1px;
+}
+
+.dial-box-form-field {
+	width: 100%;
+	height: 40px;
+	max-width: 572px;
+	grid-column-gap: 20px;
+	grid-row-gap: 5px;
+	justify-content: center;
+	align-items: flex-start;
+	display: flex;
+	margin-top: 14px;
+}
+
+.dial-box-form-input {
+	color: #D5D8DF;
+}
+/* .project-table {
 	width: 100%;
 	border-collapse: collapse;
 	color: #fff;
@@ -1494,4 +1545,4 @@ body {
 
 .project-table tr:nth-child(even) {
 	background-color: #444;
-}
+} */

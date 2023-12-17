@@ -1,40 +1,52 @@
 {% extends 'tasks/apiV2_prioritizer.html' %}
-
+{% block pagetitle %}Your Projects{% endblock pagetitle %}
+{% block switchbutton %}<a href="{% url 'tasks' %}" class="submit-btn w-button">Show all tasks</a>{% endblock switchbutton %}
 {% block table %}
 
 
+<div class="tabulator-container">
+  <div id="project-table"></div>
+  <button class="submit-btn w-button" id="add-project-button">+ add a project </button>
+</div>
 
-<h2>Your Projects</h2>
-<a href="{% url 'tasks' %}" class="submit-btn w-button">Show all tasks</a>
+<div class="tabulator-container">
+  <div id="task-table"></div>
+  <button class="submit-btn w-button" id="add-task-button">+ add a task</button>
+</div>
 
-
-
-
-
-<div id="project-table"></div>
-<button id="add-project-button">+ add a project </button>
-<div id="task-table"></div>
-<button id="add-task-button">+ add a task</button>
-<dialog id="add-project-dialog">
-  <h2>Add a new Project or the next project</h2>
+<dialog class="dial-box-container" id="add-project-dialog">
+  <h2 class='dial-box-hdr'>Add a new Project or the next project</h2>
   <form id="add-project-form">
-    <label for="project_name">Name:</label><br>
-    <input type="text" id="project_name" name="project_name"><br>
-    <label for="project_priority">Priority:</label><br>
-    <input type="text" id="project_priority" name="project_priority"><br>
-    <input type="submit" value="Create Project">
-    <button id="close-project-dialog" type="button">Close</button>
+    <div class="dial-box-form-field">
+      <label class='dial-box-lbl' for="project_name">Name:</label>
+      <input class="dial-box-form-input" type="text" id="project_name" name="project_name">
+    </div>
+    <div class="dial-box-form-field">
+      <label class='dial-box-lbl' for="project_priority">Priority:</label>
+      <input class="dial-box-form-input" type="text" id="project_priority" name="project_priority">
+    </div>
+    <div class="dial-box-form-field">
+      <input class="submit-btn w-button" type="submit" value="Create Project">
+      <button class="submit-btn w-button" id="close-project-dialog" type="button">Close</button>
+    </div>
   </form>
 </dialog>
-<dialog id="add-task-dialog">
-  <h2>Add a new task or follow-up task</h2>
+
+<dialog class="dial-box-container" id="add-task-dialog">
+  <h2 class='dial-box-hdr'>Add a new task or follow-up task</h2>
   <form id="add-task-form">
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name"><br>
-    <label for="priority">Priority:</label><br>
-    <input type="text" id="priority" name="priority"><br>
-    <input type="submit" value="Create Task">
-    <button id="close-task-dialog" type="button">Close</button>
+    <div class="dial-box-form-field">
+      <label class='dial-box-lbl' for="name">Name:</label>
+      <input class="dial-box-form-input" type="text" id="name" name="name">
+    </div>
+    <div class="dial-box-form-field">
+      <label class='dial-box-lbl' for="priority">Priority:</label>
+      <input class="dial-box-form-input" type="text" id="priority" name="priority">
+    </div>
+    <div class="dial-box-form-field">
+      <input class="submit-btn w-button" type="submit" value="Create Task">
+      <button class="submit-btn w-button" id="close-task-dialog" type="button">Close</button>
+    </div>
   </form>
 </dialog>
 
