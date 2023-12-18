@@ -30,7 +30,7 @@ $(document).ready(function() {
         var prevRow = null;
         var project_filter = null;
         var project_table = new Tabulator("#project-table", {
-            layout:"fitData", //fit columns to width of data
+            // layout:"fitData", //fit columns to width of data
             // theme:"midnight",
             resizableColumns: true,
             ajaxURL: "/project-get/",

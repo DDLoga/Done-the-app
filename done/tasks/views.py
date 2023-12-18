@@ -443,8 +443,8 @@ def user_tasks(request):
     task_statuses = dict(Tasks.STATUSES)
     project_priorities = dict(Projects.PRIORITIES)
     project_statuses = dict(Projects.STATUSES)
-    context_names = list(Context.objects.values_list('name', flat=True))
-    assignee_names = list(Assignee.objects.values_list('name', flat=True))
+    context_names = list(Context.objects.filter(user=request.user).values_list('name', flat=True))
+    assignee_names = list(Assignee.objects.filter(user=request.user).values_list('name', flat=True))
     project_names = list(Projects.objects.filter(project_complete=False, user=request.user).values_list('project_name', flat=True))
     return render(request, 'tasks/apiV2_tasks.html', {'tasks': tasks,
                                                 'project_priorities': project_priorities,
@@ -536,8 +536,8 @@ def user_projects(request):
     tasks = Tasks.objects.filter(user=request.user)
     task_priorities = dict(Tasks.PRIORITIES)
     task_statuses = dict(Tasks.STATUSES)
-    context_names = list(Context.objects.values_list('name', flat=True))
-    assignee_names = list(Assignee.objects.values_list('name', flat=True))
+    context_names = list(Context.objects.filter(user=request.user).values_list('name', flat=True))
+    assignee_names = list(Assignee.objects.filter(user=request.user).values_list('name', flat=True))
     project_names = list(Projects.objects.filter(project_complete=False, user=request.user).values_list('project_name', flat=True))
     return render(request, 'tasks/apiV2_projects.html', {'projects': projects,
                                                 'project_priorities': project_priorities,
