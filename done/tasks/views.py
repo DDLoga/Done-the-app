@@ -19,7 +19,9 @@ def home(request):
     if request.user.is_authenticated:
         return render(request, 'tasks/index.html')
     else:
-        return render(request, 'account/login.html')
+        # return render(request, 'account/login.html')
+        return render(request, 'welcome.html')
+        
     
 def sorry(request):
     return render(request, 'sorry.html')
@@ -58,8 +60,11 @@ def NewTaskOrganizerWelcome(request):
         object_id = Tasks.objects.filter(new_task=1, user=request.user)[0].pk             # get the primary key of the entry to proceed
         obj = Tasks.objects.get(pk=object_id, user=request.user)                           # get the instance of the entry to proceed
         form = NewTaskOrganizerTaskForm(
+            request.POST or None,
             initial=initial_data_task,
-            instance=obj)                                               # display task form with auto filled data
+            instance=obj,
+            user=request.user
+        )                                          # display task form with auto filled data
         form_task = NewTaskOrganizerTaskForm()                          # used in default screen and non actionable screen
         form_project = NewTaskOrganizerProjectForm(
             initial=initial_data_project,

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<body class="body">
+
+  <div class="content-div-5">
+
+    <div class="log-in-div">
+      <div class="log-in-hdr">
+        <div class="log-in-hdr-bold">Welcome to DONE</div>
+      </div>
+      <div class="w-form">
+        <div class="log-in-hint-div">
+          <div class="log-in-hint-txt">This app is currently under development... Enjoy! </div>
+        </div>
+          <div class="side-nemu-txt-div">
+            <div class="side-menu-text">
+              <a href="{% url 'socialaccount_connections' %}">Login or create an account</a>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </body>
+{% endblock content %}

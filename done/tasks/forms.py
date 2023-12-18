@@ -26,9 +26,12 @@ class NewTaskOrganizerTaskForm(forms.ModelForm):
         fields = ['priority', 'name', 'deadline', 'context', 'effort', 'parent', 'new_task']
     
     def __init__(self, *args, **kwargs):
+        # super().__init__(*args, **kwargs)
+        # self.fields['effort'].widget.attrs['placeholder'] = 'time'
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        self.fields['effort'].widget.attrs['placeholder'] = 'time'
-
+        if user:
+            self.fields['context'].queryset = Context.objects.filter(user=user)
 
 class NewTaskOrganizerProjectForm(forms.ModelForm):
     class Meta:

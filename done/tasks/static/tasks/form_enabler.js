@@ -32,6 +32,7 @@ $('form').submit(function(e) {
 
     $form
       // .hide() // optional hiding of form
+      .filter('.quick_task_entry_form').hide() // optional hiding of form
       .siblings('.w-form-done').show() // Show success
       .siblings('.w-form-fail').hide(); // Hide failure
   })
