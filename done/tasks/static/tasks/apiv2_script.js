@@ -36,6 +36,9 @@ $(document).ready(function() {
             ajaxURL: "/project-get/",
             ajaxProgressiveLoad: "scroll",
             paginationSize: 20,
+            tableBuilding: function(){
+                this.element.classList.add("dual-table"); //add class to table
+            },
             columns: [
                 { title: "Name", field: "project_name", editor: "input"},
                 { title: "Priority", field: "project_priority", editor: "select", editorParams: {values: project_priorities} },
@@ -111,10 +114,15 @@ $(document).ready(function() {
         ajaxURL: "/task-get/",
         ajaxProgressiveLoad: "scroll",
         paginationSize: 20,
+        tableBuilding: function(){
+            if (tabletype === 'project') {
+                this.element.classList.add("dual-table"); //add class to table
+            }
+        },
         columns: [
             { title: "Name", field: "name", editor: "input" },
             { title: "Priority", field: "priority", editor: "select", editorParams: {values: task_priorities} },
-            { title: "Compound Priority", field: "compound_priority", editor: "number" },
+            // { title: "Compound Priority", field: "compound_priority", editor: "number" },
             { title: "Deadline", field: "deadline", editor: dateEditor },
             { title: "Status", field: "status", editor: "select", editorParams: {values: task_statuses} },
             { title: "Effort", field: "effort", editor: "number" },
