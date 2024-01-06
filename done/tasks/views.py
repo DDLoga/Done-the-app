@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth import authenticate
 
 
 def home(request):
@@ -606,3 +607,23 @@ def delete_completed_projects(request):
     if request.method == 'DELETE':
         Projects.objects.filter(project_complete=True).delete()
         return JsonResponse({'success': True})
+    
+
+########################################################################################
+# LOGIN AND SIGNUP FOR REACT
+########################################################################################
+
+
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            # login successful, return token
+            return JsonResponse({'token': 'your_token', 'username': username})
+        else:
+            # login failed
+            return JsonResponse({'error': 'Invalid login credentials'}, status=400)
