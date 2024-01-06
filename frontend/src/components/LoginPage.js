@@ -6,9 +6,7 @@ const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-
     const { login } = useContext(UserContext); // Use the login function from context
-
 
     const navigate = useNavigate();
     const handleSubmit = async (event) => {

@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 // import { UserContext } from './components/UserContext'; // replace with the actual path to your UserContext
 import UserContext from './UserContext';
 import styles from "./sidemenu.module.css";
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faTasks,
@@ -16,6 +17,12 @@ import {
 
 function SideMenu() {
     const { user, logout } = useContext(UserContext);
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
     return (
         <div className={styles["side-menu"]}>
@@ -57,7 +64,7 @@ function SideMenu() {
             </div>  
                 <button 
                         className={styles["login-button"]} 
-                        onClick={user ? logout : null}
+                        onClick={handleLogout}
                     >
                         {user ? 'Log Out' : 'Log In'}
                 </button>

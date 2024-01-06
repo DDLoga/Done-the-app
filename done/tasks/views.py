@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.auth import authenticate
+
 
 
 def home(request):
@@ -614,16 +614,22 @@ def delete_completed_projects(request):
 ########################################################################################
 
 
-@csrf_exempt
+
+from django.contrib.auth import authenticate
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token as AuthToken
+
+@api_view(['POST'])
 def login(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            # login successful, return token
-            return JsonResponse({'token': 'your_token', 'username': username})
-        else:
-            # login failed
-            return JsonResponse({'error': 'Invalid login credentials'}, status=400)
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        token, created = AuthToken.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+    else:
+        return Response({'error': 'Invalid login credentials'})
