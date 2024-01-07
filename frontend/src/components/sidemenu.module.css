@@ -4,7 +4,8 @@
     /* position: absolute; */
     left: 1vw;
     top: 1vw;
-    height: 100vh;
+    height: 99vh;
+    margin: 5px;
     background: #18283b;
     border-radius: 16px;
     display: flex;

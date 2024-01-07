@@ -62,6 +62,12 @@ function SideMenu() {
                     </li>
                 </ul>
             </div>  
+                {user && 
+                <ul>
+                    <li>
+                        <span>Logged in as {user}</span>   
+                    </li>
+                </ul>}
                 <button 
                         className={styles["login-button"]} 
                         onClick={handleLogout}

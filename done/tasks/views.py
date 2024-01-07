@@ -615,7 +615,7 @@ def delete_completed_projects(request):
 
 
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -630,6 +630,19 @@ def login(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         token, created = AuthToken.objects.get_or_create(user=user)
-        return Response({'token': token.key})
+        return Response({'token': token.key, 'username': user.username})
     else:
         return Response({'error': 'Invalid login credentials'})
+    
+
+@api_view(['POST'])
+def logout_view(request):
+    if request.user.is_authenticated:
+        # Django logout
+        Token.objects.filter(user=request.user.id).delete()
+        logout(request)
+
+        return Response({"message": "Successfully logged out."}, status=200)
+    else:
+        print("user is not authenticated")
+        return Response({"error": "You are not logged in."}, status=400)

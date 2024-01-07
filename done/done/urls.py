@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
-from tasks.views import login 
+from tasks.views import login, logout_view
 
 urlpatterns = [
     # path("tasks/", include("tasks.urls")),
@@ -29,4 +29,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', TemplateView.as_view(template_name='index.html')),
     path('api/login/', login, name='login'),
+    # create the logout url
+    path('api/logout/', logout_view, name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
