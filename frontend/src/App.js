@@ -5,6 +5,7 @@ import Login from "./components/login";
 import SideMenu from "./components/sidemenu";
 import LoginPage from './components/LoginPage';
 import UserContext from './components/UserContext';
+import QuickTaskForm from './components/QuickTaskForm';
 
 
 const App = () => {
@@ -70,6 +71,7 @@ const App = () => {
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/login" element={<LoginPage login={login} />} />
+                        <Route path="/quickTask" element={<QuickTaskForm />} />
                     </Routes>
                 </UserContext.Provider>
             </div>

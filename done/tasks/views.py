@@ -622,6 +622,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token as AuthToken
+from rest_framework.views import APIView
+from .serializers import TaskSerializer
 
 @api_view(['POST'])
 def login(request):
@@ -646,3 +648,38 @@ def logout_view(request):
     else:
         print("user is not authenticated")
         return Response({"error": "You are not logged in."}, status=400)
+
+from django.contrib.auth.models import User
+
+class QuickTaskEntryViewAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        task_names = request.data.get('name', None)
+        user_id = request.data.get('user', None)
+
+
+        if not isinstance(task_names, list):
+            task_names = [task_names]
+            task_names = task_names[0].split("\n")   
+        
+        for task_name in task_names:
+            task_data = {'name': task_name, 'user': user_id, 'effort':0}
+            serializer = TaskSerializer(data=task_data)
+            print(task_data)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                return Response(serializer.errors, status=400)
+
+        return Response({"message": "Tasks created successfully"}, status=201)
+
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user(request):
+    user = User.objects.get(username=request.user.username)
+    return Response({'id': user.id, 'username': user.username})

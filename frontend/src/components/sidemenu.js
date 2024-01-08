@@ -65,7 +65,7 @@ function SideMenu() {
                 {user && 
                 <ul>
                     <li>
-                        <span>Logged in as {user}</span>   
+                        <span>Logged in as {user} Align this vertically</span>   
                     </li>
                 </ul>}
                 <button 

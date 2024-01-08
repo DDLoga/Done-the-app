@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
-from tasks.views import login, logout_view
+from tasks.views import login, logout_view, QuickTaskEntryViewAPI, get_user
 
 urlpatterns = [
     # path("tasks/", include("tasks.urls")),
@@ -28,7 +28,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', TemplateView.as_view(template_name='index.html')),
+    # create the login url
     path('api/login/', login, name='login'),
     # create the logout url
     path('api/logout/', logout_view, name='logout'),
+    # create the quick task url
+    path('api/quickTask/', QuickTaskEntryViewAPI.as_view(), name='quickTask'),
+    # get the ID of the user
+    path('api/getUser/', get_user, name='get_user'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

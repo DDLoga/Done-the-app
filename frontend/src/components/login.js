@@ -5,7 +5,7 @@ const login = () => {
     return (
         <BaseLayout>
             <h1>Welcome to the Login page</h1>
-            <p>This is the content of the login page.</p>
+            <p>This should be a nicer login page;).</p>
         </BaseLayout>
     );
 };
