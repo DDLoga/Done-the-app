@@ -1,10 +1,11 @@
 /* sidemenu.module.css */
 
 .side-menu {
-    /* position: absolute; */
+    position: absolute;
+    z-index: 1;
     left: 1vw;
     top: 1vw;
-    height: 99vh;
+    height: 98vh;
     margin: 5px;
     background: #18283b;
     border-radius: 16px;

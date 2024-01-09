@@ -4,5 +4,6 @@ env/
 done/done/.env
 done/db.sqlite3
 project-notes.txt
+buglist.txt
 done/done/.env
 *__pycache__*

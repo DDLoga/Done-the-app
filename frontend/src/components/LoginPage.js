@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserContext from './UserContext'; // Import your UserContext
+import BaseLayout from './baseLayout';
+import loginPageStyle from './loginPage.module.css';
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');
@@ -26,26 +28,34 @@ const LoginPage = () => {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Username:
-                    <input 
-                        type="text" 
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)} />
-                </label>
-                <label>
-                    Password:
-                    <input 
-                        type="password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} />
-                </label>
-                <input type="submit" value="Submit" />
-            </form>
+        <BaseLayout>
+        <div className={loginPageStyle.loginForm}>
+            <div className={loginPageStyle.container}>
+                <h2>Login</h2>
+                <form onSubmit={handleSubmit} className={loginPageStyle.form}>
+                    <label>
+                        Username:
+                        <input 
+                            type="text" 
+                            value={username} 
+                            onChange={(e) => setUsername(e.target.value)} 
+                            className={loginPageStyle.input}
+                        />
+                    </label>
+                    <label>
+                        Password:
+                        <input 
+                            type="password" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                            className={loginPageStyle.input}
+                        />
+                    </label>
+                    <input type="submit" value="Submit" className={loginPageStyle.submit} />
+                </form>
+            </div>
         </div>
+        </BaseLayout>
     );
 };
 

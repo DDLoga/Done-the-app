@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from './App.module.css';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/login";
 import SideMenu from "./components/sidemenu";
-import LoginPage from './components/LoginPage';
+import LoginPage from './components/loginPage';
 import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
 
@@ -67,11 +67,13 @@ const App = () => {
             <div className={styles.appContainer}>
                 <UserContext.Provider value={{ user, login, logout }}>
                     <SideMenu />
-                
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/login" element={<LoginPage login={login} />} />
-                        <Route path="/quickTask" element={<QuickTaskForm />} />
+                        <Route 
+                            path="/quickTask" 
+                            element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}
+                        />
                     </Routes>
                 </UserContext.Provider>
             </div>

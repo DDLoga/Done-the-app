@@ -37,8 +37,8 @@ function SideMenu() {
                 </h3>
                 <ul>
                     <li>
-                        <FontAwesomeIcon icon={faTasks} />
-                        <span> Quick Task Entry</span>
+                        <FontAwesomeIcon icon={faTasks} onClick={() => navigate('/quicktask')} />
+                        <span onClick={() => navigate('/quicktask')}> Quick Task Entry</span>
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faClipboard} />

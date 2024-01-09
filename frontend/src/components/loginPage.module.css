@@ -1,0 +1,49 @@
+:root {
+    --primary-color: #1F2C40;
+    --secondary-color: #344563;
+    --text-color: #FFFFFF;
+    --highlight-color: #00C875;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.loginForm {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+    /* width: 100vw;
+    height: 100vh; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    color: var(--text-color);
+    background-color: var(--primary-color);
+    border: none;
+    box-sizing: border-box; /* new */
+}
+
+.submit {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    color: var(--primary-color);
+    background-color: var(--highlight-color);
+    border: none;
+    cursor: pointer;
+}

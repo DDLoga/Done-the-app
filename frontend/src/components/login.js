@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseLayout from './baselayout';
+import BaseLayout from './baseLayout';
 
 const login = () => {
     return (

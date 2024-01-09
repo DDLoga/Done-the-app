@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
+import styles from "./QuickTaskForm.module.css";
+import BaseLayout from './baseLayout';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
 
 const QuickTaskForm = () => {
     const [task, setTask] = useState('');
 
+    // dialog box variables
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState('');
+    const [severity, setSeverity] = useState('success');
+    
+    // communication with backend
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -25,18 +36,48 @@ const QuickTaskForm = () => {
             body: JSON.stringify({ name: task, user: userId })
         });
         if (response.ok) {
-            alert('Task submitted successfully');
+            setDialogMessage('Submitted successfully');
+            setSeverity('success');
             setTask('');
         } else {
-            alert('There was an error submitting the task');
+            setDialogMessage('There was an error submitting the task');
+            setSeverity('error');
         }
+        setOpenSnackbar(true);
     };
+
+
     return (
-        <form onSubmit={handleSubmit}>
-            <textarea value={task} onChange={e => setTask(e.target.value)} rows="4" cols="50"></textarea>
-            <input type="submit" value="Submit" />
-        </form>
-    );
+        <BaseLayout>
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <div className={styles.logo}>Logo</div>
+                    <h2 className={styles.subtitle}>Clear your mind</h2>
+                </div>
+                <div className={styles.formBlock} onSubmit={handleSubmit}>
+                    <form className={styles.form}>
+                        <textarea
+                            className={styles.input}
+                            value={task}
+                            onChange={(e) => setTask(e.target.value)}
+                            rows="4"
+                            cols="50"
+                        ></textarea>
+                        <input 
+                            className={styles.submit}
+                            type="submit" 
+                            value="Submit" 
+                        />
+                    </form>
+                </div>
+            </div>
+            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+                <Alert onClose={() => setOpenSnackbar(false)} severity={severity} sx={{ width: '100%' }}>
+                    {dialogMessage}
+                </Alert>
+            </Snackbar>
+        </BaseLayout>
+    )
 };
 
 export default QuickTaskForm;

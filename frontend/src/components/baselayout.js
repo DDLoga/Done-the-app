@@ -1,25 +1,23 @@
 import React from 'react';
+import baseLayoutStyle from './baseLayout.module.css';
 
 const BaseLayout = ({ children }) => {
     return (
-        <div>
-            <header>
+        <div className={baseLayoutStyle.body}>
+            <header className={baseLayoutStyle.header}>
                 {/* Header content goes here */}
-                the header
+                the header as defined on baseLayout.js
             </header>
 
-            <main>
+            <main className={baseLayoutStyle.main}>
                 {children}
-                the main
             </main>
 
-            <footer>
+            <footer className={baseLayoutStyle.footer}>
                 {/* Footer content goes here */}
-                the footer
+                the footer as defined on baseLayout.js
             </footer>
 
-            {/* jQuery script from base.html */}
-            <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=652482ea837db348b1939c93" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossOrigin="anonymous"></script>
         </div>
     );
 };
