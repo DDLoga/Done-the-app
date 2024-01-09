@@ -3,6 +3,8 @@ import styles from "./QuickTaskForm.module.css";
 import BaseLayout from './baseLayout';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { TextField, Button } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 const QuickTaskForm = () => {
@@ -13,6 +15,20 @@ const QuickTaskForm = () => {
     const [dialogMessage, setDialogMessage] = useState('');
     const [severity, setSeverity] = useState('success');
     
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+            primary: {
+                main: '#0084FF', // monday.com's primary color
+            },
+            background: {
+                default: '#1A1A1A', // monday.com's background color
+            },
+        },
+    });
+
+
+
     // communication with backend
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -55,20 +71,28 @@ const QuickTaskForm = () => {
                     <h2 className={styles.subtitle}>Clear your mind</h2>
                 </div>
                 <div className={styles.formBlock} onSubmit={handleSubmit}>
-                    <form className={styles.form}>
-                        <textarea
-                            className={styles.input}
-                            value={task}
-                            onChange={(e) => setTask(e.target.value)}
-                            rows="4"
-                            cols="50"
-                        ></textarea>
-                        <input 
-                            className={styles.submit}
-                            type="submit" 
-                            value="Submit" 
-                        />
-                    </form>
+                    <ThemeProvider theme={darkTheme}>
+                        <form>
+                            <TextField
+                                multiline
+                                rows={15}
+                                value={task}
+                                onChange={(e) => setTask(e.target.value)}
+                                variant="outlined"
+                                fullWidth
+                                color="primary"
+                                placeholder="Write your task here, separate with a new line"
+                            />
+                            <Button 
+                                type="submit" 
+                                variant="contained" 
+                                color="primary"
+                                style={{ marginTop: '10px' }}
+                            >
+                                Submit
+                            </Button>
+                        </form>
+                    </ThemeProvider>
                 </div>
             </div>
             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
