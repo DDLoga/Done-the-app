@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-// import { UserContext } from './components/UserContext'; // replace with the actual path to your UserContext
 import UserContext from './UserContext';
 import styles from "./sidemenu.module.css";
 import { useNavigate } from 'react-router-dom';
@@ -65,7 +64,7 @@ function SideMenu() {
                 {user && 
                 <ul>
                     <li>
-                        <span>Logged in as {user} Align this vertically</span>   
+                        <span className={styles.logged}>Logged in as {user}</span>   
                     </li>
                 </ul>}
                 <button 

@@ -17,7 +17,6 @@ const BaseLayout = ({ children }) => {
                 {/* Footer content goes here */}
                 the footer as defined on baseLayout.js
             </footer>
-
         </div>
     );
 };

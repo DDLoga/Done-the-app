@@ -110,6 +110,11 @@
     /* transition: max-width 0.5s ease; */
 }
 
+.logged {
+    word-wrap: break-word;
+    white-space: normal !important;
+}
+
 .side-menu li span:hover {
     color: #9c88ff;
     /* Change this to the color you want on hover */
