@@ -718,24 +718,6 @@ def delete_task(request, task_id):    # delete a task on the new task organizer 
         task.delete()
     except IntegrityError as e:
         print("IntegrityError:", e)
-        task = Tasks.objects.get(pk=task_id)
-        find_related_objects(task)
         
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
     return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# debug purpose only
-from django.apps import apps
-
-def find_related_objects(task):
-    for model in apps.get_models():
-        for field in model._meta.get_fields():
-            if field.get_internal_type() == 'ForeignKey' and field.related_model == Tasks:
-                related_objects = model.objects.filter(**{field.name: task})
-                for obj in related_objects:
-                    print(f'{model.__name__} instance with id {obj.pk} references Tasks instance with id {task.pk} via field {field.name}')
-
-# Replace 'task_id' with the id of the Tasks instance you're trying to delete
-
