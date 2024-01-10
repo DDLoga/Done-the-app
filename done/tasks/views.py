@@ -624,6 +624,9 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token as AuthToken
 from rest_framework.views import APIView
 from .serializers import TaskSerializer
+from django.contrib.auth.models import User
+from rest_framework import status
+from django.db import IntegrityError
 
 @api_view(['POST'])
 def login(request):
@@ -649,7 +652,6 @@ def logout_view(request):
         print("user is not authenticated")
         return Response({"error": "You are not logged in."}, status=400)
 
-from django.contrib.auth.models import User
 
 class QuickTaskEntryViewAPI(APIView):
     permission_classes = [IsAuthenticated]
@@ -675,11 +677,65 @@ class QuickTaskEntryViewAPI(APIView):
         return Response({"message": "Tasks created successfully"}, status=201)
 
 
-
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request):
     user = User.objects.get(username=request.user.username)
     return Response({'id': user.id, 'username': user.username})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_tasks(request):                 # get all tasks for the new task organizer wizard
+    tasks = Tasks.objects.filter(new_task=True, user=request.user)
+    serializer = TaskSerializer(tasks, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_contexts(request):              # get all contexts for the new task organizer wizard
+    contexts = Context.objects.filter(user=request.user)
+    serializer = ContextSerializer(contexts, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_projects(request):              # get all Projects for the new task organizer wizard
+    projects = Projects.objects.filter(user=request.user, project_complete=False)
+    serializer = ProjectSerializer(projects, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_task(request, task_id):    # delete a task on the new task organizer wizard
+    try:
+        task = Tasks.objects.get(id=task_id, user=request.user)
+    except Tasks.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        task.delete()
+    except IntegrityError as e:
+        print("IntegrityError:", e)
+        task = Tasks.objects.get(pk=task_id)
+        find_related_objects(task)
+        
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# debug purpose only
+from django.apps import apps
+
+def find_related_objects(task):
+    for model in apps.get_models():
+        for field in model._meta.get_fields():
+            if field.get_internal_type() == 'ForeignKey' and field.related_model == Tasks:
+                related_objects = model.objects.filter(**{field.name: task})
+                for obj in related_objects:
+                    print(f'{model.__name__} instance with id {obj.pk} references Tasks instance with id {task.pk} via field {field.name}')
+
+# Replace 'task_id' with the id of the Tasks instance you're trying to delete
+

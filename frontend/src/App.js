@@ -6,6 +6,7 @@ import SideMenu from "./components/sidemenu";
 import LoginPage from './components/loginPage';
 import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
+import NewTaskOrganizer from './components/newTaskOrganizer';
 
 
 const App = () => {
@@ -73,6 +74,10 @@ const App = () => {
                         <Route 
                             path="/quickTask" 
                             element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}
+                        />
+                        <Route 
+                            path="/newtaskorganizer" 
+                            element={user ? <NewTaskOrganizer /> : <Navigate to="/login" replace />}
                         />
                     </Routes>
                 </UserContext.Provider>
