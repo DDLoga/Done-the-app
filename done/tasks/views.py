@@ -677,6 +677,19 @@ class QuickTaskEntryViewAPI(APIView):
         return Response({"message": "Tasks created successfully"}, status=201)
 
 
+class NtoTaskView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        print(request.data)
+        task = get_object_or_404(Tasks, id=request.data.get('id'))
+        serializer = TaskSerializer(task, data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request):
@@ -702,7 +715,6 @@ def get_contexts(request):              # get all contexts for the new task orga
 def get_projects(request):              # get all Projects for the new task organizer wizard
     projects = Projects.objects.filter(user=request.user, project_complete=False)
     serializer = ProjectSerializer(projects, many=True)
-    print('serializer.data: ', serializer.data)
     return JsonResponse(serializer.data, safe=False)
 
 

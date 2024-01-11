@@ -10,8 +10,11 @@ const NewTaskOrganizer = () => {
     const [currentTask, setCurrentTask] = useState(null);
     const [taskType, setTaskType] = useState('');
     const [priority, setPriority] = useState('A');
-    const [effort, setEffort] = useState('');
-    const [deadline, setDeadline] = useState('');
+    const [effort, setEffort] = useState(0);
+    //setting the default due date to today
+    const today = new Date();
+    const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const [deadline, setDeadline] = useState(formattedDate);
     const [context, setContext] = useState(''); //used for the form
     const [contexts, setContexts] = useState([]); //used for the API to collect the list
     const [relatedProject, setRelatedProject] = useState('');
@@ -111,9 +114,50 @@ const NewTaskOrganizer = () => {
         setNextAction(event.target.value);
     };
 
-    const handleProcessNext = () => {
+    const handleProcessNext = async () => {
+        const userResponse = await fetch('http://127.0.0.1:8000/api/getUser/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Token ${localStorage.getItem('token')}`
+            }
+        });
+        const userData = await userResponse.json();
+        const userId = userData.id;
+
+
         if (taskType === 'task') {
-            // Send POST request for a task
+            fetch('http://127.0.0.1:8000/api/NtoTask/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    name: currentTask.name,
+                    user: userId,
+                    effort: effort,
+                    id: currentTask.id,
+                    priority: priority,
+                    deadline: deadline,
+                    context: context,
+                    parent: relatedProject,
+                    new_task: false,
+                }),
+            })
+            //print the data to the console
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .then(() => {
+                // Remove the deleted task from the tasks state
+                setTasks(tasks.filter(task => task.id !== currentTask.id));
+                // If there are any tasks left, set the current task to the first one
+                // Otherwise, set the current task to null
+                setCurrentTask(tasks.length > 1 ? tasks[0] : null);
+                setTaskType([]);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         } else if (taskType === 'project') {
             // Send POST request for a project
         }
@@ -140,6 +184,7 @@ const NewTaskOrganizer = () => {
                 // If there are any tasks left, set the current task to the first one
                 // Otherwise, set the current task to null
                 setCurrentTask(tasks.length > 1 ? tasks[0] : null);
+                setTaskType([]);
             })
             .catch(error => console.error('Error:', error));
         }

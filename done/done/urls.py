@@ -13,6 +13,7 @@ urlpatterns = [
         path('login/', views.login, name='login'),
         path('logout/', views.logout_view, name='logout'),
         path('quickTask/', views.QuickTaskEntryViewAPI.as_view(), name='quickTask'),
+        path('NtoTask/', views.NtoTaskView.as_view(), name='NtoTask'),
         path('getUser/', views.get_user, name='get_user'),
         path('get_tasks/', views.get_tasks, name='get_tasks'),
         path('get_contexts/', views.get_contexts, name='get_contexts'),
