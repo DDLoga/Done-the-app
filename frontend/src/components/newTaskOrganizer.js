@@ -11,16 +11,15 @@ const NewTaskOrganizer = () => {
     const [taskType, setTaskType] = useState('');
     const [priority, setPriority] = useState('A');
     const [effort, setEffort] = useState(0);
-    //setting the default due date to today
-    const today = new Date();
+    const today = new Date();                       //setting the default due date to today
     const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const [deadline, setDeadline] = useState(formattedDate);
-    const [context, setContext] = useState(''); //used for the form
-    const [contexts, setContexts] = useState([]); //used for the API to collect the list
+    const [context, setContext] = useState('');     //used for the form
+    const [contexts, setContexts] = useState([]);   //used for the API to collect the list
     const [relatedProject, setRelatedProject] = useState('');
-    const [projects, setProjects] = useState([]); //used for the API to collect the list
+    const [projects, setProjects] = useState([]);   //used for the API to collect the list
     const [nextAction, setNextAction] = useState('');
-    const [filter, setFilter] = useState('');   //used for the filter of projects
+    const [filter, setFilter] = useState('');       //used for the filter of projects
     const filteredProjects = projects.filter(project =>
         project.project_name.toLowerCase().includes(filter.toLowerCase())
     );
@@ -118,75 +117,55 @@ const NewTaskOrganizer = () => {
         setNextAction(event.target.value);
     };
 
+    const fetchWithToken = (url, options) => fetch(url, {
+        headers: {
+            'Authorization': `Token ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+        ...options,
+    });
+
+    const handleResponse = () => {
+        setTasks(tasks.filter(task => task.id !== currentTask.id));
+        setCurrentTask(tasks.length > 1 ? tasks[0] : null);
+        setTaskType([]);
+        setNextAction([])
+        if (taskType !== 'task') {
+            handleDelete();
+        }
+    }
+
     const handleProcessNext = async () => {
-        const userResponse = await fetch('http://127.0.0.1:8000/api/getUser/', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Token ${localStorage.getItem('token')}`
-            }
-        });
+        const userResponse = await fetchWithToken('http://127.0.0.1:8000/api/getUser/', { method: 'GET' });
         const userData = await userResponse.json();
         const userId = userData.id;
 
+        const url = taskType === 'task' ? 'http://127.0.0.1:8000/api/NtoTask/' : 'http://127.0.0.1:8000/api/NtoProject/';
+        const body = taskType === 'task' ? {
+            name: currentTask.name,
+            user: userId,
+            effort: effort,
+            id: currentTask.id,
+            priority: priority,
+            deadline: deadline,
+            context: context,
+            parent: relatedProject,
+            new_task: false,
+        } : {
+            project_name: currentTask.name,
+            user: userId,
+            project_priority: priority,
+            project_deadline: deadline,
+        };
 
-        if (taskType === 'task') {
-            fetch('http://127.0.0.1:8000/api/NtoTask/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Token ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    name: currentTask.name,
-                    user: userId,
-                    effort: effort,
-                    id: currentTask.id,
-                    priority: priority,
-                    deadline: deadline,
-                    context: context,
-                    parent: relatedProject,
-                    new_task: false,
-                }),
-            })
-            //print the data to the console
-            .then(response => response.json())
-            .then(() => {
-                // Remove the deleted task from the tasks state
-                setTasks(tasks.filter(task => task.id !== currentTask.id));
-                // If there are any tasks left, set the current task to the first one
-                // Otherwise, set the current task to null
-                setCurrentTask(tasks.length > 1 ? tasks[0] : null);
-                setTaskType([]);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        } else if (taskType === 'project') {
-            fetch('http://127.0.0.1:8000/api/NtoProject/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Token ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    project_name: currentTask.name,
-                    user: userId,
-                    project_priority: priority,
-                    project_deadline: deadline,
-                }),
-            })
-            //print the data to the console
+        fetchWithToken(url, { method: 'POST', body: JSON.stringify(body) })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                // If nextAction is not empty, send another POST request to record the task
-                if (nextAction !== '') {
-                    fetch('http://127.0.0.1:8000/api/quickTask/', {
+                if (taskType === 'project' && nextAction !== '') {
+                    fetchWithToken('http://127.0.0.1:8000/api/quickTask/', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Token ${localStorage.getItem('token')}`
-                        },
                         body: JSON.stringify({
                             name: nextAction,
                             user: userId,
@@ -200,24 +179,10 @@ const NewTaskOrganizer = () => {
                     });
                 }
             })
-
-            .then(() => {
-                // Remove the deleted task from the tasks state
-                setTasks(tasks.filter(task => task.id !== currentTask.id));
-                // If there are any tasks left, set the current task to the first one
-                // Otherwise, set the current task to null
-                setCurrentTask(tasks.length > 1 ? tasks[0] : null);
-                // Refresh the project list for the next entry
-                fetchProjects();
-                setTaskType([]);
-                setNextAction([]);
-                    // Call handleDelete function
-                handleDelete();
-            })
+            .then(handleResponse)
             .catch((error) => {
                 console.error('Error:', error);
             });
-        }
     };
 
     const handleDelete = () => {
