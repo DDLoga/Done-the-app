@@ -24,4 +24,9 @@ class ContextSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projects
-        fields = ['project_name', 'id']
+        fields = ['project_name',
+                'id',
+                'project_priority',
+                'user',
+                'project_deadline']
+        

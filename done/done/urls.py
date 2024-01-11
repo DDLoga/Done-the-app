@@ -14,6 +14,7 @@ urlpatterns = [
         path('logout/', views.logout_view, name='logout'),
         path('quickTask/', views.QuickTaskEntryViewAPI.as_view(), name='quickTask'),
         path('NtoTask/', views.NtoTaskView.as_view(), name='NtoTask'),
+        path('NtoProject/', views.NtoProjectView.as_view(), name='NtoProject'),
         path('getUser/', views.get_user, name='get_user'),
         path('get_tasks/', views.get_tasks, name='get_tasks'),
         path('get_contexts/', views.get_contexts, name='get_contexts'),

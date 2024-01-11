@@ -249,7 +249,7 @@ const NewTaskOrganizer = () => {
                         <MenuItem value="D">D</MenuItem>
                     </Select>
                     <TextField type="date" value={deadline} onChange={handleDeadlineChange} />
-                    <TextField value={nextAction} onChange={handleNextActionChange} />
+                    <TextField value={nextAction} onChange={handleNextActionChange} placeholder="Enter the first actionable task for this project" />
                     <Button onClick={handleProcessNext}>Process & Next</Button>
                 </>
             )}
