@@ -659,6 +659,7 @@ class QuickTaskEntryViewAPI(APIView):
     def post(self, request):
         task_names = request.data.get('name', None)
         user_id = request.data.get('user', None)
+        parent_id = request.data.get('parent', None)
 
 
         if not isinstance(task_names, list):
@@ -666,7 +667,7 @@ class QuickTaskEntryViewAPI(APIView):
             task_names = task_names[0].split("\n")   
         
         for task_name in task_names:
-            task_data = {'name': task_name, 'user': user_id, 'effort':0}
+            task_data = {'name': task_name, 'user': user_id, 'effort':0, 'parent': parent_id}
             serializer = TaskSerializer(data=task_data)
             print(task_data)
             if serializer.is_valid():
@@ -694,11 +695,10 @@ class NtoProjectView(APIView):
 
     def post(self, request):
         print(request.data)
-        project = get_object_or_404(Projects, id=request.data.get('id'))
-        serializer = ProjectSerializer(task, data=request.data)
+        serializer = ProjectSerializer(data=request.data)  # Removed Projects
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            project = serializer.save(user=request.user)
+            return Response({'project_id': project.id}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])

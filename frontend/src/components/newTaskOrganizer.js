@@ -62,7 +62,7 @@ const NewTaskOrganizer = () => {
     }, []);
 
     // collect projects from API
-    useEffect(() => {
+    const fetchProjects = () => {
         fetch('http://127.0.0.1:8000/api/get_projects', {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -77,8 +77,12 @@ const NewTaskOrganizer = () => {
         //print the data to the console
         .then(data => setProjects(data))
         .catch(error => console.error('Error:', error));
-    }, []);
+    };
     
+    useEffect(() => {
+        fetchProjects();
+    }, []);
+
     // set the current task to the first task in the list
     useEffect(() => {
         if (tasks.length > 0) {
@@ -146,7 +150,6 @@ const NewTaskOrganizer = () => {
             })
             //print the data to the console
             .then(response => response.json())
-            .then(data => console.log(data))
             .then(() => {
                 // Remove the deleted task from the tasks state
                 setTasks(tasks.filter(task => task.id !== currentTask.id));
@@ -159,7 +162,61 @@ const NewTaskOrganizer = () => {
                 console.error('Error:', error);
             });
         } else if (taskType === 'project') {
-            // Send POST request for a project
+            fetch('http://127.0.0.1:8000/api/NtoProject/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    project_name: currentTask.name,
+                    user: userId,
+                    project_priority: priority,
+                    project_deadline: deadline,
+                }),
+            })
+            //print the data to the console
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // If nextAction is not empty, send another POST request to record the task
+                if (nextAction !== '') {
+                    fetch('http://127.0.0.1:8000/api/quickTask/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            name: nextAction,
+                            user: userId,
+                            parent: data.project_id,
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log(data))
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+            })
+
+            .then(() => {
+                // Remove the deleted task from the tasks state
+                setTasks(tasks.filter(task => task.id !== currentTask.id));
+                // If there are any tasks left, set the current task to the first one
+                // Otherwise, set the current task to null
+                setCurrentTask(tasks.length > 1 ? tasks[0] : null);
+                // Refresh the project list for the next entry
+                fetchProjects();
+                setTaskType([]);
+                setNextAction([]);
+                    // Call handleDelete function
+                handleDelete();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         }
     };
 
