@@ -44,8 +44,8 @@ function SideMenu() {
                         <span> New Task capture</span>
                     </li>
                     <li>
-                        <FontAwesomeIcon icon={faCalendar} />
-                        <span> New Task Organizer</span>
+                        <FontAwesomeIcon icon={faCalendar} onClick={() => navigate('/newtaskorganizer')}/>
+                        <span onClick={() => navigate('/newtaskorganizer')}> New Task Organizer</span>
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faList} />

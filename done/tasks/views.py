@@ -623,7 +623,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token as AuthToken
 from rest_framework.views import APIView
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer, ContextSerializer, ProjectSerializer
 from django.contrib.auth.models import User
 from rest_framework import status
 from django.db import IntegrityError
@@ -683,7 +683,6 @@ def get_user(request):
     user = User.objects.get(username=request.user.username)
     return Response({'id': user.id, 'username': user.username})
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_tasks(request):                 # get all tasks for the new task organizer wizard
@@ -703,6 +702,7 @@ def get_contexts(request):              # get all contexts for the new task orga
 def get_projects(request):              # get all Projects for the new task organizer wizard
     projects = Projects.objects.filter(user=request.user, project_complete=False)
     serializer = ProjectSerializer(projects, many=True)
+    print('serializer.data: ', serializer.data)
     return JsonResponse(serializer.data, safe=False)
 
 
@@ -721,3 +721,4 @@ def delete_task(request, task_id):    # delete a task on the new task organizer 
         
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_204_NO_CONTENT)
+

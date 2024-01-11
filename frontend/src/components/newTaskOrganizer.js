@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import BaseLayout from './baseLayout';
 import { TextField, RadioGroup, FormControlLabel, Radio, Button, Select, MenuItem } from '@mui/material';
+import List from '@mui/material/List';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
 
 const NewTaskOrganizer = () => {
     const [tasks, setTasks] = useState([]);
@@ -9,9 +12,15 @@ const NewTaskOrganizer = () => {
     const [priority, setPriority] = useState('A');
     const [effort, setEffort] = useState('');
     const [deadline, setDeadline] = useState('');
-    const [context, setContext] = useState('');
+    const [context, setContext] = useState(''); //used for the form
+    const [contexts, setContexts] = useState([]); //used for the API to collect the list
     const [relatedProject, setRelatedProject] = useState('');
+    const [projects, setProjects] = useState([]); //used for the API to collect the list
     const [nextAction, setNextAction] = useState('');
+    const [filter, setFilter] = useState('');   //used for the filter of projects
+    const filteredProjects = projects.filter(project =>
+        project.project_name.toLowerCase().includes(filter.toLowerCase())
+    );
 
     // collect tasks from API
     useEffect(() => {
@@ -32,6 +41,42 @@ const NewTaskOrganizer = () => {
         .catch(error => console.error('Error:', error));
     }, []);
 
+    // collect contexts from API
+    useEffect(() => {
+        fetch('http://127.0.0.1:8000/api/get_contexts', {
+            headers: {
+                'Authorization': `Token ${localStorage.getItem('token')}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => setContexts(data))
+        .catch(error => console.error('Error:', error));
+    }, []);
+
+    // collect projects from API
+    useEffect(() => {
+        fetch('http://127.0.0.1:8000/api/get_projects', {
+            headers: {
+                'Authorization': `Token ${localStorage.getItem('token')}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        //print the data to the console
+        .then(data => setProjects(data))
+        .catch(error => console.error('Error:', error));
+    }, []);
+    
+    // set the current task to the first task in the list
     useEffect(() => {
         if (tasks.length > 0) {
             setCurrentTask(tasks[0]);
@@ -58,8 +103,8 @@ const NewTaskOrganizer = () => {
         setContext(event.target.value);
     };
 
-    const handleRelatedProjectChange = (event) => {
-        setRelatedProject(event.target.value);
+    const handleRelatedProjectChange = (projectId) => {
+        setRelatedProject(projectId);
     };
 
     const handleNextActionChange = (event) => {
@@ -67,7 +112,11 @@ const NewTaskOrganizer = () => {
     };
 
     const handleProcessNext = () => {
-        // Send POST request to API
+        if (taskType === 'task') {
+            // Send POST request for a task
+        } else if (taskType === 'project') {
+            // Send POST request for a project
+        }
     };
 
     const handleDelete = () => {
@@ -100,7 +149,7 @@ const NewTaskOrganizer = () => {
         <BaseLayout>
             <div>{tasks.length} remaining entries</div>
             <div>Current: {currentTask?.name}</div>
-            {currentTask && <TextField value={currentTask.name} />}
+            {currentTask && <TextField value={currentTask.name} onChange={e => setCurrentTask({...currentTask, name: e.target.value})} />}
             <RadioGroup value={taskType} onChange={handleTaskTypeChange}>
                 <FormControlLabel value="task" control={<Radio />} label="A task" />
                 <FormControlLabel value="project" control={<Radio />} label="A Project" />
@@ -117,11 +166,32 @@ const NewTaskOrganizer = () => {
                     <TextField value={effort} onChange={handleEffortChange} />
                     <TextField type="date" value={deadline} onChange={handleDeadlineChange} />
                     <Select value={context} onChange={handleContextChange}>
-                        {/* Populate with contexts from API */}
+                        {contexts.map((context) => (
+                            <MenuItem key={context.id} value={context.id}>
+                                {context.name}
+                            </MenuItem>
+                        ))}
                     </Select>
-                    <Select value={relatedProject} onChange={handleRelatedProjectChange}>
-                        {/* Populate with projects from API */}
-                    </Select>
+
+                    <div>
+                        <TextField
+                        value={filter}
+                        onChange={e => setFilter(e.target.value)}
+                        label="Filter projects"
+                        />
+
+                        <List style={{ maxHeight: '200px', overflow: 'auto' }}>
+                            {filteredProjects.map((project) => (
+                                <ListItemButton
+                                    key={project.id}
+                                    selected={relatedProject === project.id}
+                                    onClick={() => handleRelatedProjectChange(project.id)}
+                                >
+                                    <ListItemText primary={project.project_name} />
+                                </ListItemButton>
+                            ))}
+                        </List>
+                    </div>
                     <Button onClick={handleProcessNext}>Process & Next</Button>
                 </>
             )}
