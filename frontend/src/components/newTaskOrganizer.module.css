@@ -1,0 +1,89 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.formElement {/* newTaskOrganizer.module.css */
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background-color: #252733; /* Dark blue background */
+    color: #ffffff; /* White text */
+}
+
+.h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.subTitle {
+    color: #888888; /* Lighter text for less important information */
+    margin-bottom: 10px;
+}
+
+.formElement {
+    margin-bottom: 10px;
+    background-color: #353744; /* Slightly lighter blue for input backgrounds */
+    color: #ffffff; /* White text for inputs */
+    border: none; /* Remove default input borders */
+}
+
+button {
+    margin-top: 20px;
+    background-color: #0086FF; /* Bright blue for buttons */
+    color: #ffffff; /* White text for buttons */
+    border: none; /* Remove default button borders */
+    padding: 10px 20px; /* Add some padding to buttons */
+    border-radius: 5px; /* Round the corners of the buttons */
+    cursor: pointer; /* Change the cursor when hovering over buttons */
+}
+
+button:hover {
+    background-color: #006FD6; /* Darken the button color when hovering */
+}
+
+button:active {
+    background-color: #005CB2; /* Darken the button color even more when clicking */
+}
+    margin: 10px 0;
+    width: 100%;
+}
+
+.h1 {
+    margin-right: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+.h1 .nonBold {
+    font-size: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.subTitle {
+        white-space: nowrap;
+        max-width: 600px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 22px;
+        border: 0px none rgb(150, 153, 166);
+        width: initial;
+        color: rgb(150, 153, 166);
+        height: 21.9886px;
+        padding: 0px 2px;
+        margin: 0px;
+        font-size: 14px;
+        vertical-align: baseline;
+        box-sizing: border-box;
+}
