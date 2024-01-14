@@ -1,24 +1,20 @@
 import React from 'react';
-import baseLayoutStyle from './baseLayout.module.css';
 
-const BaseLayout = ({ children }) => {
+function BaseLayout({ children, headerContent }) {
     return (
-        <div className={baseLayoutStyle.body}>
-            <header className={baseLayoutStyle.header}>
-                {/* Header content goes here */}
-                the header as defined on baseLayout.js
+        <div className="flex flex-col h-screen w-screen bg-gray-900 text-white">
+            <header className="p-6 bg-gray-800 border-b border-gray-700 pl-24">
+                {headerContent}
             </header>
-
-            <main className={baseLayoutStyle.main}>
+            <main className="flex-grow pl-24 p-6">
                 {children}
             </main>
-
-            <footer className={baseLayoutStyle.footer}>
+            <footer className="pl-24 p-6 bg-gray-800 border-t border-gray-700">
                 {/* Footer content goes here */}
-                the footer as defined on baseLayout.js
+                The footer as defined on baseLayout.js
             </footer>
         </div>
     );
-};
+}
 
 export default BaseLayout;

@@ -4,9 +4,9 @@ import { TextField, RadioGroup, FormControlLabel, Radio, Button, Select, MenuIte
 import List from '@mui/material/List';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-import newTaskOrganizerStyle from './newTaskOrganizer.module.css';
 
 const NewTaskOrganizer = () => {
+    const headerContent = "New Task Organizer Wizard";
     const [tasks, setTasks] = useState([]);
     const [currentTask, setCurrentTask] = useState(null);
     const [taskType, setTaskType] = useState('');
@@ -214,74 +214,139 @@ const NewTaskOrganizer = () => {
     };
 
     return (
-        <BaseLayout>
-                <div className={newTaskOrganizerStyle.container}>
-                    <div className={newTaskOrganizerStyle.h1}>{tasks.length} remaining entries</div>
-                    <div className={newTaskOrganizerStyle.subTitle}>Current: {currentTask?.name}</div>
-                    {currentTask && <TextField className={newTaskOrganizerStyle.formElement} value={currentTask.name} onChange={e => setCurrentTask({...currentTask, name: e.target.value})} />}
-                    <RadioGroup className={newTaskOrganizerStyle.formElement} value={taskType} onChange={handleTaskTypeChange}>
-                        <FormControlLabel value="task" control={<Radio />} label="A task" />
-                        <FormControlLabel value="project" control={<Radio />} label="A Project" />
-                        <FormControlLabel value="nonActionable" control={<Radio />} label="Non Actionable" />
-                    </RadioGroup>
-                {taskType === 'task' && (
-                    <>
-                        <Select value={priority} onChange={handlePriorityChange}>
-                            <MenuItem value="A">A</MenuItem>
-                            <MenuItem value="B">B</MenuItem>
-                            <MenuItem value="C">C</MenuItem>
-                            <MenuItem value="D">D</MenuItem>
-                        </Select>
-                        <TextField value={effort} onChange={handleEffortChange} />
-                        <TextField type="date" value={deadline} onChange={handleDeadlineChange} />
-                        <Select value={context} onChange={handleContextChange}>
-                            {contexts.map((context) => (
-                                <MenuItem key={context.id} value={context.id}>
-                                    {context.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-
-                        <div>
-                            <TextField
-                            value={filter}
-                            onChange={e => setFilter(e.target.value)}
-                            label="Filter projects"
+    <BaseLayout headerContent={headerContent}>
+        <div className="flex flex-col text-white p-6">
+            <div>
+                <div className="flex justify-between max-w-screen-lg mx-auto">
+                    <div>
+                        <h1 className="text-2xl mb-4" style={{ color: '#579BFC' }}>{tasks.length} remaining entries</h1>
+                        <h2 className="text-lg mb-4">Current: {currentTask?.name}</h2>
+                        {currentTask && (
+                        <TextField
+                            className="form-input mt-1 block w-full"
+                            label="Rename your task"
+                            value={currentTask.name}
+                            variant="outlined"
+                            InputProps={{
+                                style: { color: '#fff', borderColor: '#9699A6' },
+                            }}
+                            InputLabelProps={{
+                                style: { color: '#9699A6' },
+                            }}
+                            onChange={(e) =>
+                                setCurrentTask({ ...currentTask, name: e.target.value })
+                            }
+                        />
+                )}
+                    </div>
+                    <div>
+                        <h2 className="text-lg mb-4" style={{ color: '#579BFC' }}>What is this?</h2>
+                        <RadioGroup
+                            className="flex flex-row my-4 items-left"
+                            value={taskType}
+                            onChange={handleTaskTypeChange}
+                        >
+                            <FormControlLabel 
+                                value="task" 
+                                control={<Radio />} 
+                                label="A task" 
+                                className="flex items-center"
                             />
+                            <FormControlLabel
+                                value="project"
+                                control={<Radio />} 
+                                label="A Project"
+                                className="flex items-center"
+                            />
+                            <FormControlLabel
+                                value="nonActionable"
+                                control={<Radio />} 
+                                label="Non Actionable"
+                                className="flex items-center"
+                            />
+                        </RadioGroup>
+                    </div>
+                </div>
+                
 
-                            <List style={{ maxHeight: '200px', overflow: 'auto' }}>
-                                {filteredProjects.map((project) => (
-                                    <ListItemButton
-                                        key={project.id}
-                                        selected={relatedProject === project.id}
-                                        onClick={() => handleRelatedProjectChange(project.id)}
-                                    >
-                                        <ListItemText primary={project.project_name} />
-                                    </ListItemButton>
-                                ))}
-                            </List>
-                        </div>
-                        <Button onClick={handleProcessNext}>Process & Next</Button>
-                    </>
-                )}
-                {taskType === 'project' && (
-                    <>
-                        <Select value={priority} onChange={handlePriorityChange}>
-                            <MenuItem value="A">A</MenuItem>
-                            <MenuItem value="B">B</MenuItem>
-                            <MenuItem value="C">C</MenuItem>
-                            <MenuItem value="D">D</MenuItem>
-                        </Select>
-                        <TextField type="date" value={deadline} onChange={handleDeadlineChange} />
-                        <TextField value={nextAction} onChange={handleNextActionChange} placeholder="Enter the first actionable task for this project" />
-                        <Button onClick={handleProcessNext}>Process & Next</Button>
-                    </>
-                )}
-                {taskType === 'nonActionable' && (
-                    <Button onClick={handleDelete}>Delete</Button>
-                )}
+        
             </div>
-        </BaseLayout>
+
+        {taskType === "task" && (
+            <>
+            <Select value={priority} onChange={handlePriorityChange}>
+                <MenuItem value="A">A</MenuItem>
+                <MenuItem value="B">B</MenuItem>
+                <MenuItem value="C">C</MenuItem>
+                <MenuItem value="D">D</MenuItem>
+            </Select>
+            <TextField value={effort} onChange={handleEffortChange} />
+            <TextField
+                type="date"
+                value={deadline}
+                onChange={handleDeadlineChange}
+            />
+            <Select value={context} onChange={handleContextChange}>
+                {contexts.map((context) => (
+                <MenuItem key={context.id} value={context.id}>
+                    {context.name}
+                </MenuItem>
+                ))}
+            </Select>
+
+            <div>
+                <TextField
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                label="Filter projects"
+                />
+
+                <List style={{ maxHeight: "200px", overflow: "auto" }}>
+                {filteredProjects.map((project) => (
+                    <ListItemButton
+                    key={project.id}
+                    selected={relatedProject === project.id}
+                    onClick={() => handleRelatedProjectChange(project.id)}
+                    >
+                    <ListItemText primary={project.project_name} />
+                    </ListItemButton>
+                ))}
+                </List>
+            </div>
+            <Button onClick={handleProcessNext}>Process & Next</Button>
+            </>
+        )}
+        {taskType === "project" && (
+            <>
+            <Select value={priority} onChange={handlePriorityChange}>
+                <MenuItem value="A">A</MenuItem>
+                <MenuItem value="B">B</MenuItem>
+                <MenuItem value="C">C</MenuItem>
+                <MenuItem value="D">D</MenuItem>
+            </Select>
+            <TextField
+                type="date"
+                value={deadline}
+                onChange={handleDeadlineChange}
+            />
+            <TextField
+                value={nextAction}
+                onChange={handleNextActionChange}
+                placeholder="Enter the first actionable task for this project"
+            />
+            <Button onClick={handleProcessNext}>Process & Next</Button>
+            </>
+        )}
+        {taskType === "nonActionable" && (
+            <Button
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleDelete}
+            >
+            Delete
+            </Button>
+        )}
+        </div>
+    </BaseLayout>
     );
 };
 
