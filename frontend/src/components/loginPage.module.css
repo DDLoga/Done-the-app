@@ -8,9 +8,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    height: 70vh; Optional: This will make the container take up the full viewport height
 }
 .loginForm {
-    background-color: var(--primary-color);
+    /* background-color: var(--primary-color); */
     color: var(--text-color);
     font-family: 'Roboto', sans-serif;
     /* width: 100vw;

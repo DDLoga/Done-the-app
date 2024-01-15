@@ -5,6 +5,7 @@ import BaseLayout from './baseLayout';
 import loginPageStyle from './loginPage.module.css';
 
 const LoginPage = () => {
+    const headerContent = "Login Page";
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -28,33 +29,33 @@ const LoginPage = () => {
     };
 
     return (
-        <BaseLayout>
-        <div className={loginPageStyle.loginForm}>
-            <div className={loginPageStyle.container}>
-                <h2>Login</h2>
-                <form onSubmit={handleSubmit} className={loginPageStyle.form}>
-                    <label>
-                        Username:
-                        <input 
-                            type="text" 
-                            value={username} 
-                            onChange={(e) => setUsername(e.target.value)} 
-                            className={loginPageStyle.input}
-                        />
-                    </label>
-                    <label>
-                        Password:
-                        <input 
-                            type="password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            className={loginPageStyle.input}
-                        />
-                    </label>
-                    <input type="submit" value="Submit" className={loginPageStyle.submit} />
-                </form>
+        <BaseLayout headerContent={headerContent}>
+            <div className={loginPageStyle.loginForm}>
+                <div className={loginPageStyle.container}>
+                    <h2>Login</h2>
+                    <form onSubmit={handleSubmit} className={loginPageStyle.form}>
+                        <label>
+                            Username:
+                            <input 
+                                type="text" 
+                                value={username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                className={loginPageStyle.input}
+                            />
+                        </label>
+                        <label>
+                            Password:
+                            <input 
+                                type="password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                className={loginPageStyle.input}
+                            />
+                        </label>
+                        <input type="submit" value="Submit" className={loginPageStyle.submit} />
+                    </form>
+                </div>
             </div>
-        </div>
         </BaseLayout>
     );
 };
