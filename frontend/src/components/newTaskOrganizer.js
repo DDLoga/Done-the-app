@@ -213,6 +213,23 @@ const NewTaskOrganizer = () => {
         }
     };
 
+    const commonStyles = {
+        '& .MuiOutlinedInput-root': {
+        color: '#FFFFFF',
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#9699A6',
+            borderWidth: '2px',
+        },
+        },
+        '& label': {
+        color: '#9699A6',
+        },
+        '& .MuiOutlinedInput-notchedOutline' : {
+        borderColor: '#9699A6',
+        },
+    };
+
+
     return (
     <BaseLayout headerContent={headerContent}>
         <div className="flex flex-col text-white p-6">
@@ -226,16 +243,7 @@ const NewTaskOrganizer = () => {
                             className="form-input mt-1 block w-full"
                             label="Rename your task"
                             value={currentTask.name}
-                            variant="outlined"
-                            InputProps={{
-                                style: { color: '#fff', borderColor: '#9699A6' },
-                            }}
-                            InputLabelProps={{
-                                style: { color: '#9699A6' },
-                            }}
-                            onChange={(e) =>
-                                setCurrentTask({ ...currentTask, name: e.target.value })
-                            }
+                            sx={commonStyles}
                         />
                 )}
                     </div>
@@ -248,19 +256,19 @@ const NewTaskOrganizer = () => {
                         >
                             <FormControlLabel 
                                 value="task" 
-                                control={<Radio />} 
+                                control={<Radio color="default" sx={{ color: 'grey', '&.Mui-checked': { color: '#579BFC' } }} />} 
                                 label="A task" 
                                 className="flex items-center"
                             />
                             <FormControlLabel
                                 value="project"
-                                control={<Radio />} 
+                                control={<Radio color="default" sx={{ color: 'grey', '&.Mui-checked': { color: '#579BFC' } }} />} 
                                 label="A Project"
                                 className="flex items-center"
                             />
                             <FormControlLabel
                                 value="nonActionable"
-                                control={<Radio />} 
+                                control={<Radio color="default" sx={{ color: 'grey', '&.Mui-checked': { color: '#579BFC' } }} />} 
                                 label="Non Actionable"
                                 className="flex items-center"
                             />
@@ -274,19 +282,58 @@ const NewTaskOrganizer = () => {
 
         {taskType === "task" && (
             <>
-            <Select value={priority} onChange={handlePriorityChange}>
+            <Select 
+                value={priority} 
+                onChange={handlePriorityChange}
+                sx={{ '& .MuiSelect-select': {
+                    color: '#FFFFFF',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#9699A6', // red color on hover
+                    },
+                }}
+                >
                 <MenuItem value="A">A</MenuItem>
                 <MenuItem value="B">B</MenuItem>
                 <MenuItem value="C">C</MenuItem>
                 <MenuItem value="D">D</MenuItem>
             </Select>
-            <TextField value={effort} onChange={handleEffortChange} />
+            <TextField 
+                value={effort} 
+                onChange={handleEffortChange}
+                sx={commonStyles}
+            />
             <TextField
                 type="date"
                 value={deadline}
                 onChange={handleDeadlineChange}
+                sx={{ 
+                    '& .MuiOutlinedInput-root': {       //this is the class for the input field
+                        color: '#FFFFFF',            //this is the color of the text
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#9699A6', // red color on hover
+                            borderWidth: '2px', // increased border thickness
+                        },
+                    },
+                    '& label': {
+                        color: '#9699A6',         //this is the color of the label
+                    },
+                    '& .MuiOutlinedInput-notchedOutline' : {
+                        borderColor: '#9699A6',     //this is the color of the border
+                    },
+                }}
             />
-            <Select value={context} onChange={handleContextChange}>
+            <Select 
+                value={context} 
+                onChange={handleContextChange}
+                sx={{ '& .MuiSelect-select': {
+                    color: '#FFFFFF',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#9699A6', // red color on hover
+                    },
+                }}
+                >
                 {contexts.map((context) => (
                 <MenuItem key={context.id} value={context.id}>
                     {context.name}
@@ -299,6 +346,7 @@ const NewTaskOrganizer = () => {
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 label="Filter projects"
+                sx={commonStyles}
                 />
 
                 <List style={{ maxHeight: "200px", overflow: "auto" }}>
