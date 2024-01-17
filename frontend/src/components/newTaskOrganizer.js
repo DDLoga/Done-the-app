@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import BaseLayout from './baseLayout';
-import { TextField, RadioGroup, FormControlLabel, Radio, Button, Select, MenuItem } from '@mui/material';
+import { TextField, RadioGroup, FormControlLabel, Radio, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
+import OutlinedInput from '@mui/material/OutlinedInput';
 
 const NewTaskOrganizer = () => {
     const headerContent = "New Task Organizer Wizard";
@@ -227,175 +228,216 @@ const NewTaskOrganizer = () => {
         '& .MuiOutlinedInput-notchedOutline' : {
         borderColor: '#9699A6',
         },
+        '& .MuiSelect-select': {
+            color: '#FFFFFF',
+        },
     };
 
 
     return (
-    <BaseLayout headerContent={headerContent}>
-        <div className="flex flex-col text-white p-6">
-            <div>
-                <div className="flex justify-between max-w-screen-lg mx-auto">
-                    <div>
-                        <h1 className="text-2xl mb-4" style={{ color: '#579BFC' }}>{tasks.length} remaining entries</h1>
-                        <h2 className="text-lg mb-4">Current: {currentTask?.name}</h2>
-                        {currentTask && (
-                        <TextField
-                            className="form-input mt-1 block w-full"
-                            label="Rename your task"
-                            value={currentTask.name}
-                            sx={commonStyles}
-                        />
-                )}
-                    </div>
-                    <div>
-                        <h2 className="text-lg mb-4" style={{ color: '#579BFC' }}>What is this?</h2>
-                        <RadioGroup
+        <BaseLayout headerContent={headerContent}>
+            <div className="flex flex-col text-white p-6 space-y-4">
+                <div>
+                    <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
+                        <div>
+                            <h1 className="text-2xl mb-4" style={{ color: "#579BFC" }}>
+                            {tasks.length} remaining entries
+                            </h1>
+                            <h2 className="text-lg mb-4">Current: {currentTask?.name}</h2>
+                            {currentTask && (
+                            <TextField
+                                className="form-input mt-1 block w-full"
+                                label="Rename your task"
+                                value={currentTask.name}
+                                sx={commonStyles}
+                                onChange={(e) =>
+                                setCurrentTask({ ...currentTask, name: e.target.value })
+                                }
+                            />
+                            )}
+                        </div>
+                        <div>
+                            <h2 className="text-lg mb-4" style={{ color: "#579BFC" }}>
+                            What is this?
+                            </h2>
+                            <RadioGroup
                             className="flex flex-row my-4 items-left"
                             value={taskType}
                             onChange={handleTaskTypeChange}
-                        >
-                            <FormControlLabel 
-                                value="task" 
-                                control={<Radio color="default" sx={{ color: 'grey', '&.Mui-checked': { color: '#579BFC' } }} />} 
-                                label="A task" 
+                            >
+                            <FormControlLabel
+                                value="task"
+                                control={
+                                <Radio
+                                    color="default"
+                                    sx={{
+                                    color: "grey",
+                                    "&.Mui-checked": { color: "#579BFC" },
+                                    }}
+                                />
+                                }
+                                label="A task"
                                 className="flex items-center"
                             />
                             <FormControlLabel
                                 value="project"
-                                control={<Radio color="default" sx={{ color: 'grey', '&.Mui-checked': { color: '#579BFC' } }} />} 
+                                control={
+                                <Radio
+                                    color="default"
+                                    sx={{
+                                    color: "grey",
+                                    "&.Mui-checked": { color: "#579BFC" },
+                                    }}
+                                />
+                                }
                                 label="A Project"
                                 className="flex items-center"
                             />
                             <FormControlLabel
                                 value="nonActionable"
-                                control={<Radio color="default" sx={{ color: 'grey', '&.Mui-checked': { color: '#579BFC' } }} />} 
+                                control={
+                                <Radio
+                                    color="default"
+                                    sx={{
+                                    color: "grey",
+                                    "&.Mui-checked": { color: "#579BFC" },
+                                    }}
+                                />
+                                }
                                 label="Non Actionable"
                                 className="flex items-center"
                             />
-                        </RadioGroup>
+                            </RadioGroup>
+                        </div>
                     </div>
                 </div>
-                
 
-        
+            <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
+                {taskType === "task" && (
+                    <>
+                        <FormControl variant="outlined" sx={commonStyles}>
+                            <InputLabel id="priority-label">Priority</InputLabel>
+                            <Select
+                                label="Priority"
+                                value={priority}
+                                onChange={handlePriorityChange}
+                                input={<OutlinedInput label="Priority" />}
+                            >
+                            <MenuItem value="A">A</MenuItem>
+                            <MenuItem value="B">B</MenuItem>
+                            <MenuItem value="C">C</MenuItem>
+                            <MenuItem value="D">D</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            value={effort}
+                            label="Effort"
+                            onChange={handleEffortChange}
+                            sx={commonStyles}
+                        />
+                        <TextField
+                            type="date"
+                            label="Due date"
+                            value={deadline}
+                            onChange={handleDeadlineChange}
+                            sx={commonStyles}
+                        />
+
+                        <FormControl variant="outlined" sx={commonStyles}>
+                            <InputLabel id="context-label">Context</InputLabel>
+                            <Select
+                            label="Context"
+                            value={context}
+                            onChange={handleContextChange}
+                            input={<OutlinedInput label="Context" />}
+                            >
+                            {contexts.map((context) => (
+                                <MenuItem key={context.id} value={context.id}>
+                                {context.name}
+                                </MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl>
+
+                        <div class='space-y-4'>
+                            <TextField
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            label="Filter projects"
+                            sx={commonStyles}
+                            />
+
+                            <List
+                            sx={{
+                                maxHeight: "200px",
+                                overflow: "auto",
+                                border: "1px solid #9699A6",
+                                borderRadius: "4px",
+                            }}
+                            >
+                            {filteredProjects.map((project) => (
+                                <ListItemButton
+                                key={project.id}
+                                selected={relatedProject === project.id}
+                                onClick={() => handleRelatedProjectChange(project.id)}
+                                sx={{
+                                    "&:hover": {
+                                    backgroundColor: "#18283b", // replace with your color
+                                    },
+                                }}
+                                >
+                                <ListItemText primary={project.project_name} />
+                                </ListItemButton>
+                            ))}
+                            </List>
+                        </div>
+                        <Button onClick={handleProcessNext}>Process & Next</Button>
+                    </>
+                )}
             </div>
 
-        {taskType === "task" && (
-            <>
-            <Select 
-                value={priority} 
-                onChange={handlePriorityChange}
-                sx={{ '& .MuiSelect-select': {
-                    color: '#FFFFFF',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#9699A6', // red color on hover
-                    },
-                }}
-                >
-                <MenuItem value="A">A</MenuItem>
-                <MenuItem value="B">B</MenuItem>
-                <MenuItem value="C">C</MenuItem>
-                <MenuItem value="D">D</MenuItem>
-            </Select>
-            <TextField 
-                value={effort} 
-                onChange={handleEffortChange}
-                sx={commonStyles}
-            />
-            <TextField
-                type="date"
-                value={deadline}
-                onChange={handleDeadlineChange}
-                sx={{ 
-                    '& .MuiOutlinedInput-root': {       //this is the class for the input field
-                        color: '#FFFFFF',            //this is the color of the text
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#9699A6', // red color on hover
-                            borderWidth: '2px', // increased border thickness
-                        },
-                    },
-                    '& label': {
-                        color: '#9699A6',         //this is the color of the label
-                    },
-                    '& .MuiOutlinedInput-notchedOutline' : {
-                        borderColor: '#9699A6',     //this is the color of the border
-                    },
-                }}
-            />
-            <Select 
-                value={context} 
-                onChange={handleContextChange}
-                sx={{ '& .MuiSelect-select': {
-                    color: '#FFFFFF',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#9699A6', // red color on hover
-                    },
-                }}
-                >
-                {contexts.map((context) => (
-                <MenuItem key={context.id} value={context.id}>
-                    {context.name}
-                </MenuItem>
-                ))}
-            </Select>
-
-            <div>
-                <TextField
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                label="Filter projects"
-                sx={commonStyles}
-                />
-
-                <List style={{ maxHeight: "200px", overflow: "auto" }}>
-                {filteredProjects.map((project) => (
-                    <ListItemButton
-                    key={project.id}
-                    selected={relatedProject === project.id}
-                    onClick={() => handleRelatedProjectChange(project.id)}
+            {taskType === "project" && (
+                <>
+                <FormControl variant="outlined" sx={commonStyles}>
+                    <InputLabel id="priority-label">Priority</InputLabel>
+                    <Select
+                    label="Priority"
+                    value={priority}
+                    onChange={handlePriorityChange}
+                    input={<OutlinedInput label="Priority" />}
                     >
-                    <ListItemText primary={project.project_name} />
-                    </ListItemButton>
-                ))}
-                </List>
+                    <MenuItem value="A">A</MenuItem>
+                    <MenuItem value="B">B</MenuItem>
+                    <MenuItem value="C">C</MenuItem>
+                    <MenuItem value="D">D</MenuItem>
+                    </Select>
+                </FormControl>
+                <TextField
+                    type="date"
+                    value={deadline}
+                    onChange={handleDeadlineChange}
+                    sx={commonStyles}
+                />
+                <TextField
+                    value={nextAction}
+                    label="First Action"
+                    onChange={handleNextActionChange}
+                    sx={commonStyles}
+                />
+                <Button onClick={handleProcessNext}>Process & Next</Button>
+                </>
+            )}
+            {taskType === "nonActionable" && (
+                <Button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleDelete}
+                >
+                Delete
+                </Button>
+            )}
             </div>
-            <Button onClick={handleProcessNext}>Process & Next</Button>
-            </>
-        )}
-        {taskType === "project" && (
-            <>
-            <Select value={priority} onChange={handlePriorityChange}>
-                <MenuItem value="A">A</MenuItem>
-                <MenuItem value="B">B</MenuItem>
-                <MenuItem value="C">C</MenuItem>
-                <MenuItem value="D">D</MenuItem>
-            </Select>
-            <TextField
-                type="date"
-                value={deadline}
-                onChange={handleDeadlineChange}
-            />
-            <TextField
-                value={nextAction}
-                onChange={handleNextActionChange}
-                placeholder="Enter the first actionable task for this project"
-            />
-            <Button onClick={handleProcessNext}>Process & Next</Button>
-            </>
-        )}
-        {taskType === "nonActionable" && (
-            <Button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleDelete}
-            >
-            Delete
-            </Button>
-        )}
-        </div>
-    </BaseLayout>
-    );
-};
+        </BaseLayout>
+        );
+    };
 
 export default NewTaskOrganizer;
