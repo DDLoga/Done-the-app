@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 
+
 const NewTaskOrganizer = () => {
     const headerContent = "New Task Organizer Wizard";
     const [tasks, setTasks] = useState([]);
@@ -231,6 +232,9 @@ const NewTaskOrganizer = () => {
         '& .MuiSelect-select': {
             color: '#FFFFFF',
         },
+        '& .MuiSvgIcon-root': {
+            color: '#FFFFFF',
+        },
     };
 
 
@@ -238,7 +242,7 @@ const NewTaskOrganizer = () => {
         <BaseLayout headerContent={headerContent}>
             <div className="flex flex-col text-white p-6 space-y-4">
                 <div>
-                    <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
+                    <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 max-w-screen-sm">
                         <div>
                             <h1 className="text-2xl mb-4" style={{ color: "#579BFC" }}>
                             {tasks.length} remaining entries
@@ -312,120 +316,132 @@ const NewTaskOrganizer = () => {
                     </div>
                 </div>
 
-            <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
+            
                 {taskType === "task" && (
                     <>
-                        <FormControl variant="outlined" sx={commonStyles}>
-                            <InputLabel id="priority-label">Priority</InputLabel>
-                            <Select
-                                label="Priority"
-                                value={priority}
-                                onChange={handlePriorityChange}
-                                input={<OutlinedInput label="Priority" />}
-                            >
-                            <MenuItem value="A">A</MenuItem>
-                            <MenuItem value="B">B</MenuItem>
-                            <MenuItem value="C">C</MenuItem>
-                            <MenuItem value="D">D</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            value={effort}
-                            label="Effort"
-                            onChange={handleEffortChange}
-                            sx={commonStyles}
-                        />
-                        <TextField
-                            type="date"
-                            label="Due date"
-                            value={deadline}
-                            onChange={handleDeadlineChange}
-                            sx={commonStyles}
-                        />
+                    <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
+                        <div className="flex flex-col space-y-4">
+                            <div className="flex flex-row space-x-4">
+                                <FormControl variant="outlined" sx={{ ...commonStyles, minWidth: 80 }}>
+                                    <InputLabel id="priority-label">Priority</InputLabel>
+                                    <Select
+                                        label="Priority"
+                                        value={priority}
+                                        onChange={handlePriorityChange}
+                                        input={<OutlinedInput label="Priority" />}
+                                    >
+                                        <MenuItem value="A">A</MenuItem>
+                                        <MenuItem value="B">B</MenuItem>
+                                        <MenuItem value="C">C</MenuItem>
+                                        <MenuItem value="D">D</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <TextField
+                                    type="date"
+                                    label="Due date"
+                                    value={deadline}
+                                    onChange={handleDeadlineChange}
+                                    sx={commonStyles}
+                                />
+    
+                            </div>
+                            <div className="flex flex-row space-x-4">                        
+                                <TextField
+                                    value={effort}
+                                    label="Effort (min)"
+                                    onChange={handleEffortChange}
+                                    sx={{ ...commonStyles, maxWidth: 100 }}
+                                />
 
-                        <FormControl variant="outlined" sx={commonStyles}>
-                            <InputLabel id="context-label">Context</InputLabel>
-                            <Select
-                            label="Context"
-                            value={context}
-                            onChange={handleContextChange}
-                            input={<OutlinedInput label="Context" />}
-                            >
-                            {contexts.map((context) => (
-                                <MenuItem key={context.id} value={context.id}>
-                                {context.name}
-                                </MenuItem>
-                            ))}
-                            </Select>
-                        </FormControl>
+                                <FormControl variant="outlined" sx={{ ...commonStyles, minWidth: 180 }}>
+                                    <InputLabel id="context-label">Context</InputLabel>
+                                    <Select
+                                    label="Context"
+                                    value={context}
+                                    onChange={handleContextChange}
+                                    input={<OutlinedInput label="Context" />}
+                                    >
+                                    {contexts.map((context) => (
+                                        <MenuItem key={context.id} value={context.id}>
+                                        {context.name}
+                                        </MenuItem>
+                                    ))}
+                                    </Select>
+                                </FormControl>
+                            </div>
+                            <div className="flex flex-col space-y-4">
+                                <TextField
+                                    value={filter}
+                                    onChange={(e) => setFilter(e.target.value)}
+                                    label="Filter projects"
+                                    sx={commonStyles}
+                                />
 
-                        <div class='space-y-4'>
-                            <TextField
-                            value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
-                            label="Filter projects"
-                            sx={commonStyles}
-                            />
-
-                            <List
-                            sx={{
-                                maxHeight: "200px",
-                                overflow: "auto",
-                                border: "1px solid #9699A6",
-                                borderRadius: "4px",
-                            }}
-                            >
-                            {filteredProjects.map((project) => (
-                                <ListItemButton
-                                key={project.id}
-                                selected={relatedProject === project.id}
-                                onClick={() => handleRelatedProjectChange(project.id)}
-                                sx={{
-                                    "&:hover": {
-                                    backgroundColor: "#18283b", // replace with your color
-                                    },
-                                }}
-                                >
-                                <ListItemText primary={project.project_name} />
-                                </ListItemButton>
-                            ))}
-                            </List>
+                                <List
+                                    sx={{
+                                        maxHeight: "200px",
+                                        overflow: "auto",
+                                        border: "1px solid #9699A6",
+                                        borderRadius: "4px",
+                                    }}
+                                    >
+                                    {filteredProjects.map((project) => (
+                                        <ListItemButton
+                                        key={project.id}
+                                        selected={relatedProject === project.id}
+                                        onClick={() => handleRelatedProjectChange(project.id)}
+                                        sx={{
+                                            "&:hover": {
+                                            backgroundColor: "#18283b", // replace with your color
+                                            },
+                                        }}
+                                        >
+                                        <ListItemText primary={project.project_name} />
+                                        </ListItemButton>
+                                    ))}
+                                </List>
+                            </div>
                         </div>
+                    </div>
                         <Button onClick={handleProcessNext}>Process & Next</Button>
                     </>
                 )}
-            </div>
+            
 
             {taskType === "project" && (
-                <>
-                <FormControl variant="outlined" sx={commonStyles}>
-                    <InputLabel id="priority-label">Priority</InputLabel>
-                    <Select
-                    label="Priority"
-                    value={priority}
-                    onChange={handlePriorityChange}
-                    input={<OutlinedInput label="Priority" />}
-                    >
-                    <MenuItem value="A">A</MenuItem>
-                    <MenuItem value="B">B</MenuItem>
-                    <MenuItem value="C">C</MenuItem>
-                    <MenuItem value="D">D</MenuItem>
-                    </Select>
-                </FormControl>
-                <TextField
-                    type="date"
-                    value={deadline}
-                    onChange={handleDeadlineChange}
-                    sx={commonStyles}
-                />
-                <TextField
-                    value={nextAction}
-                    label="First Action"
-                    onChange={handleNextActionChange}
-                    sx={commonStyles}
-                />
-                <Button onClick={handleProcessNext}>Process & Next</Button>
-                </>
+                <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
+                    <div className="flex flex-col space-y-4">
+                        <div className="flex flex-row space-x-4">
+                            <FormControl variant="outlined" sx={{ ...commonStyles, minWidth: 100 }}>
+                                <InputLabel id="priority-label">Priority</InputLabel>
+                                <Select
+                                    label="Priority"
+                                    value={priority}
+                                    onChange={handlePriorityChange}
+                                    input={<OutlinedInput label="Priority" />}
+                                >
+                                    <MenuItem value="A">A</MenuItem>
+                                    <MenuItem value="B">B</MenuItem>
+                                    <MenuItem value="C">C</MenuItem>
+                                    <MenuItem value="D">D</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                type="date"
+                                value={deadline}
+                                onChange={handleDeadlineChange}
+                                sx={{ ...commonStyles, minWidth: 100 }}
+                            />
+                        </div>
+                    <TextField
+                        value={nextAction}
+                        label="First Action"
+                        onChange={handleNextActionChange}
+                        sx={{ ...commonStyles, minWidth: 100 }}
+                    />
+                    <Button onClick={handleProcessNext}>Process & Next</Button>
+                    </div>
+                </div>
             )}
             {taskType === "nonActionable" && (
                 <Button
