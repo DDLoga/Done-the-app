@@ -5,6 +5,9 @@ import List from '@mui/material/List';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import PrioritySelect from './_PrioritySelect';  //importing the priority select component (refactor)
+import DatePicker from './_DatePicker';          //importing the date picker component (refactor)
+import { commonStyles } from './_commonStyles';
 
 
 const NewTaskOrganizer = () => {
@@ -215,27 +218,7 @@ const NewTaskOrganizer = () => {
         }
     };
 
-    const commonStyles = {
-        '& .MuiOutlinedInput-root': {
-        color: '#FFFFFF',
-        '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#9699A6',
-            borderWidth: '2px',
-        },
-        },
-        '& label': {
-        color: '#9699A6',
-        },
-        '& .MuiOutlinedInput-notchedOutline' : {
-        borderColor: '#9699A6',
-        },
-        '& .MuiSelect-select': {
-            color: '#FFFFFF',
-        },
-        '& .MuiSvgIcon-root': {
-            color: '#FFFFFF',
-        },
-    };
+
 
 
     return (
@@ -322,27 +305,8 @@ const NewTaskOrganizer = () => {
                     <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
                         <div className="flex flex-col space-y-4">
                             <div className="flex flex-row space-x-4">
-                                <FormControl variant="outlined" sx={{ ...commonStyles, minWidth: 80 }}>
-                                    <InputLabel id="priority-label">Priority</InputLabel>
-                                    <Select
-                                        label="Priority"
-                                        value={priority}
-                                        onChange={handlePriorityChange}
-                                        input={<OutlinedInput label="Priority" />}
-                                    >
-                                        <MenuItem value="A">A</MenuItem>
-                                        <MenuItem value="B">B</MenuItem>
-                                        <MenuItem value="C">C</MenuItem>
-                                        <MenuItem value="D">D</MenuItem>
-                                    </Select>
-                                </FormControl>
-                                <TextField
-                                    type="date"
-                                    label="Due date"
-                                    value={deadline}
-                                    onChange={handleDeadlineChange}
-                                    sx={commonStyles}
-                                />
+                                <PrioritySelect value={priority} onChange={handlePriorityChange} />
+                                <DatePicker value={deadline} onChange={handleDeadlineChange} />
     
                             </div>
                             <div className="flex flex-row space-x-4">                        
@@ -412,26 +376,8 @@ const NewTaskOrganizer = () => {
                 <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
                     <div className="flex flex-col space-y-4">
                         <div className="flex flex-row space-x-4">
-                            <FormControl variant="outlined" sx={{ ...commonStyles, minWidth: 100 }}>
-                                <InputLabel id="priority-label">Priority</InputLabel>
-                                <Select
-                                    label="Priority"
-                                    value={priority}
-                                    onChange={handlePriorityChange}
-                                    input={<OutlinedInput label="Priority" />}
-                                >
-                                    <MenuItem value="A">A</MenuItem>
-                                    <MenuItem value="B">B</MenuItem>
-                                    <MenuItem value="C">C</MenuItem>
-                                    <MenuItem value="D">D</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <TextField
-                                type="date"
-                                value={deadline}
-                                onChange={handleDeadlineChange}
-                                sx={{ ...commonStyles, minWidth: 100 }}
-                            />
+                            <PrioritySelect value={priority} onChange={handlePriorityChange} />
+                            <DatePicker value={deadline} onChange={handleDeadlineChange} />
                         </div>
                     <TextField
                         value={nextAction}
