@@ -10,6 +10,7 @@ import DatePicker from './_DatePicker';          //importing the date picker com
 import { commonStyles } from './_commonStyles';
 import { useFetchProjects } from './_fetchProjects';        // collect projects from API
 import { useFetchTasks } from './_fetchTasks';              // collect tasks from API
+import { useFetchContexts } from './_fetchContexts';        // collect contexts from API
 
 
 
@@ -24,6 +25,7 @@ const NewTaskOrganizer = () => {
     const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const [deadline, setDeadline] = useState(formattedDate);
     const [context, setContext] = useState('');     //used for the form
+    const fetchedContexts = useFetchContexts();     // using the custom hook to fetch the contexts from the API
     const [contexts, setContexts] = useState([]);   //used for the API to collect the list
     const [relatedProject, setRelatedProject] = useState('');
     const [nextAction, setNextAction] = useState('');
@@ -35,27 +37,18 @@ const NewTaskOrganizer = () => {
         project.project_name.toLowerCase().includes(filter.toLowerCase())
     );
 
+
+    // initialize contexts with the fetched contexts
+    useEffect(() => {
+        setContexts(fetchedContexts);
+    }, [fetchedContexts]);
+
+
     // initialize tasks with the fetched tasks
     useEffect(() => {
         setTasks(fetchedTasks);
     }, [fetchedTasks]);
 
-    // collect contexts from API
-    useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/get_contexts', {
-            headers: {
-                'Authorization': `Token ${localStorage.getItem('token')}`
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => setContexts(data))
-        .catch(error => console.error('Error:', error));
-    }, []);
 
     // set the current task to the first task in the list
     useEffect(() => {
