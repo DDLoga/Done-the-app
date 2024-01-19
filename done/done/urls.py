@@ -8,7 +8,8 @@ from tasks import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('', TemplateView.as_view(template_name='index.html')),
+    # path('', TemplateView.as_view(template_name='index.html')),
+    path('', include('tasks.urls')),
     path('api/', include([
         path('login/', views.login, name='login'),
         path('logout/', views.logout_view, name='logout'),

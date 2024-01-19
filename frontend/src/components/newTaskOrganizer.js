@@ -8,11 +8,14 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import PrioritySelect from './_PrioritySelect';  //importing the priority select component (refactor)
 import DatePicker from './_DatePicker';          //importing the date picker component (refactor)
 import { commonStyles } from './_commonStyles';
+import { useFetchProjects } from './_fetchProjects';        // collect projects from API
+import { useFetchTasks } from './_fetchTasks';              // collect tasks from API
+
+
 
 
 const NewTaskOrganizer = () => {
     const headerContent = "New Task Organizer Wizard";
-    const [tasks, setTasks] = useState([]);
     const [currentTask, setCurrentTask] = useState(null);
     const [taskType, setTaskType] = useState('');
     const [priority, setPriority] = useState('A');
@@ -23,31 +26,19 @@ const NewTaskOrganizer = () => {
     const [context, setContext] = useState('');     //used for the form
     const [contexts, setContexts] = useState([]);   //used for the API to collect the list
     const [relatedProject, setRelatedProject] = useState('');
-    const [projects, setProjects] = useState([]);   //used for the API to collect the list
     const [nextAction, setNextAction] = useState('');
     const [filter, setFilter] = useState('');       //used for the filter of projects
+    const fetchedTasks = useFetchTasks();           // using the custom hook to fetch the tasks from the API
+    const [tasks, setTasks] = useState([]);
+    const projects = useFetchProjects();            //using the custom hook to fetch the projects from the API
     const filteredProjects = projects.filter(project =>
         project.project_name.toLowerCase().includes(filter.toLowerCase())
     );
 
-    // collect tasks from API
+    // initialize tasks with the fetched tasks
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/get_tasks', {
-            headers: {
-                'Authorization': `Token ${localStorage.getItem('token')}`
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        //print the data to the console
-        //.then(data => console.log(data))
-        .then(data => setTasks(data))
-        .catch(error => console.error('Error:', error));
-    }, []);
+        setTasks(fetchedTasks);
+    }, [fetchedTasks]);
 
     // collect contexts from API
     useEffect(() => {
@@ -64,28 +55,6 @@ const NewTaskOrganizer = () => {
         })
         .then(data => setContexts(data))
         .catch(error => console.error('Error:', error));
-    }, []);
-
-    // collect projects from API
-    const fetchProjects = () => {
-        fetch('http://127.0.0.1:8000/api/get_projects', {
-            headers: {
-                'Authorization': `Token ${localStorage.getItem('token')}`
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        //print the data to the console
-        .then(data => setProjects(data))
-        .catch(error => console.error('Error:', error));
-    };
-    
-    useEffect(() => {
-        fetchProjects();
     }, []);
 
     // set the current task to the first task in the list
