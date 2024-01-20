@@ -8,9 +8,9 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import PrioritySelect from './_PrioritySelect';  //importing the priority select component (refactor)
 import DatePicker from './_DatePicker';          //importing the date picker component (refactor)
 import { commonStyles } from './_commonStyles';
-import { useFetchProjects } from './_fetchProjects';        // collect projects from API
-import { useFetchTasks } from './_fetchTasks';              // collect tasks from API
-import { useFetchContexts } from './_fetchContexts';        // collect contexts from API
+import { FetchProjects } from './_fetchProjects';        // collect projects from API
+import { FetchTasks } from './_fetchTasks';              // collect tasks from API
+import { FetchContexts } from './_fetchContexts';        // collect contexts from API
 
 
 
@@ -25,14 +25,14 @@ const NewTaskOrganizer = () => {
     const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const [deadline, setDeadline] = useState(formattedDate);
     const [context, setContext] = useState('');     //used for the form
-    const fetchedContexts = useFetchContexts();     // using the custom hook to fetch the contexts from the API
+    const fetchedContexts = FetchContexts();     // using the custom hook to fetch the contexts from the API
     const [contexts, setContexts] = useState([]);   //used for the API to collect the list
     const [relatedProject, setRelatedProject] = useState('');
     const [nextAction, setNextAction] = useState('');
     const [filter, setFilter] = useState('');       //used for the filter of projects
-    const fetchedTasks = useFetchTasks();           // using the custom hook to fetch the tasks from the API
+    const fetchedTasks = FetchTasks();           // using the custom hook to fetch the tasks from the API
     const [tasks, setTasks] = useState([]);
-    const projects = useFetchProjects();            //using the custom hook to fetch the projects from the API
+    const projects = FetchProjects();            //using the custom hook to fetch the projects from the API
     const filteredProjects = projects.filter(project =>
         project.project_name.toLowerCase().includes(filter.toLowerCase())
     );

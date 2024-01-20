@@ -13,7 +13,10 @@ class TaskSerializer(serializers.ModelSerializer):
                 'context',
                 'effort',
                 'parent',
-                'new_task']
+                'new_task',
+                'assignee',
+                'status',
+                'complete']
         
 
 class ContextSerializer(serializers.ModelSerializer):
@@ -33,5 +36,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 'id',
                 'project_priority',
                 'user',
-                'project_deadline']
+                'project_deadline',
+                'project_status',
+                'project_complete']
         

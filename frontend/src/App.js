@@ -7,6 +7,7 @@ import LoginPage from './components/loginPage';
 import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
+import Prioritizer from './components/prioritizer';
 
 
 const App = () => {
@@ -78,6 +79,10 @@ const App = () => {
                         <Route 
                             path="/newtaskorganizer" 
                             element={user ? <NewTaskOrganizer /> : <Navigate to="/login" replace />}
+                        />
+                        <Route 
+                            path="/prioritizer" 
+                            element={user ? <Prioritizer /> : <Navigate to="/login" replace />}
                         />
                     </Routes>
                 </UserContext.Provider>
