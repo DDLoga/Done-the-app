@@ -1,32 +1,34 @@
 import React from 'react';
+import BaseLayout from './baseLayout';
 import { useEffect, useState } from 'react';
-import { FetchProjects } from './_fetchProjects';
-import { FetchTasks } from './_fetchTasks';
+import { useFetchProjects } from './_fetchProjects';
+import { useFetchTasks } from './_fetchTasks';
 import { FetchContexts } from './_fetchContexts';
 import { FetchAssignees } from './_fetchAssignees';
 import { useTable } from 'react-table';
 
 const Prioritizer = () => {
+    const headerContent = "Prioritizer";
     const [tasks, setTasks] = useState([]);
     const [projects, setProjects] = useState([]);
     const [contexts, setContexts] = useState([]);
     const [assignees, setAssignees] = useState([]);
 
+    const tasksData = useFetchTasks();
+    const projectsData = useFetchProjects();
+    const contextsData = FetchContexts();
+    const assigneesData = FetchAssignees();
+
     useEffect(() => {
-        const fetchData = async () => {
-            const tasksData = await FetchTasks();
-            const projectsData = await FetchProjects();
-            const contextsData = await FetchContexts();
-            const assigneesData = await FetchAssignees();
-
-            setTasks(tasksData);
-            setProjects(projectsData);
-            setContexts(contextsData);
-            setAssignees(assigneesData);
-        };
-
-        fetchData();
-    }, []);
+        setTasks(tasksData);
+        console.log('here comes the tasks data');
+        console.log(tasksData);
+        setProjects(projectsData);
+        console.log('here comes the projects data');
+        console.log(projectsData);
+        setContexts(contextsData);
+        setAssignees(assigneesData);
+    }, [tasksData, projectsData, contextsData, assigneesData]);
 
 
     //using the `React.useMemo` hook to memoize the columns configuration for the project table.
@@ -51,6 +53,7 @@ const Prioritizer = () => {
             {
                 Completed: 'Completed',
                 accessor: 'project_complete',
+                Cell: ({value}) => <input type="checkbox" checked={value} readOnly />
             },
         ],
         []
@@ -115,57 +118,59 @@ const Prioritizer = () => {
     } = useTable({ columns: taskColumns, data: tasks });
 
     return (
-        <div>
-            {/* Project Table */}
-            <table {...getProjectTableProps()}>
-                <thead>
-                    {projectHeaderGroups.map(headerGroup => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map(column => (
-                                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
-                <tbody {...getProjectTableBodyProps()}>
-                    {projectRows.map(row => {
-                        prepareProjectRow(row);
-                        return (
-                            <tr {...row.getRowProps()}>
-                                {row.cells.map(cell => (
-                                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+        <BaseLayout headerContent={headerContent}>
+            <div>
+                {/* Project Table */}
+                <table {...getProjectTableProps()}>
+                    <thead>
+                        {projectHeaderGroups.map(headerGroup => (
+                            <tr {...headerGroup.getHeaderGroupProps()}>
+                                {headerGroup.headers.map(column => (
+                                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
                                 ))}
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                        ))}
+                    </thead>
+                    <tbody {...getProjectTableBodyProps()}>
+                        {projectRows.map(row => {
+                            prepareProjectRow(row);
+                            return (
+                                <tr {...row.getRowProps()}>
+                                    {row.cells.map(cell => (
+                                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                                    ))}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
 
-            {/* Task Table */}
-            <table {...getTaskTableProps()}>
-                <thead>
-                    {taskHeaderGroups.map(headerGroup => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map(column => (
-                                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
-                <tbody {...getTaskTableBodyProps()}>
-                    {taskRows.map(row => {
-                        prepareTaskRow(row);
-                        return (
-                            <tr {...row.getRowProps()}>
-                                {row.cells.map(cell => (
-                                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                {/* Task Table */}
+                <table {...getTaskTableProps()}>
+                    <thead>
+                        {taskHeaderGroups.map(headerGroup => (
+                            <tr {...headerGroup.getHeaderGroupProps()}>
+                                {headerGroup.headers.map(column => (
+                                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
                                 ))}
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-        </div>
+                        ))}
+                    </thead>
+                    <tbody {...getTaskTableBodyProps()}>
+                        {taskRows.map(row => {
+                            prepareTaskRow(row);
+                            return (
+                                <tr {...row.getRowProps()}>
+                                    {row.cells.map(cell => (
+                                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                                    ))}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </BaseLayout>
     );
 
 }

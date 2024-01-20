@@ -1,7 +1,7 @@
 // used in new task organizer and priority
 import { useState, useEffect } from 'react';
 
-export const FetchTasks = () => {
+export const useFetchTasks = () => {
     const [tasks, setTasks] = useState([]);
 
     useEffect(() => {

@@ -710,8 +710,9 @@ def get_user(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_tasks(request):                 # get all tasks for the new task organizer wizard and prioritizer
-    tasks = Tasks.objects.filter(new_task=True, user=request.user)
+    tasks = Tasks.objects.filter(user=request.user)
     serializer = TaskSerializer(tasks, many=True)
+    print(serializer.data)
     return JsonResponse(serializer.data, safe=False)
 
 @api_view(['GET'])
