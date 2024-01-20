@@ -1,12 +1,12 @@
 // used in new task organizer and priority
 import { useState, useEffect } from 'react';
 
-export const useFetchProjects = () => {
-    const [projects, setProjects] = useState([]);
+export const useFetchAssignees = () => {
+    const [assignees, setAssignees] = useState([]);
 
     useEffect(() => {
-        const fetchProjects = () => {
-            fetch('http://127.0.0.1:8000/api/get_projects', {
+        const fetchAssignees = () => {
+            fetch('http://127.0.0.1:8000/api/get_assignees', {
                 headers: {
                     'Authorization': `Token ${localStorage.getItem('token')}`
                 }
@@ -17,12 +17,12 @@ export const useFetchProjects = () => {
                 }
                 return response.json();
             })
-            .then(data => setProjects(data))
+            .then(data => setAssignees(data))
             .catch(error => console.error('Error:', error));
         };
 
-        fetchProjects();
+        fetchAssignees();
     }, []);
 
-    return projects;
+    return assignees;
 };

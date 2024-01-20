@@ -623,7 +623,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token as AuthToken
 from rest_framework.views import APIView
-from .serializers import TaskSerializer, ContextSerializer, ProjectSerializer
+from .serializers import TaskSerializer, ContextSerializer, ProjectSerializer, AssigneeSerializer
 from django.contrib.auth.models import User
 from rest_framework import status
 from django.db import IntegrityError
@@ -709,21 +709,28 @@ def get_user(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_tasks(request):                 # get all tasks for the new task organizer wizard
+def get_tasks(request):                 # get all tasks for the new task organizer wizard and prioritizer
     tasks = Tasks.objects.filter(new_task=True, user=request.user)
     serializer = TaskSerializer(tasks, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_contexts(request):              # get all contexts for the new task organizer wizard
+def get_contexts(request):              # get all contexts for the new task organizer wizard and prioritizer
     contexts = Context.objects.filter(user=request.user)
     serializer = ContextSerializer(contexts, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_projects(request):              # get all Projects for the new task organizer wizard
+def get_assignees(request):              # get all assignees for the new task organizer wizard and prioritizer
+    assignees = Assignee.objects.filter(user=request.user)
+    serializer = AssigneeSerializer(assignees, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_projects(request):              # get all Projects for the new task organizer wizard and prioritizer
     projects = Projects.objects.filter(user=request.user, project_complete=False)
     serializer = ProjectSerializer(projects, many=True)
     return JsonResponse(serializer.data, safe=False)

@@ -19,6 +19,7 @@ urlpatterns = [
         path('getUser/', views.get_user, name='get_user'),
         path('get_tasks/', views.get_tasks, name='get_tasks'),
         path('get_contexts/', views.get_contexts, name='get_contexts'),
+        path('get_assignees/', views.get_assignees, name='get_assignees'),
         path('get_projects/', views.get_projects, name='get_projects'),
         path('tasks/<int:task_id>/', views.delete_task, name='delete_task'),
     ])),
