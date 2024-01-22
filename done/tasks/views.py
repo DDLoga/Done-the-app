@@ -712,7 +712,6 @@ def get_user(request):
 def get_tasks(request):                 # get all tasks for the new task organizer wizard and prioritizer
     tasks = Tasks.objects.filter(user=request.user)
     serializer = TaskSerializer(tasks, many=True)
-    print(serializer.data)
     return JsonResponse(serializer.data, safe=False)
 
 @api_view(['GET'])
@@ -740,6 +739,10 @@ def get_projects(request):              # get all Projects for the new task orga
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_task(request, task_id):    # delete a task on the new task organizer wizard
+    print("task_id:", task_id)
+    print("request.user:", request.user)
+    print("request.data:", request.data)
+    print("request.data.get('id'):", request.data.get('id'))
     try:
         task = Tasks.objects.get(id=task_id, user=request.user)
     except Tasks.DoesNotExist:

@@ -1,178 +1,138 @@
 import React from 'react';
 import BaseLayout from './baseLayout';
-import { useEffect, useState } from 'react';
 import { useFetchProjects } from './_fetchProjects';
 import { useFetchTasks } from './_fetchTasks';
 import { FetchContexts } from './_fetchContexts';
 import { FetchAssignees } from './_fetchAssignees';
-import { useTable } from 'react-table';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { DataGrid } from '@mui/x-data-grid';
 
 const Prioritizer = () => {
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+        },
+    });
     const headerContent = "Prioritizer";
-    const [tasks, setTasks] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [contexts, setContexts] = useState([]);
-    const [assignees, setAssignees] = useState([]);
+
 
     const tasksData = useFetchTasks();
+    // filter tasksData to only include tasks that are not new (new_task : false)
+    const filteredTasksData = tasksData.filter(task => task.new_task === false);
+    console.log('here is the tasks data')
+    console.log(filteredTasksData)
     const projectsData = useFetchProjects();
+    console.log('here is the projects data')
+    console.log(projectsData)
     const contextsData = FetchContexts();
     const assigneesData = FetchAssignees();
 
-    useEffect(() => {
-        setTasks(tasksData);
-        console.log('here comes the tasks data');
-        console.log(tasksData);
-        setProjects(projectsData);
-        console.log('here comes the projects data');
-        console.log(projectsData);
-        setContexts(contextsData);
-        setAssignees(assigneesData);
-    }, [tasksData, projectsData, contextsData, assigneesData]);
+
+
 
 
     //using the `React.useMemo` hook to memoize the columns configuration for the project table.
-    const projectColumns = React.useMemo(
-        () => [
-            {
-                Header: 'Name',
-                accessor: 'project_name',
-            },
-            {
-                Header: 'Priority',
-                accessor: 'project_priority',
-            },
-            {
-                Header: 'Deadline',
-                accessor: 'project_deadline',
-            },
-            {
-                Header: 'Status',
-                accessor: 'project_status',
-            },
-            {
-                Completed: 'Completed',
-                accessor: 'project_complete',
-                Cell: ({value}) => <input type="checkbox" checked={value} readOnly />
-            },
-        ],
-        []
-    );
-//using the `React.useMemo` hook to memoize the columns configuration for the task table.
+    const projectColumns = [
+        { field: 'id', headerName: 'ID', width: 70, resizable: true },
+        { field: 'project_name', headerName: 'Name', width: 130, resizable: true },
+        { field: 'project_priority', headerName: 'Priority', width: 130, resizable: true },
+        { field: 'project_deadline', headerName: 'Deadline', width: 130, resizable: true },
+        { field: 'project_status', headerName: 'Status', width: 130, resizable: true },
+        { 
+            field: 'project_complete', 
+            headerName: 'Completed', 
+            width: 130, 
+            resizable: true,
+            renderCell: (params) => (
+                <input type="checkbox" checked={params.value} readOnly />
+            ),
+        },
+    ];
+    //using the `React.useMemo` hook to memoize the columns configuration for the task table.
     const taskColumns = React.useMemo(
         () => [
             {
-                Header: 'Name',
-                accessor: 'name',
+                field: 'name',
+                headerName: 'Name',
+                width: 130,
+                resizable: true,
             },
             {
-                Header: 'Priority',
-                accessor: 'priority',
+                field: 'priority',
+                headerName: 'Priority',
+                width: 130,
+                resizable: true,
             },
             {
-                Header: 'Deadline',
-                accessor: 'deadline',
+                field: 'deadline',
+                headerName: 'Deadline',
+                width: 130,
+                resizable: true,
             },
             {
-                Header: 'Status',
-                accessor: 'status',
+                field: 'status',
+                headerName: 'Status',
+                width: 130,
+                resizable: true,
             },
             {
-                Header: 'Effort',
-                accessor: 'effort',
+                field: 'effort',
+                headerName: 'Effort',
+                width: 130,
+                resizable: true,
             },
             {
-                Header: 'Context',
-                accessor: 'context',
+                field: 'context',
+                headerName: 'Context',
+                width: 130,
+                resizable: true,
             },
             {
-                Header: 'Assignee',
-                accessor: 'assignee',
+                field: 'assignee',
+                headerName: 'Assignee',
+                width: 130,
+                resizable: true,
             },
             {
-                Header: 'Parent',
-                accessor: 'parent',
+                field: 'parent',
+                headerName: 'Parent',
+                width: 130,
+                resizable: true,
             },
             {
-                Completed: 'Completed',
-                accessor: 'complete',
+                field: 'complete',
+                headerName: 'Completed',
+                width: 130,
+                resizable: true,
+                renderCell: (params) => (
+                    <input type="checkbox" checked={params.value} readOnly />
+                ),
             },
         ],
         []
     );
 
-    const {
-        getTableProps: getProjectTableProps,
-        getTableBodyProps: getProjectTableBodyProps,
-        headerGroups: projectHeaderGroups,
-        rows: projectRows,
-        prepareRow: prepareProjectRow,
-    } = useTable({ columns: projectColumns, data: projects });
-    
-    const {
-        getTableProps: getTaskTableProps,
-        getTableBodyProps: getTaskTableBodyProps,
-        headerGroups: taskHeaderGroups,
-        rows: taskRows,
-        prepareRow: prepareTaskRow,
-    } = useTable({ columns: taskColumns, data: tasks });
-
     return (
         <BaseLayout headerContent={headerContent}>
-            <div>
-                {/* Project Table */}
-                <table {...getProjectTableProps()}>
-                    <thead>
-                        {projectHeaderGroups.map(headerGroup => (
-                            <tr {...headerGroup.getHeaderGroupProps()}>
-                                {headerGroup.headers.map(column => (
-                                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-                                ))}
-                            </tr>
-                        ))}
-                    </thead>
-                    <tbody {...getProjectTableBodyProps()}>
-                        {projectRows.map(row => {
-                            prepareProjectRow(row);
-                            return (
-                                <tr {...row.getRowProps()}>
-                                    {row.cells.map(cell => (
-                                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                                    ))}
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-
-                {/* Task Table */}
-                <table {...getTaskTableProps()}>
-                    <thead>
-                        {taskHeaderGroups.map(headerGroup => (
-                            <tr {...headerGroup.getHeaderGroupProps()}>
-                                {headerGroup.headers.map(column => (
-                                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-                                ))}
-                            </tr>
-                        ))}
-                    </thead>
-                    <tbody {...getTaskTableBodyProps()}>
-                        {taskRows.map(row => {
-                            prepareTaskRow(row);
-                            return (
-                                <tr {...row.getRowProps()}>
-                                    {row.cells.map(cell => (
-                                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                                    ))}
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
+            <ThemeProvider theme={darkTheme}>
+                <div className="flex flex-col text-white p-6 space-y-4 w-full">
+                    <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
+                        <DataGrid 
+                            rows={projectsData} 
+                            columns={projectColumns} 
+                            pageSize={projectsData.length} 
+                        />
+                    </div>
+                    <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
+                        <DataGrid 
+                            rows={filteredTasksData} 
+                            columns={taskColumns} 
+                            pageSize={filteredTasksData.length} 
+                        />
+                    </div>
+                </div>
+            </ThemeProvider>
         </BaseLayout>
     );
-
-}
-
+    }
 export default Prioritizer;

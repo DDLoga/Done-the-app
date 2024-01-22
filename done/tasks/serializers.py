@@ -16,7 +16,8 @@ class TaskSerializer(serializers.ModelSerializer):
                 'new_task',
                 'assignee',
                 'status',
-                'complete']
+                'complete',
+                'new_task']
         
 
 class ContextSerializer(serializers.ModelSerializer):
