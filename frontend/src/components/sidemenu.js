@@ -49,7 +49,7 @@ function SideMenu() {
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faList} />
-                        <span> Prioritizer</span>
+                        <span onClick={() => navigate('/prioritizer')}> Prioritizer </span>
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faBook} />

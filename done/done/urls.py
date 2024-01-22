@@ -18,6 +18,7 @@ urlpatterns = [
         path('NtoProject/', views.NtoProjectView.as_view(), name='NtoProject'),
         path('getUser/', views.get_user, name='get_user'),
         path('get_tasks/', views.get_tasks, name='get_tasks'),
+        path('get_new_tasks/', views.get_new_tasks, name='get_new_tasks'),
         path('get_contexts/', views.get_contexts, name='get_contexts'),
         path('get_assignees/', views.get_assignees, name='get_assignees'),
         path('get_projects/', views.get_projects, name='get_projects'),

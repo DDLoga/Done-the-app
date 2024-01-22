@@ -32,7 +32,7 @@ const NewTaskOrganizer = () => {
 
     // collect tasks from API
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/get_tasks', {
+        fetch('http://127.0.0.1:8000/api/get_new_tasks', {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             }
@@ -43,9 +43,9 @@ const NewTaskOrganizer = () => {
             }
             return response.json();
         })
-        //print the data to the console
-        //.then(data => console.log(data))
         .then(data => setTasks(data))
+        // print the details to the console
+        // .then(data => console.log(data))
         .catch(error => console.error('Error:', error));
     }, []);
 
