@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import BaseLayout from './baseLayout';
 import { useFetchProjects } from './_fetchProjects';
 import { useFetchTasks } from './_fetchTasks';
@@ -6,43 +6,98 @@ import { FetchContexts } from './_fetchContexts';
 import { FetchAssignees } from './_fetchAssignees';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
+import {Select, MenuItem, TextField} from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { isValid, parseISO, format } from 'date-fns';
+import { enGB } from 'date-fns/locale';
 
 const Prioritizer = () => {
+    // use dark theme for the data grid
     const darkTheme = createTheme({
         palette: {
             mode: 'dark',
         },
     });
+    // set the header content to be displayed in the base layout
     const headerContent = "Prioritizer";
 
-
+    // tasksData, contextsData, and assigneesData are used to populate the data grid
     const tasksData = useFetchTasks();
-    // filter tasksData to only include tasks that are not new (new_task : false)
-    const filteredTasksData = tasksData.filter(task => task.new_task === false);
-    console.log('here is the tasks data')
-    console.log(filteredTasksData)
-    const projectsData = useFetchProjects();
-    console.log('here is the projects data')
-    console.log(projectsData)
     const contextsData = FetchContexts();
     const assigneesData = FetchAssignees();
 
+    // fetch the projects data on load with useEffect and update the state with useState on table edit
+    const fetchedProjectsData = useFetchProjects(); 
+    const [projectsData, updateProjectsData] = useState([]);
+    useEffect(() => {
+        updateProjectsData(fetchedProjectsData);
+    }, [fetchedProjectsData]);
 
 
-
-
-    //using the `React.useMemo` hook to memoize the columns configuration for the project table.
+    //project table columns
     const projectColumns = [
-        { field: 'id', headerName: 'ID', width: 70, resizable: true },
-        { field: 'project_name', headerName: 'Name', width: 130, resizable: true },
-        { field: 'project_priority', headerName: 'Priority', width: 130, resizable: true },
-        { field: 'project_deadline', headerName: 'Deadline', width: 130, resizable: true },
-        { field: 'project_status', headerName: 'Status', width: 130, resizable: true },
+        // name
+        {
+            field: 'project_name',
+            headerName: 'Name',
+            flex: 1,
+            editable: true, // Make this field editable
+        },
+        // priority dropdown
+        { 
+            field: 'project_priority', 
+            headerName: 'Priority', 
+            flex: 1,
+            renderCell: (params) => (
+                <Select
+                    value={params.value}
+                    onChange={(event) => {
+                        const updatedProjectsData = projectsData.map((project) =>
+                            project.id === params.id ? { ...project, project_priority: event.target.value } : project
+                        );
+                        updateProjectsData(updatedProjectsData);
+                    }}
+                >
+                    <MenuItem value="A">A</MenuItem>
+                    <MenuItem value="B">B</MenuItem>
+                    <MenuItem value="C">C</MenuItem>
+                    <MenuItem value="D">D</MenuItem>
+                </Select>
+            ),
+        },
+        // deadline date picker
+        { 
+            field: 'project_deadline', 
+            headerName: 'Deadline', 
+            flex: 1,
+            renderCell: (params) => {
+                let date = params.value ? parseISO(params.value) : null;
+                return (
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                            value={date && isValid(date) ? date : null}
+                            onChange={(newValue) => {
+                                const updatedProjectsData = projectsData.map((project) =>
+                                    project.id === params.id ? { ...project, project_deadline: newValue ? format(newValue, 'yyyy-MM-dd') : '' } : project
+                                );
+                                updateProjectsData(updatedProjectsData);
+                            }}
+                            inputFormat="dd/MM/yy"
+                            renderInput={(params) => <TextField {...params} />}
+                        />
+                    </LocalizationProvider>
+                );
+            },
+        },
+        // status
+        { field: 'project_status', headerName: 'Status', width: 130},
+        // complete checkbox
         { 
             field: 'project_complete', 
             headerName: 'Completed', 
-            width: 130, 
-            resizable: true,
+            width: 130,
             renderCell: (params) => (
                 <input type="checkbox" checked={params.value} readOnly />
             ),
@@ -55,55 +110,46 @@ const Prioritizer = () => {
                 field: 'name',
                 headerName: 'Name',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'priority',
                 headerName: 'Priority',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'deadline',
                 headerName: 'Deadline',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'status',
                 headerName: 'Status',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'effort',
                 headerName: 'Effort',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'context',
                 headerName: 'Context',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'assignee',
                 headerName: 'Assignee',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'parent',
                 headerName: 'Parent',
                 width: 130,
-                resizable: true,
             },
             {
                 field: 'complete',
                 headerName: 'Completed',
                 width: 130,
-                resizable: true,
                 renderCell: (params) => (
                     <input type="checkbox" checked={params.value} readOnly />
                 ),
@@ -117,17 +163,26 @@ const Prioritizer = () => {
             <ThemeProvider theme={darkTheme}>
                 <div className="flex flex-col text-white p-6 space-y-4 w-full">
                     <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
-                        <DataGrid 
-                            rows={projectsData} 
-                            columns={projectColumns} 
-                            pageSize={projectsData.length} 
+                    <DataGrid 
+                        rows={projectsData} 
+                        columns={projectColumns} 
+                        pageSize={projectsData.length} 
+                        onCellEditCommit={(params, event) => {
+                            if (params.field === 'project_name') {
+                            // Update your data here
+                            const updatedProjectsData = projectsData.map((project) =>
+                                project.id === params.id ? { ...project, project_name: params.value } : project
+                            );
+                            updateProjectsData(updatedProjectsData);
+                            }
+                        }}
                         />
                     </div>
                     <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
                         <DataGrid 
-                            rows={filteredTasksData} 
+                            rows={tasksData} 
                             columns={taskColumns} 
-                            pageSize={filteredTasksData.length} 
+                            pageSize={tasksData.length} 
                         />
                     </div>
                 </div>
