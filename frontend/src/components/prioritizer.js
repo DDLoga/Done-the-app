@@ -72,6 +72,7 @@ const Prioritizer = () => {
             field: 'project_deadline', 
             headerName: 'Deadline', 
             width: 200,
+            
             renderCell: (params) => {
                 let date = params.value ? parseISO(params.value) : null;
                 return (
@@ -85,6 +86,7 @@ const Prioritizer = () => {
                                 updateProjectsData(updatedProjectsData);
                             }}
                             inputFormat="dd/MM/yy"
+                            format="dd/MM/yy"
                             renderInput={(params) => <TextField {...params} />}
                         />
                     </LocalizationProvider>
