@@ -42,14 +42,14 @@ const Prioritizer = () => {
         {
             field: 'project_name',
             headerName: 'Name',
-            flex: 1,
+            width: 250,
             editable: true, // Make this field editable
         },
         // priority dropdown
         { 
             field: 'project_priority', 
             headerName: 'Priority', 
-            flex: 1,
+            width: 80,
             renderCell: (params) => (
                 <Select
                     value={params.value}
@@ -71,7 +71,7 @@ const Prioritizer = () => {
         { 
             field: 'project_deadline', 
             headerName: 'Deadline', 
-            flex: 1,
+            width: 200,
             renderCell: (params) => {
                 let date = params.value ? parseISO(params.value) : null;
                 return (
@@ -91,19 +91,32 @@ const Prioritizer = () => {
                 );
             },
         },
-        // status
-        { field: 'project_status', headerName: 'Status', width: 130},
-        // complete checkbox
+        // status dropdown
         { 
-            field: 'project_complete', 
-            headerName: 'Completed', 
-            width: 130,
+            field: 'project_status', 
+            headerName: 'Status', 
+            width: 150,
             renderCell: (params) => (
-                <input type="checkbox" checked={params.value} readOnly />
+                <Select
+                    value={params.value}
+                    onChange={(event) => {
+                        const updatedProjectsData = projectsData.map((project) =>
+                            project.id === params.id ? { ...project, project_status: event.target.value } : project
+                        );
+                        updateProjectsData(updatedProjectsData);
+                    }}
+                >
+                    <MenuItem value="Co">Completed</MenuItem>
+                    <MenuItem value="Cn">Cancelled</MenuItem>
+                    <MenuItem value="De">Delegated</MenuItem>
+                    <MenuItem value="Ip">In Process</MenuItem>
+                    <MenuItem value="Ns">Not Started</MenuItem>
+                    <MenuItem value="Wa">Wait for</MenuItem>
+                </Select>
             ),
         },
     ];
-    //using the `React.useMemo` hook to memoize the columns configuration for the task table.
+    //task table columns
     const taskColumns = React.useMemo(
         () => [
             {
@@ -166,6 +179,7 @@ const Prioritizer = () => {
                     <DataGrid 
                         rows={projectsData} 
                         columns={projectColumns} 
+                        checkboxSelection
                         pageSize={projectsData.length} 
                         onCellEditCommit={(params, event) => {
                             if (params.field === 'project_name') {
