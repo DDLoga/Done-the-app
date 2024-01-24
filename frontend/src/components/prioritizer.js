@@ -11,7 +11,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { isValid, parseISO, format } from 'date-fns';
-import { enGB } from 'date-fns/locale';
 
 const Prioritizer = () => {
     // use dark theme for the data grid
@@ -52,6 +51,7 @@ const Prioritizer = () => {
             width: 80,
             renderCell: (params) => (
                 <Select
+                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
                     value={params.value}
                     onChange={(event) => {
                         const updatedProjectsData = projectsData.map((project) =>
@@ -78,6 +78,7 @@ const Prioritizer = () => {
                 return (
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
+                            sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
                             value={date && isValid(date) ? date : null}
                             onChange={(newValue) => {
                                 const updatedProjectsData = projectsData.map((project) =>
@@ -100,6 +101,7 @@ const Prioritizer = () => {
             width: 150,
             renderCell: (params) => (
                 <Select
+                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
                     value={params.value}
                     onChange={(event) => {
                         const updatedProjectsData = projectsData.map((project) =>
@@ -178,10 +180,11 @@ const Prioritizer = () => {
             <ThemeProvider theme={darkTheme}>
                 <div className="flex flex-col text-white p-6 space-y-4 w-full">
                     <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
-                    <DataGrid 
+                    <DataGrid
                         rows={projectsData} 
                         columns={projectColumns} 
                         checkboxSelection
+                        disableRowSelectionOnClick
                         pageSize={projectsData.length} 
                         onCellEditCommit={(params, event) => {
                             if (params.field === 'project_name') {
