@@ -6,11 +6,13 @@ import { FetchContexts } from './_fetchContexts';
 import { FetchAssignees } from './_fetchAssignees';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
-import {Select, MenuItem, TextField} from '@mui/material';
+import { Select, MenuItem, TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { isValid, parseISO, format } from 'date-fns';
+import Fab from '@mui/material/Fab';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Prioritizer = () => {
     // use dark theme for the data grid
@@ -33,6 +35,14 @@ const Prioritizer = () => {
     useEffect(() => {
         updateProjectsData(fetchedProjectsData);
     }, [fetchedProjectsData]);
+
+    // selectedRows is used to store the selected rows in the data grid
+    const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
+
+    useEffect(() => {
+        console.log('selectedRows updated:', selectedRows);
+        console.log('selectedRows.length', selectedRows.length);
+    }, [selectedRows]); // This effect runs whenever selectedRows changes
 
 
     //project table columns
@@ -179,23 +189,36 @@ const Prioritizer = () => {
         <BaseLayout headerContent={headerContent}>
             <ThemeProvider theme={darkTheme}>
                 <div className="flex flex-col text-white p-6 space-y-4 w-full">
-                    <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
-                    <DataGrid
-                        rows={projectsData} 
-                        columns={projectColumns} 
-                        checkboxSelection
-                        disableRowSelectionOnClick
-                        pageSize={projectsData.length} 
-                        onCellEditCommit={(params, event) => {
-                            if (params.field === 'project_name') {
-                            // Update your data here
-                            const updatedProjectsData = projectsData.map((project) =>
-                                project.id === params.id ? { ...project, project_name: params.value } : project
-                            );
-                            updateProjectsData(updatedProjectsData);
-                            }
-                        }}
+                    <div style={{ position: 'relative', height: 400, width: '100%', overflow: 'auto' }}>
+                        <DataGrid
+                            rows={projectsData} 
+                            columns={projectColumns} 
+                            checkboxSelection
+                            disableRowSelectionOnClick
+                            pageSize={projectsData.length} 
+                            onRowSelectionModelChange={(newSelection) => {
+                                setSelectedRows(newSelection);
+                            }}
+                            onCellEditCommit={(params) => {
+                                if (params.field === 'project_name') {
+                                    const updatedProjectsData = projectsData.map((project) =>
+                                        project.id === params.id ? { ...project, project_name: params.value } : project
+                                    );
+                                    updateProjectsData(updatedProjectsData);
+                                }
+                            }}
                         />
+                        {selectedRows.length > 0 && (
+                            <Fab color="secondary" aria-label="delete" onClick={() => {
+                                const updatedProjectsData = projectsData.filter((project) =>
+                                    !selectedRows.includes(project.id)
+                                );
+                                updateProjectsData(updatedProjectsData);
+                                setSelectedRows([]);
+                            }} style={{ position: 'absolute', top: 0, right: 0 }}>
+                                <DeleteIcon />
+                            </Fab>
+                        )}
                     </div>
                     <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
                         <DataGrid 
