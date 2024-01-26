@@ -25,6 +25,7 @@ class Projects(models.Model):
         ("D", "D"),
     ]
     STATUSES = [
+        ('', 'No Status'),
         ("Co", "Completed"),
         ("Cn", "Cancelled"),
         ("De", "Delegated"),
@@ -51,6 +52,7 @@ class Tasks(models.Model):
         ("D", "D"),
     ]
     STATUSES = [
+        ('', 'No Status'),
         ("Co", "Completed"),
         ("Cn", "Cancelled"),
         ("De", "Delegated"),

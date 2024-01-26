@@ -14,6 +14,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { isValid, parseISO, format } from 'date-fns';
 import Fab from '@mui/material/Fab';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useMutation } from 'react-query';
+import { updateProjectAPI } from './_updateProject';
 
 
 const Prioritizer = () => {
@@ -31,7 +33,7 @@ const Prioritizer = () => {
     const contextsData = FetchContexts();
     const assigneesData = FetchAssignees();
 
-    // fetch the projects data on load with use Query and useEffect and update the state with useState on table edit
+    //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
     const {                                                        // useQuery hook to fetch the projects data
         data: fetchedProjectsData, 
         isLoading:isLoadingProjects, 
@@ -41,6 +43,16 @@ const Prioritizer = () => {
     useEffect(() => {                                               // useEffect hook to update the projects data state when the fetchedProjectsData changes
         updateProjectsData(fetchedProjectsData);
     }, [fetchedProjectsData]);
+    const updateProjectMutation = useMutation(updateProjectAPI, {   // useMutation hook to update the project data on table edit
+        onSuccess: (data) => {
+            // On success, update the local state with the updated project data
+            const updatedProjectsData = projectsData.map((project) =>
+                project.id === data.id ? data : project
+            );
+            updateProjectsData(updatedProjectsData);
+        },
+    });
+
 
 
     // selectedRows is used to store the selected rows in the data grid
@@ -66,10 +78,12 @@ const Prioritizer = () => {
                     sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
                     value={params.value}
                     onChange={(event) => {
-                        const updatedProjectsData = projectsData.map((project) =>
-                            project.id === params.id ? { ...project, project_priority: event.target.value } : project
-                        );
-                        updateProjectsData(updatedProjectsData);
+                        const updatedProject = projectsData.find((project) => project.id === params.id);
+                        console.log('updatedProject', updatedProject);
+                        if (updatedProject) {
+                            updatedProject.project_priority = event.target.value;
+                            updateProjectMutation.mutate({ projectId: params.id, updatedProject });
+                        }
                     }}
                 >
                     <MenuItem value="A">A</MenuItem>
@@ -84,7 +98,6 @@ const Prioritizer = () => {
             field: 'project_deadline', 
             headerName: 'Deadline', 
             width: 200,
-            
             renderCell: (params) => {
                 let date = params.value ? parseISO(params.value) : null;
                 return (
@@ -93,10 +106,11 @@ const Prioritizer = () => {
                             sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
                             value={date && isValid(date) ? date : null}
                             onChange={(newValue) => {
-                                const updatedProjectsData = projectsData.map((project) =>
-                                    project.id === params.id ? { ...project, project_deadline: newValue ? format(newValue, 'yyyy-MM-dd') : '' } : project
-                                );
-                                updateProjectsData(updatedProjectsData);
+                                const updatedProject = projectsData.find((project) => project.id === params.id);
+                                if (updatedProject) {
+                                    updatedProject.project_deadline = newValue ? format(newValue, 'yyyy-MM-dd') : '';
+                                    updateProjectMutation.mutate({ projectId: params.id, updatedProject });
+                                }
                             }}
                             inputFormat="dd/MM/yy"
                             format="dd/MM/yy"
@@ -116,10 +130,11 @@ const Prioritizer = () => {
                     sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
                     value={params.value}
                     onChange={(event) => {
-                        const updatedProjectsData = projectsData.map((project) =>
-                            project.id === params.id ? { ...project, project_status: event.target.value } : project
-                        );
-                        updateProjectsData(updatedProjectsData);
+                        const updatedProject = projectsData.find((project) => project.id === params.id);
+                        if (updatedProject) {
+                            updatedProject.project_status = event.target.value;
+                            updateProjectMutation.mutate({ projectId: params.id, updatedProject });
+                        }
                     }}
                 >
                     <MenuItem value="Co">Completed</MenuItem>
@@ -130,7 +145,7 @@ const Prioritizer = () => {
                     <MenuItem value="Wa">Wait for</MenuItem>
                 </Select>
             ),
-        },
+        }
     ];
 
     //task table columns definition
@@ -205,11 +220,10 @@ const Prioritizer = () => {
                                     setSelectedRows(newSelection);
                                 }}
                                 onCellEditCommit={(params) => {
-                                    if (params.field === 'project_name') {
-                                        const updatedProjectsData = projectsData.map((project) =>
-                                            project.id === params.id ? { ...project, project_name: params.value } : project
-                                        );
-                                        updateProjectsData(updatedProjectsData);
+                                    const updatedProject = projectsData.find((project) => project.id === params.id);
+                                    if (updatedProject) {
+                                        updatedProject[params.field] = params.value;
+                                        updateProjectMutation.mutate({ projectId: params.id, updatedProject });
                                     }
                                 }}
                             />

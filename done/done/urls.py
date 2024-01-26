@@ -16,6 +16,7 @@ urlpatterns = [
         path('quickTask/', views.QuickTaskEntryViewAPI.as_view(), name='quickTask'),
         path('NtoTask/', views.NtoTaskView.as_view(), name='NtoTask'),
         path('NtoProject/', views.NtoProjectView.as_view(), name='NtoProject'),
+        path('NtoProject/<int:pk>/', views.NtoProjectView.as_view(), name='project-detail'),
         path('getUser/', views.get_user, name='get_user'),
         path('get_tasks/', views.get_tasks, name='get_tasks'),
         path('get_new_tasks/', views.get_new_tasks, name='get_new_tasks'),

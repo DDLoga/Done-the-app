@@ -694,11 +694,18 @@ class NtoProjectView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        print(request.data)
         serializer = ProjectSerializer(data=request.data)  # Removed Projects
         if serializer.is_valid():
             project = serializer.save(user=request.user)
             return Response({'project_id': project.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, pk=None):
+        project = get_object_or_404(Projects, pk=pk)
+        serializer = ProjectSerializer(project, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
