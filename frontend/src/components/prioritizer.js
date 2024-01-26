@@ -16,6 +16,7 @@ import Fab from '@mui/material/Fab';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useMutation } from 'react-query';
 import { updateProjectAPI } from './_updateProject';
+import Tooltip from '@mui/material/Tooltip';
 
 
 const Prioritizer = () => {
@@ -28,10 +29,7 @@ const Prioritizer = () => {
     // set the header content to be displayed in the base layout
     const headerContent = "Prioritizer";
 
-    // tasksData, contextsData, and assigneesData are used to populate the data grid
-    const { data: tasksData, isLoading:isLoadingTasks, error:errorLoadingTasks } = useQuery('fetchTasks', fetchTasks);
-    const contextsData = FetchContexts();
-    const assigneesData = FetchAssignees();
+
 
     //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
     const {                                                        // useQuery hook to fetch the projects data
@@ -53,6 +51,10 @@ const Prioritizer = () => {
         },
     });
 
+    // tasksData, contextsData, and assigneesData are used to populate the data grid
+    const { data: tasksData, isLoading:isLoadingTasks, error:errorLoadingTasks } = useQuery('fetchTasks', fetchTasks);
+    const contextsData = FetchContexts();
+    const assigneesData = FetchAssignees();
 
 
     // selectedRows is used to store the selected rows in the data grid
@@ -66,7 +68,31 @@ const Prioritizer = () => {
             field: 'project_name',
             headerName: 'Name',
             width: 250,
-            editable: true, // Make this field editable
+            renderCell: (params) => (
+                <Tooltip title={params.value ? params.value.toString() : ''} enterDelay={500}>  {/* Tooltip to display the full project name on hover */}  
+                    <div>
+                        <TextField
+                            sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
+                            defaultValue={params.value}
+                            onKeyDown={(event) => {   // allow space key and ctrl+a while editing
+                                if (event.key === ' ') {
+                                    event.stopPropagation();
+                                }
+                                if (event.key === 'a' && event.ctrlKey) {
+                                    event.stopPropagation();
+                                }
+                            }}
+                            onBlur={(event) => {
+                                const updatedProject = projectsData.find((project) => project.id === params.id);
+                                if (updatedProject) {
+                                    updatedProject.project_name = event.target.value;
+                                    updateProjectMutation.mutate({ projectId: params.id, updatedProject });
+                                }
+                            }}
+                        />
+                    </div>
+                </Tooltip>
+            ),
         },
         // priority dropdown
         { 
@@ -212,19 +238,12 @@ const Prioritizer = () => {
                         {!isLoadingProjects && projectsData !== undefined &&  (    // Only render the data grid if the data has been fetched. Should handle error as well and display an error message as well as a loading spinner
                             <DataGrid
                                 rows={projectsData} 
-                                columns={projectColumns} 
+                                columns={projectColumns}
                                 checkboxSelection
                                 disableRowSelectionOnClick
                                 pageSize={projectsData.length} 
                                 onRowSelectionModelChange={(newSelection) => {
                                     setSelectedRows(newSelection);
-                                }}
-                                onCellEditCommit={(params) => {
-                                    const updatedProject = projectsData.find((project) => project.id === params.id);
-                                    if (updatedProject) {
-                                        updatedProject[params.field] = params.value;
-                                        updateProjectMutation.mutate({ projectId: params.id, updatedProject });
-                                    }
                                 }}
                             />
                         )}
