@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query';
 import BaseLayout from './baseLayout';
-import { useFetchProjects } from './_fetchProjects';
-import { useFetchTasks } from './_fetchTasks';
+import { fetchProjects } from './_fetchProjects';
+import { fetchTasks } from './_fetchTasks';
 import { FetchContexts } from './_fetchContexts';
 import { FetchAssignees } from './_fetchAssignees';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -14,6 +15,7 @@ import { isValid, parseISO, format } from 'date-fns';
 import Fab from '@mui/material/Fab';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+
 const Prioritizer = () => {
     // use dark theme for the data grid
     const darkTheme = createTheme({
@@ -25,27 +27,27 @@ const Prioritizer = () => {
     const headerContent = "Prioritizer";
 
     // tasksData, contextsData, and assigneesData are used to populate the data grid
-    const tasksData = useFetchTasks();
+    const { data: tasksData, isLoading:isLoadingTasks, error:errorLoadingTasks } = useQuery('fetchTasks', fetchTasks);
     const contextsData = FetchContexts();
     const assigneesData = FetchAssignees();
 
-    // fetch the projects data on load with useEffect and update the state with useState on table edit
-    const fetchedProjectsData = useFetchProjects(); 
-    const [projectsData, updateProjectsData] = useState([]);
-    useEffect(() => {
+    // fetch the projects data on load with use Query and useEffect and update the state with useState on table edit
+    const {                                                        // useQuery hook to fetch the projects data
+        data: fetchedProjectsData, 
+        isLoading:isLoadingProjects, 
+        error:errorLoadingProjects 
+    } = useQuery('fetchedProjectsData', fetchProjects);
+    const [projectsData, updateProjectsData] = useState([]);        // useState hook to store and update the projects data
+    useEffect(() => {                                               // useEffect hook to update the projects data state when the fetchedProjectsData changes
         updateProjectsData(fetchedProjectsData);
     }, [fetchedProjectsData]);
+
 
     // selectedRows is used to store the selected rows in the data grid
     const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
 
-    useEffect(() => {
-        console.log('selectedRows updated:', selectedRows);
-        console.log('selectedRows.length', selectedRows.length);
-    }, [selectedRows]); // This effect runs whenever selectedRows changes
 
-
-    //project table columns
+    //project table columns definition
     const projectColumns = [
         // name
         {
@@ -130,7 +132,8 @@ const Prioritizer = () => {
             ),
         },
     ];
-    //task table columns
+
+    //task table columns definition
     const taskColumns = React.useMemo(
         () => [
             {
@@ -185,30 +188,33 @@ const Prioritizer = () => {
         []
     );
 
+
     return (
         <BaseLayout headerContent={headerContent}>
             <ThemeProvider theme={darkTheme}>
                 <div className="flex flex-col text-white p-6 space-y-4 w-full">
                     <div style={{ position: 'relative', height: 400, width: '100%', overflow: 'auto' }}>
-                        <DataGrid
-                            rows={projectsData} 
-                            columns={projectColumns} 
-                            checkboxSelection
-                            disableRowSelectionOnClick
-                            pageSize={projectsData.length} 
-                            onRowSelectionModelChange={(newSelection) => {
-                                setSelectedRows(newSelection);
-                            }}
-                            onCellEditCommit={(params) => {
-                                if (params.field === 'project_name') {
-                                    const updatedProjectsData = projectsData.map((project) =>
-                                        project.id === params.id ? { ...project, project_name: params.value } : project
-                                    );
-                                    updateProjectsData(updatedProjectsData);
-                                }
-                            }}
-                        />
-                        {selectedRows.length > 0 && (
+                        {!isLoadingProjects && projectsData !== undefined &&  (    // Only render the data grid if the data has been fetched. Should handle error as well and display an error message as well as a loading spinner
+                            <DataGrid
+                                rows={projectsData} 
+                                columns={projectColumns} 
+                                checkboxSelection
+                                disableRowSelectionOnClick
+                                pageSize={projectsData.length} 
+                                onRowSelectionModelChange={(newSelection) => {
+                                    setSelectedRows(newSelection);
+                                }}
+                                onCellEditCommit={(params) => {
+                                    if (params.field === 'project_name') {
+                                        const updatedProjectsData = projectsData.map((project) =>
+                                            project.id === params.id ? { ...project, project_name: params.value } : project
+                                        );
+                                        updateProjectsData(updatedProjectsData);
+                                    }
+                                }}
+                            />
+                        )}
+                        {selectedRows > 0 && (
                             <Fab color="secondary" aria-label="delete" onClick={() => {
                                 const updatedProjectsData = projectsData.filter((project) =>
                                     !selectedRows.includes(project.id)
@@ -221,15 +227,18 @@ const Prioritizer = () => {
                         )}
                     </div>
                     <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
-                        <DataGrid 
-                            rows={tasksData} 
-                            columns={taskColumns} 
-                            pageSize={tasksData.length} 
-                        />
+                        {!isLoadingTasks && (    // Only render the data grid if the data has been fetched. Should handle error as well and display an error message as well as a loading spinner
+                            <DataGrid 
+                                rows={tasksData} 
+                                columns={taskColumns} 
+                                pageSize={tasksData.length}
+                            />
+                        )}
                     </div>
                 </div>
             </ThemeProvider>
         </BaseLayout>
     );
     }
+
 export default Prioritizer;

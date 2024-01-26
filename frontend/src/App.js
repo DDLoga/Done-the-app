@@ -8,7 +8,11 @@ import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
 import Prioritizer from './components/prioritizer';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
+
+
+const queryClient = new QueryClient();
 
 const App = () => {
     const [user, setUser] = useState(localStorage.getItem('username') || null);
@@ -65,29 +69,31 @@ const App = () => {
     };
 
     return (
-        <Router>
-            <div className={styles.appContainer}>
-                <UserContext.Provider value={{ user, login, logout }}>
-                    <SideMenu />
-                    <Routes>
-                        <Route path="/" element={<Login />} />
-                        <Route path="/login" element={<LoginPage login={login} />} />
-                        <Route 
-                            path="/quickTask" 
-                            element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}
-                        />
-                        <Route 
-                            path="/newtaskorganizer" 
-                            element={user ? <NewTaskOrganizer /> : <Navigate to="/login" replace />}
-                        />
-                        <Route 
-                            path="/prioritizer" 
-                            element={user ? <Prioritizer /> : <Navigate to="/login" replace />}
-                        />
-                    </Routes>
-                </UserContext.Provider>
-            </div>
-        </Router>
+        <QueryClientProvider client={queryClient}>
+            <Router>
+                <div className={styles.appContainer}>
+                    <UserContext.Provider value={{ user, login, logout }}>
+                        <SideMenu />
+                        <Routes>
+                            <Route path="/" element={<Login />} />
+                            <Route path="/login" element={<LoginPage login={login} />} />
+                            <Route 
+                                path="/quickTask" 
+                                element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}
+                            />
+                            <Route 
+                                path="/newtaskorganizer" 
+                                element={user ? <NewTaskOrganizer /> : <Navigate to="/login" replace />}
+                            />
+                            <Route 
+                                path="/prioritizer" 
+                                element={user ? <Prioritizer /> : <Navigate to="/login" replace />}
+                            />
+                        </Routes>
+                    </UserContext.Provider>
+                </div>
+            </Router>
+        </QueryClientProvider>
     );
 };
 
