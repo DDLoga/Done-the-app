@@ -16,7 +16,9 @@ import Fab from '@mui/material/Fab';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useMutation } from 'react-query';
 import { updateProjectAPI } from './_updateProject';
+import { deleteProjectsAPI } from './_deleteProjects';
 import Tooltip from '@mui/material/Tooltip';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 
 
 const Prioritizer = () => {
@@ -50,6 +52,31 @@ const Prioritizer = () => {
             updateProjectsData(updatedProjectsData);
         },
     });
+    const updateProject = (params, field, value) => {               // Function to update the project data on table edit (used in columns definition)
+        const updatedProject = projectsData.find((project) => project.id === params.id);
+        if (updatedProject) {
+            updatedProject[field] = value;
+            updateProjectMutation.mutate({ projectId: params.id, updatedProject });
+        }
+    };
+    const handleDelete = async () => {                              // Function to handle the delete button click
+        await deleteProjectsAPI(selectedRows);
+        const updatedProjectsData = projectsData.filter((project) =>
+            !selectedRows.includes(project.id)
+        );
+        updateProjectsData(updatedProjectsData);
+        setSelectedRows([]);
+        setOpen(false);
+    };
+
+
+    const [open, setOpen] = React.useState(false);                // useState hook to store and update the open state of the delete confirmation dialog
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     // tasksData, contextsData, and assigneesData are used to populate the data grid
     const { data: tasksData, isLoading:isLoadingTasks, error:errorLoadingTasks } = useQuery('fetchTasks', fetchTasks);
@@ -61,6 +88,7 @@ const Prioritizer = () => {
     const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
 
 
+
     //project table columns definition
     const projectColumns = [
         // name
@@ -69,12 +97,12 @@ const Prioritizer = () => {
             headerName: 'Name',
             width: 250,
             renderCell: (params) => (
-                <Tooltip title={params.value ? params.value.toString() : ''} enterDelay={500}>  {/* Tooltip to display the full project name on hover */}  
+                <Tooltip title={params.value ? params.value.toString() : ''} enterDelay={500}>
                     <div>
                         <TextField
-                            sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
+                            sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
                             defaultValue={params.value}
-                            onKeyDown={(event) => {   // allow space key and ctrl+a while editing
+                            onKeyDown={(event) => {
                                 if (event.key === ' ') {
                                     event.stopPropagation();
                                 }
@@ -82,13 +110,7 @@ const Prioritizer = () => {
                                     event.stopPropagation();
                                 }
                             }}
-                            onBlur={(event) => {
-                                const updatedProject = projectsData.find((project) => project.id === params.id);
-                                if (updatedProject) {
-                                    updatedProject.project_name = event.target.value;
-                                    updateProjectMutation.mutate({ projectId: params.id, updatedProject });
-                                }
-                            }}
+                            onBlur={(event) => updateProject(params, 'project_name', event.target.value)}
                         />
                     </div>
                 </Tooltip>
@@ -101,16 +123,9 @@ const Prioritizer = () => {
             width: 80,
             renderCell: (params) => (
                 <Select
-                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
+                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
                     value={params.value}
-                    onChange={(event) => {
-                        const updatedProject = projectsData.find((project) => project.id === params.id);
-                        console.log('updatedProject', updatedProject);
-                        if (updatedProject) {
-                            updatedProject.project_priority = event.target.value;
-                            updateProjectMutation.mutate({ projectId: params.id, updatedProject });
-                        }
-                    }}
+                    onChange={(event) => updateProject(params, 'project_priority', event.target.value)}
                 >
                     <MenuItem value="A">A</MenuItem>
                     <MenuItem value="B">B</MenuItem>
@@ -129,15 +144,9 @@ const Prioritizer = () => {
                 return (
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
-                            sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
+                            sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
                             value={date && isValid(date) ? date : null}
-                            onChange={(newValue) => {
-                                const updatedProject = projectsData.find((project) => project.id === params.id);
-                                if (updatedProject) {
-                                    updatedProject.project_deadline = newValue ? format(newValue, 'yyyy-MM-dd') : '';
-                                    updateProjectMutation.mutate({ projectId: params.id, updatedProject });
-                                }
-                            }}
+                            onChange={(newValue) => updateProject(params, 'project_deadline', newValue ? format(newValue, 'yyyy-MM-dd') : '')}
                             inputFormat="dd/MM/yy"
                             format="dd/MM/yy"
                             renderInput={(params) => <TextField {...params} />}
@@ -153,15 +162,9 @@ const Prioritizer = () => {
             width: 150,
             renderCell: (params) => (
                 <Select
-                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}} // remove the border
+                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
                     value={params.value}
-                    onChange={(event) => {
-                        const updatedProject = projectsData.find((project) => project.id === params.id);
-                        if (updatedProject) {
-                            updatedProject.project_status = event.target.value;
-                            updateProjectMutation.mutate({ projectId: params.id, updatedProject });
-                        }
-                    }}
+                    onChange={(event) => updateProject(params, 'project_status', event.target.value)}
                 >
                     <MenuItem value="Co">Completed</MenuItem>
                     <MenuItem value="Cn">Cancelled</MenuItem>
@@ -248,15 +251,30 @@ const Prioritizer = () => {
                             />
                         )}
                         {selectedRows > 0 && (
-                            <Fab color="secondary" aria-label="delete" onClick={() => {
-                                const updatedProjectsData = projectsData.filter((project) =>
-                                    !selectedRows.includes(project.id)
-                                );
-                                updateProjectsData(updatedProjectsData);
-                                setSelectedRows([]);
-                            }} style={{ position: 'absolute', top: 0, right: 0 }}>
+                            <div>
+                            <Fab color="secondary" aria-label="delete" onClick={handleClickOpen} style={{ position: 'absolute', top: 0, right: 0 }}>
                                 <DeleteIcon />
                             </Fab>
+                            <Dialog
+                                open={open}
+                                onClose={handleClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        Are you sure you want to delete the selected project(s)?
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleClose}>Cancel</Button>
+                                    <Button onClick={handleDelete} autoFocus>
+                                        Delete
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                            </div>
                         )}
                     </div>
                     <div style={{ height: 400, width: '100%', overflow: 'auto' }}>
