@@ -77,6 +77,17 @@ const TasksPrioritizer = () => {
 
     // contextsData, and assigneesData are used to populate the data grid
     const { data: contextsData, isLoading:isLoadingContexts, error:errorLoadingContexts } = useQuery('fetchContexts', fetchContexts);
+    const [contextToIdMapping, setContextToIdMapping] = useState({});
+    useEffect(() => {
+        if (contextsData) {
+            let mapping = {};
+            contextsData.forEach(context => {
+                mapping[context.name] = context.id;
+            });
+            setContextToIdMapping(mapping);
+        }
+    }, [contextsData]);
+
     const { data: assigneesData, isLoading:isLoadingAssignees, error:errorLoadingAssignees } = useQuery('fetchAssignees', fetchAssignees);
 
 
@@ -198,20 +209,29 @@ const TasksPrioritizer = () => {
             field: 'context',
             headerName: 'Context',
             width: 130,
-            renderCell: (params) => (
-                <Select
-                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
-                    value={params.value}
-                    onChange={(event) => updateTask(params, 'context', event.target.value)}
-                >
-                    {isLoadingContexts ? <MenuItem>Loading...</MenuItem> : 
-                        errorLoadingContexts ? <MenuItem>Error</MenuItem> :
-                        contextsData.map((context) => (
-                            <MenuItem key={context.id} value={context.name}>{context.name}</MenuItem>
-                        ))
-                    }
-                </Select>
-            ),
+            renderCell: (params) => {
+                const contextIdToNameMapping = Object.fromEntries(
+                    Object.entries(contextToIdMapping).map(([name, id]) => [id, name])
+                );
+                return (
+                    <Select
+                        sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
+                        value={contextIdToNameMapping[params.value] || ''}
+                        onChange={(event) => {
+                            const contextName = event.target.value;
+                            const contextId = contextToIdMapping[contextName];
+                            updateTask(params, 'context', contextId);
+                        }}
+                    >
+                        {isLoadingContexts ? <MenuItem>Loading...</MenuItem> : 
+                            errorLoadingContexts ? <MenuItem>Error</MenuItem> :
+                            contextsData.map((context) => (
+                                <MenuItem key={context.id} value={context.name}>{context.name}</MenuItem>
+                            ))
+                        }
+                    </Select>
+                );
+            },
         },
         // assignee dropdown
         {
