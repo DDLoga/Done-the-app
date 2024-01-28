@@ -163,6 +163,7 @@ const NewTaskOrganizer = () => {
             user: userId,
             project_priority: priority,
             project_deadline: deadline,
+            project_status: 'Ns',
         };
 
         fetchWithToken(url, { method: 'POST', body: JSON.stringify(body) })

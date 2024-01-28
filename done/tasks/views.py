@@ -682,13 +682,24 @@ class NtoTaskView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        print(request.data)
-        task = get_object_or_404(Tasks, id=request.data.get('id'))
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            task = serializer.save(user=request.user)
+            return Response({'task_id': task.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk=None):
+        task = get_object_or_404(Tasks, pk=pk)
         serializer = TaskSerializer(task, data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer.save()
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        task = get_object_or_404(Tasks, pk=pk)
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class NtoProjectView(APIView):
     permission_classes = [IsAuthenticated]
