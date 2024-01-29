@@ -75,10 +75,14 @@ const TasksPrioritizer = () => {
         setOpen(false);
     };
 
-    // contextsData, and assigneesData are used to populate the data grid
-    const { data: contextsData, isLoading:isLoadingContexts, error:errorLoadingContexts } = useQuery('fetchContexts', fetchContexts);
-    const [contextToIdMapping, setContextToIdMapping] = useState({});
-    useEffect(() => {
+    //////////////////////////////////////////////////////////////  // CONTEXTS AND ASSIGNEES API COMMUNICATION //  //////////////////////////////////////////////////////////////
+    const {                                         // useQuery hook to fetch the contexts data into contextsData
+        data: contextsData, 
+        isLoading:isLoadingContexts, 
+        error:errorLoadingContexts
+    } = useQuery('fetchContexts', fetchContexts);
+    const [contextToIdMapping, setContextToIdMapping] = useState({});   // useState hook to store and update the contexts data
+    useEffect(() => {                                // useEffect hook to update the contexts data state when the fetchedContextsData changes
         if (contextsData) {
             let mapping = {};
             contextsData.forEach(context => {
@@ -88,13 +92,24 @@ const TasksPrioritizer = () => {
         }
     }, [contextsData]);
 
-    const { data: assigneesData, isLoading:isLoadingAssignees, error:errorLoadingAssignees } = useQuery('fetchAssignees', fetchAssignees);
-
+    const {                                          // useQuery hook to fetch the assignees data into assigneesData
+        data: assigneesData, 
+        isLoading:isLoadingAssignees, 
+        error:errorLoadingAssignees 
+    } = useQuery('fetchAssignees', fetchAssignees);
+    const [assigneeToIdMapping, setAssigneeToIdMapping] = useState({}); // useState hook to store and update the assignees data
+    useEffect(() => {                                // useEffect hook to update the assignees data state when the fetchedAssigneesData changes
+        if (assigneesData) {
+            let mapping = {};
+            assigneesData.forEach(assignee => {
+                mapping[assignee.name] = assignee.id;
+            });
+            setAssigneeToIdMapping(mapping);
+        }
+    }, [assigneesData]);
 
     // selectedRows is used to store the selected rows in the data grid
     const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
-
-
 
     //task table columns definition
     const taskColumns = [
@@ -131,7 +146,7 @@ const TasksPrioritizer = () => {
             renderCell: (params) => (
                 <Select
                     sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
-                    value={params.value}
+                    value={params.value || ''}
                     onChange={(event) => updateTask(params, 'priority', event.target.value)}
                 >
                     <MenuItem value="A">A</MenuItem>
@@ -170,7 +185,7 @@ const TasksPrioritizer = () => {
             renderCell: (params) => (
                 <Select
                     sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
-                    value={params.value}
+                    value={params.value || ''}
                     onChange={(event) => updateTask(params, 'status', event.target.value)}
                 >
                     <MenuItem value="Co">Completed</MenuItem>
@@ -238,20 +253,29 @@ const TasksPrioritizer = () => {
             field: 'assignee',
             headerName: 'Assignee',
             width: 130,
-            renderCell: (params) => (
-                <Select
-                    sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
-                    value={params.value}
-                    onChange={(event) => updateTask(params, 'assignee', event.target.value)}
-                >
-                    {isLoadingAssignees ? <MenuItem>Loading...</MenuItem> : 
-                        errorLoadingAssignees ? <MenuItem>Error</MenuItem> :
-                        assigneesData.map((assignee) => (
-                            <MenuItem key={assignee.id} value={assignee.name}>{assignee.name}</MenuItem>
-                        ))
-                    }
-                </Select>
-            ),
+            renderCell: (params) => {
+                const assigneeIdToNameMapping = Object.fromEntries(
+                    Object.entries(assigneeToIdMapping).map(([name, id]) => [id, name])
+                );
+                return (
+                    <Select
+                        sx={{ boxShadow: 'none', '.MuiOutlinedInput-notchedOutline': { border: 0 }}}
+                        value={assigneeIdToNameMapping[params.value] || ''}
+                        onChange={(event) => {
+                            const assigneeName = event.target.value;
+                            const assigneeId = assigneeToIdMapping[assigneeName];
+                            updateTask(params, 'assignee', assigneeId);
+                        }}
+                    >
+                        {isLoadingAssignees ? <MenuItem>Loading...</MenuItem> : 
+                            errorLoadingAssignees ? <MenuItem>Error</MenuItem> :
+                            assigneesData.map((assignee) => (
+                                <MenuItem key={assignee.id} value={assignee.name}>{assignee.name}</MenuItem>
+                            ))
+                        }
+                    </Select>
+                );
+            },
         },
         // parent field
         {
@@ -287,7 +311,7 @@ const TasksPrioritizer = () => {
                     }}
                 />
             ) : null}
-            {selectedRows > 0 && (
+            {selectedRows.length > 0 && (
                 <div>
                     <Fab color="secondary" aria-label="delete" onClick={handleClickOpen} style={{ position: 'absolute', top: 0, right: 0 }}>
                         <DeleteIcon />

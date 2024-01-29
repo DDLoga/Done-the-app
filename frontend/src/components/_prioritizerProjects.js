@@ -184,7 +184,7 @@ const ProjectsPrioritizer = () => {
                     }}
                 />
             ) : null}
-            {selectedRows > 0 && (
+            {selectedRows.length > 0 && (
                 <div>
                     <Fab color="secondary" aria-label="delete" onClick={handleClickOpen} style={{ position: 'absolute', top: 0, right: 0 }}>
                         <DeleteIcon />
