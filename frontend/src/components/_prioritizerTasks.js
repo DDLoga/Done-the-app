@@ -61,9 +61,9 @@ const TasksPrioritizer = () => {
     //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
     const { data: projectsData } = useQuery('fetchProjects', fetchProjects); // Fetch the Projects data
 
-    const getProjectName = (parentId) => {                      // Function to get the project name from the project id
+    const getProjectName = (parentId) => {              // Function to get the project name from the project id
         const project = projectsData.find((project) => project.id === parentId);
-        return project ? project.name : '';
+        return project ? project.project_name : '';
     };
 
     ///////////////////////////////////////////////////////////////////////  // DIALOG BOX //  ///////////////////////////////////////////////////////////////////////
@@ -282,11 +282,11 @@ const TasksPrioritizer = () => {
             field: 'parent',
             headerName: 'Parent',
             width: 130,
-            valueGetter: (params) => getProjectName(params.value),
+            valueGetter: (params) => projectsData && getProjectName(params.value),
             renderCell: (params) => (
-                <Tooltip title={params.value ? getProjectName(params.value).toString() : ''} enterDelay={500}>
+                <Tooltip title={projectsData && params.value ? params.value : ''} enterDelay={500}>
                     <div>
-                        {getProjectName(params.value)}
+                        {projectsData && params.value}
                     </div>
                 </Tooltip>
             ),
