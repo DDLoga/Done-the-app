@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { useQuery, useMutation } from 'react-query';
 
 import { fetchTasks } from './_fetchTasks';
@@ -8,6 +8,7 @@ import { deleteTasksAPI } from './_deleteTasks';
 import { fetchProjects } from './_fetchProjects';
 import { fetchContexts } from './_fetchContexts';
 import { fetchAssignees } from './_fetchAssignees';
+import { SelectedRowsContext } from './_prioritizerSelectedRowsContext';    // import the SelectedRowsContext from './SelectedRowsContext'
 
 import { Select, MenuItem, TextField, Fab, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
@@ -26,15 +27,24 @@ const TasksPrioritizer = () => {
         isLoading:isLoadingTasks, 
         error:errorLoadingTasks 
     } = useQuery('fetchedTasksData', fetchTasks);                   // use the function { fetchTasks } from './_fetchTasks' and store the result in fetchedTasksData
-    const [tasksData, updateTasksData] = useState([]);              // useState hook to store and update the tasks data
+    
+    const [tasksData, updateTasksData] = useState([]);              // manage the tasks data state
+    const [filteredTasksData, setFilteredTasksData] = useState([]); // manage the filtered tasks data (from projects selection)
 
-    useEffect(() => {                                               // useEffect hook to update the tasks data state when the fetchedTasksData changes
-        updateTasksData(fetchedTasksData);
+    useEffect(() => {                                               // update the tasks data state when the fetchedTasksData changes
+        updateTasksData(fetchedTasksData); 
     }, [fetchedTasksData]);
+
+    const [projectSelectedRows, ] = useContext(SelectedRowsContext); // get the projectSelectedRows
+
+    useEffect(() => {                                               // update the filtered tasks data state when the projectSelectedRows changes
+            const updatedTasksData = projectSelectedRows.length > 0 ? tasksData.filter(task => projectSelectedRows.includes(task.parent)) : tasksData;
+            setFilteredTasksData(updatedTasksData);
+    }, [projectSelectedRows, tasksData]);
 
     const updateTaskMutation = useMutation(updateTaskAPI, {         // function to update task data on the API using useMutation hook with { updateTaskAPI } from './_updateTask';
         onSuccess: (data) => {                                      // onSuccess function to update the tasks data state when the mutation is successful
-            const updatedTasksData = tasksData.map((task) =>
+            const updatedTasksData = filteredTasksData.map((task) =>
                 task.id === data.id ? data : task
             );
             updateTasksData(updatedTasksData);
@@ -42,7 +52,7 @@ const TasksPrioritizer = () => {
     });
 
     const updateTask = (params, field, value) => {                  // Function to update the task data on table edit (used in columns definition)
-        const updatedTask = tasksData.find((task) => task.id === params.id);
+        const updatedTask = filteredTasksData.find((task) => task.id === params.id);
         if (updatedTask) {
             updatedTask[field] = value;
             updateTaskMutation.mutate({ taskId: params.id, updatedTask });
@@ -50,7 +60,7 @@ const TasksPrioritizer = () => {
     };
     const handleDelete = async () => {                              // Function to handle the delete button click
         await deleteTasksAPI(selectedRows);
-        const updatedTasksData = tasksData.filter((task) =>
+        const updatedTasksData = filteredTasksData.filter((task) =>
             !selectedRows.includes(task.id)
         );
         updateTasksData(updatedTasksData);
@@ -111,7 +121,7 @@ const TasksPrioritizer = () => {
     // selectedRows is used to store the selected rows in the data grid
     const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
 
-    //task table columns definition
+    ///////////////////////////////////////////////////////////////////////  // task table columns definition//  ///////////////////////////////////////////////////////////////////////
     const taskColumns = [
         // name
         {
@@ -299,13 +309,13 @@ const TasksPrioritizer = () => {
                 <CircularProgress /> // Display a loading spinner if the tasks are still loading
             ) : errorLoadingTasks ? (
                 <Alert severity="error">Error loading tasks</Alert> // Display an error message if there was an error loading the tasks
-            ) : tasksData !== undefined ? (
+            ) : filteredTasksData !== undefined ? (
                 <DataGrid
-                    rows={tasksData}
+                    rows={filteredTasksData}
                     columns={taskColumns}
                     checkboxSelection
                     disableRowSelectionOnClick
-                    pageSize={tasksData.length}
+                    pageSize={filteredTasksData.length}
                     onRowSelectionModelChange={(newSelection) => {
                         setSelectedRows(newSelection);
                     }}

@@ -17,6 +17,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 
+import { SelectedRowsContext } from './_prioritizerSelectedRowsContext';
+
 
 const ProjectsPrioritizer = () => {
 
@@ -73,6 +75,10 @@ const ProjectsPrioritizer = () => {
 
     // selectedRows is used to store the selected rows in the data grid
     const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
+    const [, setSelectedRowsContext] = React.useContext(SelectedRowsContext); //pass the selectedRows state to the SelectedRowsContext  
+    useEffect(() => {
+        setSelectedRowsContext(selectedRows);
+    }, [selectedRows, setSelectedRowsContext]);
 
 
 
