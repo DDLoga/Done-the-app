@@ -14,6 +14,7 @@ from django.forms.models import model_to_dict
 from django.core.serializers.json import DjangoJSONEncoder
 
 
+
 def home(request):
     # if user is authenticated, redirect to the prioritizer
     if request.user.is_authenticated:
@@ -606,3 +607,178 @@ def delete_completed_projects(request):
     if request.method == 'DELETE':
         Projects.objects.filter(project_complete=True).delete()
         return JsonResponse({'success': True})
+    
+
+########################################################################################
+# LOGIN AND SIGNUP FOR REACT
+########################################################################################
+
+
+
+from django.contrib.auth import authenticate, logout
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token as AuthToken
+from rest_framework.views import APIView
+from .serializers import TaskSerializer, ContextSerializer, ProjectSerializer, AssigneeSerializer
+from django.contrib.auth.models import User
+from rest_framework import status
+from django.db import IntegrityError
+
+@api_view(['POST'])
+def login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        token, created = AuthToken.objects.get_or_create(user=user)
+        return Response({'token': token.key, 'username': user.username})
+    else:
+        return Response({'error': 'Invalid login credentials'})
+    
+
+@api_view(['POST'])
+def logout_view(request):
+    if request.user.is_authenticated:
+        # Django logout
+        Token.objects.filter(user=request.user.id).delete()
+        logout(request)
+
+        return Response({"message": "Successfully logged out."}, status=200)
+    else:
+        print("user is not authenticated")
+        return Response({"error": "You are not logged in."}, status=400)
+
+
+class QuickTaskEntryViewAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        task_names = request.data.get('name', None)
+        user_id = request.data.get('user', None)
+        parent_id = request.data.get('parent', None)
+
+
+        if not isinstance(task_names, list):
+            task_names = [task_names]
+            task_names = task_names[0].split("\n")   
+        
+        for task_name in task_names:
+            task_data = {'name': task_name, 'user': user_id, 'effort':0, 'parent': parent_id}
+            serializer = TaskSerializer(data=task_data)
+            print(task_data)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                return Response(serializer.errors, status=400)
+
+        return Response({"message": "Tasks created successfully"}, status=201)
+
+
+class NtoTaskView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            task = serializer.save(user=request.user)
+            return Response({'task_id': task.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk=None):
+        task = get_object_or_404(Tasks, pk=pk)
+        serializer = TaskSerializer(task, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        task = get_object_or_404(Tasks, pk=pk)
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class NtoProjectView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ProjectSerializer(data=request.data)  # Removed Projects
+        if serializer.is_valid():
+            project = serializer.save(user=request.user)
+            return Response({'project_id': project.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, pk=None):
+        project = get_object_or_404(Projects, pk=pk)
+        serializer = ProjectSerializer(project, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk=None):
+        project = get_object_or_404(Projects, pk=pk)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user(request):
+    user = User.objects.get(username=request.user.username)
+    return Response({'id': user.id, 'username': user.username})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_tasks(request):                 # get all tasks for the new task organizer wizard and prioritizer
+    tasks = Tasks.objects.filter(user=request.user)
+    serializer = TaskSerializer(tasks, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_new_tasks(request):                 # get all tasks for the new task organizer wizard and prioritizer
+    tasks = Tasks.objects.filter(user=request.user, new_task=True)
+    serializer = TaskSerializer(tasks, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_contexts(request):              # get all contexts for the new task organizer wizard and prioritizer
+    contexts = Context.objects.filter(user=request.user)
+    serializer = ContextSerializer(contexts, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_assignees(request):              # get all assignees for the new task organizer wizard and prioritizer
+    assignees = Assignee.objects.filter(user=request.user)
+    serializer = AssigneeSerializer(assignees, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_projects(request):              # get all Projects for the new task organizer wizard and prioritizer
+    projects = Projects.objects.filter(user=request.user, project_complete=False)
+    serializer = ProjectSerializer(projects, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_task(request, task_id):    # delete a task on the new task organizer wizard
+    try:
+        task = Tasks.objects.get(id=task_id, user=request.user)
+    except Tasks.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        task.delete()
+    except IntegrityError as e:
+        print("IntegrityError:", e)
+        
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_204_NO_CONTENT)
+

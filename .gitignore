@@ -4,5 +4,8 @@ env/
 done/done/.env
 done/db.sqlite3
 project-notes.txt
+buglist.txt
 done/done/.env
 *__pycache__*
+frontend/src/components/prioritizer.txt
+frontend/.env

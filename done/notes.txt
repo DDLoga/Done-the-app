@@ -1,0 +1,1 @@
+filter the table of _prioritizerTasks.js on the parent column with the selected project from _prioritizerProjects.js
