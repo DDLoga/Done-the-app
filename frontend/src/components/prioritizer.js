@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import BaseLayout from './baseLayout';
+import BaseLayout from './baselayout';
 import TasksPrioritizer from './_prioritizerTasks';
 import ProjectsPrioritizer from './_prioritizerProjects';
 import { SelectedRowsContext } from './_prioritizerSelectedRowsContext';    // import the SelectedRowsContext from './SelectedRowsContext'

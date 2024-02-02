@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserContext from './UserContext'; // Import your UserContext
-import BaseLayout from './baseLayout';
+import BaseLayout from './baselayout';
 import loginPageStyle from './loginPage.module.css';
 
 const LoginPage = () => {
