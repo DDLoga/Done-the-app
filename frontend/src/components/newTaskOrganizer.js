@@ -32,7 +32,7 @@ const NewTaskOrganizer = () => {
 
     // collect tasks from API
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/get_new_tasks', {
+        fetch(`${process.env.REACT_APP_API_URL}/get_new_tasks`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             }
@@ -51,7 +51,7 @@ const NewTaskOrganizer = () => {
 
     // collect contexts from API
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/get_contexts', {
+        fetch(`${process.env.REACT_APP_API_URL}/get_contexts`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             }
@@ -68,7 +68,7 @@ const NewTaskOrganizer = () => {
 
     // collect projects from API
     const fetchProjects = () => {
-        fetch('http://127.0.0.1:8000/api/get_projects', {
+        fetch(`${process.env.REACT_APP_API_URL}/get_projects`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             }
@@ -143,11 +143,11 @@ const NewTaskOrganizer = () => {
     }
 
     const handleProcessNext = async () => {
-        const userResponse = await fetchWithToken('http://127.0.0.1:8000/api/getUser/', { method: 'GET' });
+        const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
         const userData = await userResponse.json();
         const userId = userData.id;
 
-        const url = taskType === 'task' ? 'http://127.0.0.1:8000/api/NtoTask/' : 'http://127.0.0.1:8000/api/NtoProject/';
+        const url = taskType === 'task' ? `${process.env.REACT_APP_API_URL}/NtoTask/` : `${process.env.REACT_APP_API_URL}/NtoProject/`;
         const body = taskType === 'task' ? {
             name: currentTask.name,
             user: userId,
@@ -171,7 +171,7 @@ const NewTaskOrganizer = () => {
             .then(data => {
                 console.log(data);
                 if (taskType === 'project' && nextAction !== '') {
-                    fetchWithToken('http://127.0.0.1:8000/api/quickTask/', {
+                    fetchWithToken(`${process.env.REACT_APP_API_URL}/quickTask/`, {
                         method: 'POST',
                         body: JSON.stringify({
                             name: nextAction,
@@ -194,7 +194,7 @@ const NewTaskOrganizer = () => {
 
     const handleDelete = () => {
         if (currentTask) {
-            fetch(`http://127.0.0.1:8000/api/tasks/${currentTask.id}`, {
+            fetch(`${process.env.REACT_APP_API_URL}/tasks/${currentTask.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Token ${localStorage.getItem('token')}`

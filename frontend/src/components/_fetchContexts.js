@@ -1,5 +1,5 @@
 export const fetchContexts = async () => {
-    const response = await fetch('http://127.0.0.1:8000/api/get_contexts', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get_contexts`, {
         headers: {
             'Authorization': `Token ${localStorage.getItem('token')}`
         }

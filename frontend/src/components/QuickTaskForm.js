@@ -39,7 +39,7 @@ const QuickTaskForm = () => {
         event.preventDefault();
 
         // Get user_id from backend
-        const userResponse = await fetch('http://127.0.0.1:8000/api/getUser/', {
+        const userResponse = await fetch(`${process.env.REACT_APP_API_URL}//getUser/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -48,7 +48,7 @@ const QuickTaskForm = () => {
         const userData = await userResponse.json();
         const userId = userData.id;
 
-        const response = await fetch('http://127.0.0.1:8000/api/quickTask/', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/quickTask/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

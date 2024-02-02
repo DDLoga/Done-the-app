@@ -8,3 +8,4 @@ buglist.txt
 done/done/.env
 *__pycache__*
 frontend/src/components/prioritizer.txt
+frontend/.env

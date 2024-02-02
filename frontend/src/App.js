@@ -26,7 +26,7 @@ const App = () => {
 
     const login = async (username, password) => {
         // Call your API to log in the user
-        const response = await fetch('http://127.0.0.1:8000/api/login/', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/login/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -45,7 +45,7 @@ const App = () => {
     const logout = async () => {
         try {
             // Send a POST request to the logout endpoint
-            const response = await fetch('http://127.0.0.1:8000/api/logout/', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/logout/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 export const fetchTasks = async () => {
-    const response = await fetch('http://127.0.0.1:8000/api/get_tasks', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get_tasks`, {
         headers: {
             'Authorization': `Token ${localStorage.getItem('token')}`
         }

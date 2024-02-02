@@ -86,13 +86,13 @@ const TasksPrioritizer = () => {
     };
 
     //////////////////////////////////////////////////////////////  // CONTEXTS AND ASSIGNEES API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const {                                         // useQuery hook to fetch the contexts data into contextsData
+    const {                                                             // useQuery hook to fetch the contexts data into contextsData
         data: contextsData, 
         isLoading:isLoadingContexts, 
         error:errorLoadingContexts
     } = useQuery('fetchContexts', fetchContexts);
     const [contextToIdMapping, setContextToIdMapping] = useState({});   // useState hook to store and update the contexts data
-    useEffect(() => {                                // useEffect hook to update the contexts data state when the fetchedContextsData changes
+    useEffect(() => {                                                   // useEffect hook to update the contexts data state when the fetchedContextsData changes
         if (contextsData) {
             let mapping = {};
             contextsData.forEach(context => {
@@ -102,13 +102,13 @@ const TasksPrioritizer = () => {
         }
     }, [contextsData]);
 
-    const {                                          // useQuery hook to fetch the assignees data into assigneesData
+    const {                                                             // useQuery hook to fetch the assignees data into assigneesData
         data: assigneesData, 
         isLoading:isLoadingAssignees, 
         error:errorLoadingAssignees 
     } = useQuery('fetchAssignees', fetchAssignees);
     const [assigneeToIdMapping, setAssigneeToIdMapping] = useState({}); // useState hook to store and update the assignees data
-    useEffect(() => {                                // useEffect hook to update the assignees data state when the fetchedAssigneesData changes
+    useEffect(() => {                                                   // useEffect hook to update the assignees data state when the fetchedAssigneesData changes
         if (assigneesData) {
             let mapping = {};
             assigneesData.forEach(assignee => {
