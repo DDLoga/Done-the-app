@@ -3,7 +3,7 @@ import styles from './App.module.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/login";
 import SideMenu from "./components/sidemenu";
-import LoginPage from './components/loginPage';
+import LoginPage from './components/LoginPage';
 import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
