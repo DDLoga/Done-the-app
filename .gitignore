@@ -6,3 +6,4 @@ done/db.sqlite3
 project-notes.txt
 done/done/.env
 *__pycache__*
+node_modules
