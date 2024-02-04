@@ -58,16 +58,19 @@ const App = () => {
                 localStorage.setItem('username', data.username);  // Store the username
                 localStorage.setItem('token', data.token);  // Store the token
                 console.log('Login successful:', data);
+                setOpen(false); // Close the dialog box if the login is successful
                 setError(null);  // Clear any previous errors
                 return true;
             } else {
                 console.error('Login failed:', data);
                 setError(data.error || 'Login failed');
+                setOpen(true); // Open the dialog box if the login fails
                 return false;
             }
         } catch (error) {
             console.error('Network error:', error);
             setError('Network error: Could not connect to the server');
+            setOpen(true); // Open the dialog box if there is a network error
             return false;
         } finally {
             setLoading(false); // Set loading to false when the request finishes to deactivate the spinner
@@ -138,7 +141,7 @@ const App = () => {
                     </div>
                 )}
                 <Dialog
-                    open={!!error} // Open the dialog if there is an error
+                    open={open} // Open the dialog if there is an error
                     onClose={handleClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
