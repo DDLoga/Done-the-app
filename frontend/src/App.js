@@ -9,38 +9,76 @@ import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
 import Prioritizer from './components/prioritizer';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 
 const queryClient = new QueryClient();
 
 const App = () => {
-    const [user, setUser] = useState(localStorage.getItem('username') || null);
 
-    useEffect(() => {
+    const darkTheme = createTheme({                     // create a dark theme
+        palette: {
+            mode: 'dark',
+        },
+    });
+
+    const [user, setUser] = useState(                   // get the username from local storage
+        localStorage.getItem('username') || null);
+
+    useEffect(() => {                                   // set the user state to the stored username
         const storedUsername = localStorage.getItem('username');
         if (storedUsername) {
             setUser(storedUsername);
         }
     }, []);
 
-    const login = async (username, password) => {
-        // Call your API to log in the user
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/login/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        if (response.ok) {
+    const [error, setError] = useState(null);   // handle login errors
+    const [open, setOpen] = useState(false);    // handle dialog open state
+    const handleClose = () => {
+        setOpen(false);
+        setError(null); // Reset the error state when the dialog is closed
+    };
+
+    const [loading, setLoading] = useState(false);  // handle loading state for the spinner
+
+    const login = async (username, password) => {   // handle login function
+        setLoading(true);                           // set loading state to true to activate the spinner
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/login/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
             const data = await response.json();
-            setUser(data.username);  // Set the user state
-            localStorage.setItem('username', data.username);  // Store the username
-            localStorage.setItem('token', data.token);  // Store the token
-            return true;
-        } else {
+            if (response.ok && !data.error) {
+                setUser(data.username);  // Set the user state
+                localStorage.setItem('username', data.username);  // Store the username
+                localStorage.setItem('token', data.token);  // Store the token
+                console.log('Login successful:', data);
+                setError(null);  // Clear any previous errors
+                return true;
+            } else {
+                console.error('Login failed:', data);
+                setError(data.error || 'Login failed');
+                return false;
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+            setError('Network error: Could not connect to the server');
             return false;
+        } finally {
+            setLoading(false); // Set loading to false when the request finishes to deactivate the spinner
         }
     };
+
+    useEffect(() => {                           // handle login errors by opening a dialog box with the error message
+        if (error) {
+            setOpen(true);
+        }
+    }, [error]);
 
     const logout = async () => {
         try {
@@ -70,29 +108,54 @@ const App = () => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <Router>
-                <div className={styles.appContainer}>
-                    <UserContext.Provider value={{ user, login, logout }}>
-                        <SideMenu />
-                        <Routes>
-                            <Route path="/" element={<Login />} />
-                            <Route path="/login" element={<LoginPage login={login} />} />
-                            <Route 
-                                path="/quickTask" 
-                                element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}
-                            />
-                            <Route 
-                                path="/newtaskorganizer" 
-                                element={user ? <NewTaskOrganizer /> : <Navigate to="/login" replace />}
-                            />
-                            <Route 
-                                path="/prioritizer" 
-                                element={user ? <Prioritizer /> : <Navigate to="/login" replace />}
-                            />
-                        </Routes>
-                    </UserContext.Provider>
-                </div>
-            </Router>
+            <ThemeProvider theme={darkTheme}>
+                <Router>
+                    <div className={styles.appContainer}>
+                        <UserContext.Provider value={{ user, login, logout }}>
+                            <SideMenu />
+                            <Routes>
+                                <Route path="/" element={<Login />} />
+                                <Route path="/login" element={<LoginPage login={login} />} />
+                                <Route 
+                                    path="/quickTask" 
+                                    element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}
+                                />
+                                <Route 
+                                    path="/newtaskorganizer" 
+                                    element={user ? <NewTaskOrganizer /> : <Navigate to="/login" replace />}
+                                />
+                                <Route 
+                                    path="/prioritizer" 
+                                    element={user ? <Prioritizer /> : <Navigate to="/login" replace />}
+                                />
+                            </Routes>
+                        </UserContext.Provider>
+                    </div>
+                </Router>
+                {loading && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                        <CircularProgress />
+                    </div>
+                )}
+                <Dialog
+                    open={!!error} // Open the dialog if there is an error
+                    onClose={handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{"Error"}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                        {error}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary" autoFocus>
+                        OK
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </ThemeProvider>
         </QueryClientProvider>
     );
 };

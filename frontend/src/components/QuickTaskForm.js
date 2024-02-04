@@ -4,7 +4,6 @@ import BaseLayout from './baselayout';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { TextField, Button } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 const QuickTaskForm = () => {
@@ -15,17 +14,6 @@ const QuickTaskForm = () => {
     const [dialogMessage, setDialogMessage] = useState('');
     const [severity, setSeverity] = useState('success');
     
-    const darkTheme = createTheme({
-        palette: {
-            mode: 'dark',
-            primary: {
-                main: '#0084FF', // monday.com's primary color
-            },
-            background: {
-                default: '#1A1A1A', // monday.com's background color
-            },
-        },
-    });
 
 
 
@@ -39,7 +27,7 @@ const QuickTaskForm = () => {
         event.preventDefault();
 
         // Get user_id from backend
-        const userResponse = await fetch(`${process.env.REACT_APP_API_URL}//getUser/`, {
+        const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/getUser/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -76,7 +64,6 @@ const QuickTaskForm = () => {
                     <h2 className={styles.subtitle}>Clear your mind</h2>
                 </div>
                 <div className={styles.formBlock} onSubmit={handleSubmit}>
-                    <ThemeProvider theme={darkTheme}>
                         <form>
                             <TextField
                                 multiline
@@ -97,7 +84,6 @@ const QuickTaskForm = () => {
                                 Submit
                             </Button>
                         </form>
-                    </ThemeProvider>
                 </div>
             </div>
             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
