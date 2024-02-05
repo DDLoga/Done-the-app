@@ -11,6 +11,7 @@ urlpatterns = [
     # path('', TemplateView.as_view(template_name='index.html')),
     path('', include('tasks.urls')),
     path('api/', include([
+        path('register/', views.CreateUserView.as_view(), name='register'),
         path('login/', views.login, name='login'),
         path('logout/', views.logout_view, name='logout'),
         path('quickTask/', views.QuickTaskEntryViewAPI.as_view(), name='quickTask'),

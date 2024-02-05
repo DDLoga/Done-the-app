@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './App.module.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/login";
+import RegisterPage from './components/RegisterPage';
 import SideMenu from "./components/sidemenu";
 import LoginPage from './components/LoginPage';
 import UserContext from './components/UserContext';
@@ -117,8 +118,15 @@ const App = () => {
                         <UserContext.Provider value={{ user, login, logout }}>
                             <SideMenu />
                             <Routes>
-                                <Route path="/" element={<Login />} />
-                                <Route path="/login" element={<LoginPage login={login} />} />
+                                <Route 
+                                    path="/" 
+                                    element={<Login />} />
+                                <Route 
+                                    path="/login" 
+                                    element={<LoginPage login={login} />} />
+                                <Route 
+                                    path="/register" 
+                                    element={<RegisterPage />} />
                                 <Route 
                                     path="/quickTask" 
                                     element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}

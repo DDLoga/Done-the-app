@@ -627,6 +627,12 @@ from .serializers import TaskSerializer, ContextSerializer, ProjectSerializer, A
 from django.contrib.auth.models import User
 from rest_framework import status
 from django.db import IntegrityError
+from .serializers import UserSerializer
+from rest_framework import generics
+
+
+class CreateUserView(generics.CreateAPIView):
+    serializer_class = UserSerializer
 
 @api_view(['POST'])
 def login(request):
