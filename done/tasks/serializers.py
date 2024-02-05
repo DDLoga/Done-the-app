@@ -49,6 +49,9 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
     def create(self, validated_data):
+        username = validated_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError({"username": "A user with this username already exists."})
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if password is not None:

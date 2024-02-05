@@ -55,7 +55,7 @@ const LoginPage = () => {
                         </label>
                         <input type="submit" value="Submit" className={loginPageStyle.submit} />
                     </form>
-                    <p>No account yet? <Link to="/register">Register</Link></p>
+                    <p>No account yet? <Link to="/register" className="text-blue-500 underline hover:text-blue-800">Register</Link></p>
                 </div>
             </div>
         </BaseLayout>

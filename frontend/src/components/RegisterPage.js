@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BaseLayout from './baselayout';
 import loginPageStyle from './loginPage.module.css';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
 const RegisterPage = () => {
     const headerContent = "Register Page";
@@ -9,6 +10,10 @@ const RegisterPage = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState('');
+    const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+    const [successDialogMessage, setSuccessDialogMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -24,11 +29,15 @@ const RegisterPage = () => {
             if (response.ok && !data.error) {
                 console.log('Registration successful:', data);
                 setError(null);
-                navigate('/login');
+                setSuccessDialogMessage('Registration successful. You can now proceed to login');
+                setSuccessDialogOpen(true);
                 return true;
             } else {
                 console.error('Registration failed:', data);
                 setError(data.error || 'Registration failed');
+                const errorMessage = data.username ? data.username[0] : 'Registration failed';
+                setDialogMessage(errorMessage);
+                setDialogOpen(true);
                 return false;
             }
         } catch (error) {
@@ -38,6 +47,15 @@ const RegisterPage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleClose = () => {
+        setDialogOpen(false);
+    };
+
+    const handleSuccessClose = () => {
+        setSuccessDialogOpen(false);
+        navigate('/login');
     };
 
     const handleSubmit = async (event) => {
@@ -75,6 +93,28 @@ const RegisterPage = () => {
                     {error && <div>Error: {error}</div>}
                 </div>
             </div>
+            {dialogOpen && (
+                <Dialog open={dialogOpen} onClose={handleClose}>
+                    <DialogTitle>Error</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>{dialogMessage}</DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Close</Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {successDialogOpen && (
+                <Dialog open={successDialogOpen} onClose={handleSuccessClose}>
+                    <DialogTitle>Success</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>{successDialogMessage}</DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleSuccessClose}>Close</Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </BaseLayout>
     );
 };
