@@ -2,26 +2,37 @@
 {% load static %}
 {% load widget_tweaks %}
 {% block content %}
-<body class="body">
+<body style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #2d3748; color: white;">
 
-  <div class="content-div-5">
-
-    <div class="log-in-div">
-      <div class="log-in-hdr">
-        <div class="log-in-hdr-bold">Welcome to DONE</div>
-      </div>
-      <div class="w-form">
-        <div class="log-in-hint-div">
-          <div class="log-in-hint-txt">This app is currently under development... Enjoy! </div>
-        </div>
-          <div class="side-nemu-txt-div">
-            <div class="side-menu-text">
-              <a href="{% url 'socialaccount_connections' %}">Login or create an account</a>
-            </div>
-        </div>
-      </div>
-    </div>
+  <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; text-align: center;">
+  <h1 style="font-size: 3em; font-weight: bold; margin-bottom: 1em; color: #d69e2e;">Welcome to DONE</h1>
+  <h2 style="font-size: 2em; margin-bottom: 0.5em;">This is the Django, HTMX and vanilla JS version of DONE, the App!</h2>
+  <h2 style="font-size: 2em; margin-bottom: 2em;">Click on the Login link in the side bar to login</h2>
+  <p style="font-size: 1.5em; margin-bottom: 2em;">
+    Another front end version is available 
+    <a 
+      href="https://donefront.vercel.app/" 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      style="color: #4299e1; text-decoration: underline; margin-left: 0.5em; margin-right: 0.5em;"
+    >
+      here
+    </a> 
+    if you prefer React
+  </p>
+  <div style="text-align: center;">
+    <a 
+      href="https://donefront.vercel.app/" 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      style="display: inline-block; padding: 1em; background-color: #4299e1; color: white; border-radius: 0.25em; text-decoration: none; transition: background-color 0.2s ease-in-out;"
+      onmouseover="this.style.backgroundColor='#2b6cb0';"
+      onmouseout="this.style.backgroundColor='#4299e1';"
+    >
+      Try React Version
+    </a>
   </div>
   </div>
-  </body>
+
+</body>
 {% endblock content %}

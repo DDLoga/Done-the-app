@@ -11,7 +11,7 @@ function BaseLayout({ children, headerContent }) {
             </main>
             <footer className="pl-24 p-6 bg-gray-800 border-t border-gray-700">
                 {/* Footer content goes here */}
-                The footer as defined on baseLayout.js
+                {/* The footer as defined on baseLayout.js */}
             </footer>
         </div>
     );

@@ -8,6 +8,7 @@ const RegisterPage = () => {
     const headerContent = "Register Page";
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [password2, setPassword2] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -17,13 +18,13 @@ const RegisterPage = () => {
 
     const navigate = useNavigate();
 
-    const register = async (username, password) => {
+    const register = async (username, password, password2) => {
         setLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/register/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password, password2 })
             });
             const data = await response.json();
             if (response.ok && !data.error) {
@@ -60,7 +61,7 @@ const RegisterPage = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        await register(username, password);
+        await register(username, password, password2);
     };
 
     return (
@@ -87,7 +88,17 @@ const RegisterPage = () => {
                                 className={loginPageStyle.input}
                             />
                         </label>
+                        <label>
+                            Confirm Password:
+                            <input 
+                                type="password" 
+                                value={password2} 
+                                onChange={(e) => setPassword2(e.target.value)} 
+                                className={loginPageStyle.input}
+                            />
+                        </label>
                         <input type="submit" value="Submit" className={loginPageStyle.submit} />
+
                     </form>
                     {loading && <div>Loading...</div>}
                     {error && <div>Error: {error}</div>}

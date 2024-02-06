@@ -43,16 +43,29 @@ class ProjectSerializer(serializers.ModelSerializer):
         
         
 class UserSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
     class Meta:
         model = User
-        fields = ['username', 'password']
-        extra_kwargs = {'password': {'write_only': True, 'required': True}}
+        fields = ['username', 'password', 'password2']
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': True},
+            'password2': {'write_only': True, 'required': True}
+        }
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"username": "Password fields didn't match."})
+        if len(attrs['password']) < 8:
+            raise serializers.ValidationError({"username": "Password is too short. It must contain at least 8 characters."})
+        return attrs
 
     def create(self, validated_data):
         username = validated_data.get('username')
         if User.objects.filter(username=username).exists():
             raise serializers.ValidationError({"username": "A user with this username already exists."})
         password = validated_data.pop('password', None)
+        validated_data.pop('password2', None)
         instance = self.Meta.model(**validated_data)
         if password is not None:
             instance.set_password(password)

@@ -4,8 +4,32 @@ import BaseLayout from './baselayout';
 const login = () => {
     return (
         <BaseLayout>
-            <h1>Welcome to the Login page</h1>
-            <p>This should be a nicer login page (v0.1);).</p>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
+                <h1 className="text-5xl font-bold mb-4 text-yellow-300">DONE, the App</h1>
+                <h2 className="text-3xl mb-2">This is the React version of DONE, the App!</h2>
+                <h2 className="text-3xl mb-8">Click on the Login link in the side bar to login</h2>
+                <p className="text-xl mb-8">
+                    Another front end version is available 
+                    <a 
+                        href="https://flavourdev.pythonanywhere.com/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-400 underline mx-2"
+                    >
+                        here
+                    </a> 
+                    if you prefer Django @ vanilla JS
+                </p>
+                <a 
+                    href="https://flavourdev.pythonanywhere.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-400 transition-colors"
+                >
+                    Try Django Version
+                </a>
+            </div>
+
         </BaseLayout>
     );
 };
