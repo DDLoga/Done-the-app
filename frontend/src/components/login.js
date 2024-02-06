@@ -18,7 +18,7 @@ const login = () => {
                     >
                         here
                     </a> 
-                    if you prefer Django @ vanilla JS
+                    if you prefer Django & vanilla JS
                 </p>
                 <a 
                     href="https://flavourdev.pythonanywhere.com/" 
