@@ -673,6 +673,8 @@ class QuickTaskEntryViewAPI(APIView):
             task_names = task_names[0].split("\n")   
         
         for task_name in task_names:
+            if not task_name.strip():  # skip this iteration if task_name is empty or only contains spaces
+                continue
             task_data = {'name': task_name, 'user': user_id, 'effort':0, 'parent': parent_id}
             serializer = TaskSerializer(data=task_data)
             print(task_data)

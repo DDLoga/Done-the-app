@@ -303,21 +303,46 @@ const NewTaskOrganizer = () => {
             
                 {taskType === "task" && (
                     <>
-                    <div className="flex flex-col sm:flex-row justify-between max-w-screen-lg mx-auto space-y-4">
+                    <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 space-x-12 max-w-screen-sm">
+                    {/* <div className="flex flex-row space-x-12 justify-center"> */}
                         <div className="flex flex-col space-y-4">
-                            <div className="flex flex-row space-x-4">
+                            <TextField
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                label="Filter projects"
+                                sx={commonStyles}
+                            />
+
+                            <List
+                                sx={{
+                                    maxHeight: "200px",
+                                    overflow: "auto",
+                                    border: "1px solid #9699A6",
+                                    borderRadius: "4px",
+                                }}
+                                >
+                                {filteredProjects.map((project) => (
+                                    <ListItemButton
+                                    key={project.id}
+                                    selected={relatedProject === project.id}
+                                    onClick={() => handleRelatedProjectChange(project.id)}
+                                    sx={{
+                                        "&:hover": {
+                                        backgroundColor: "#18283b", // replace with your color
+                                        },
+                                    }}
+                                    >
+                                    <ListItemText primary={project.project_name} />
+                                    </ListItemButton>
+                                ))}
+                            </List>
+                        </div>
+                        <div className="flex flex-col space-y-4">
+                            <div className="flex flex-col space-y-4">
                                 <PrioritySelect value={priority} onChange={handlePriorityChange} />
                                 <DatePicker value={deadline} onChange={handleDeadlineChange} />
-    
                             </div>
-                            <div className="flex flex-row space-x-4">                        
-                                <TextField
-                                    value={effort}
-                                    label="Effort (min)"
-                                    onChange={handleEffortChange}
-                                    sx={{ ...commonStyles, maxWidth: 100 }}
-                                />
-
+                            <div className="flex flex-col space-y-4">                        
                                 <FormControl variant="outlined" sx={{ ...commonStyles, minWidth: 180 }}>
                                     <InputLabel id="context-label">Context</InputLabel>
                                     <Select
@@ -333,38 +358,12 @@ const NewTaskOrganizer = () => {
                                     ))}
                                     </Select>
                                 </FormControl>
-                            </div>
-                            <div className="flex flex-col space-y-4">
                                 <TextField
-                                    value={filter}
-                                    onChange={(e) => setFilter(e.target.value)}
-                                    label="Filter projects"
-                                    sx={commonStyles}
+                                    value={effort}
+                                    label="Effort (min)"
+                                    onChange={handleEffortChange}
+                                    sx={{ ...commonStyles, maxWidth: 100 }}
                                 />
-
-                                <List
-                                    sx={{
-                                        maxHeight: "200px",
-                                        overflow: "auto",
-                                        border: "1px solid #9699A6",
-                                        borderRadius: "4px",
-                                    }}
-                                    >
-                                    {filteredProjects.map((project) => (
-                                        <ListItemButton
-                                        key={project.id}
-                                        selected={relatedProject === project.id}
-                                        onClick={() => handleRelatedProjectChange(project.id)}
-                                        sx={{
-                                            "&:hover": {
-                                            backgroundColor: "#18283b", // replace with your color
-                                            },
-                                        }}
-                                        >
-                                        <ListItemText primary={project.project_name} />
-                                        </ListItemButton>
-                                    ))}
-                                </List>
                             </div>
                         </div>
                     </div>
