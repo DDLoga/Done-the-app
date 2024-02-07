@@ -1,5 +1,6 @@
 import React from 'react';
 import BaseLayout from './baselayout';
+import { Link } from 'react-router-dom';
 
 const login = () => {
     return (
@@ -20,16 +21,25 @@ const login = () => {
                     </a> 
                     if you prefer Django & vanilla JS
                 </p>
-                <a 
-                    href="https://flavourdev.pythonanywhere.com/" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-400 transition-colors"
-                >
-                    Try Django Version
-                </a>
-            </div>
+                <div className="flex space-x-4">
 
+                    <Link 
+                        to="/login" 
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+                    >
+                        Login
+                    </Link>
+                    <a 
+                        href="https://flavourdev.pythonanywhere.com/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-400 transition-colors"
+                    >
+                        Try Django Version
+                    </a>
+
+                </div>
+            </div>
         </BaseLayout>
     );
 };

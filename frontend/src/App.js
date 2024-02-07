@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import styles from './App.module.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/login";
@@ -9,6 +9,7 @@ import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
 import Prioritizer from './components/prioritizer';
+import WelcomeMessage from './components/welcomeMessage';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -117,10 +118,12 @@ const App = () => {
                     <div className={styles.appContainer}>
                         <UserContext.Provider value={{ user, login, logout }}>
                             <SideMenu />
+                            
                             <Routes>
                                 <Route 
                                     path="/" 
-                                    element={<Login />} />
+                                    element={user ? <WelcomeMessage /> : <Login />}
+                                />
                                 <Route 
                                     path="/login" 
                                     element={<LoginPage login={login} />} />
