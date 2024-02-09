@@ -12,24 +12,23 @@ import { TextField, Fab, Tooltip, Dialog, DialogActions, DialogContent, DialogCo
 const ContextManager = () => {
     const headerContent = "Context Manager";                        // headerContent on BaseLayout.js
     const [selectedRows, setSelectedRows] = useState([]);           // rows selected in the table
+    const [contextsData, updateContextsData] = useState([]);        // context data
+    const [name, setName] = useState('');                           // dialog box form fields
+    const [description, setDescription] = useState('');
 
-
-
-    const {                                                        // useQuery hook to fetch the context data into fetchedContextsData
+    const {                                                         // fetch the contexts data from the API
         data: fetchedContextsData, 
         isLoading:isLoadingContexts, 
         error:errorLoadingContexts 
-    } = useQuery('fetchedContextsData', fetchContexts);             // use the function { fetchContexts } from './_fetchContexts' and stores data into fetchedContextsData
+    } = useQuery('fetchedContextsData', fetchContexts);             
     
-    const [contextsData, updateContextsData] = useState([]);        // useState hook to store and update the contexts data
-
-    useEffect(() => {                                               // only update contextsData when fetchedContextsData is defined (prevent error on table render when fetchedContextsData is undefined)
+    useEffect(() => {                                               // loading context data on local variable
         if (fetchedContextsData) {
             updateContextsData(fetchedContextsData);
         }
     }, [fetchedContextsData]);
 
-    const columns = [
+    const columns = [                                               // columns for the context data table
         {
             field: 'name',
             headerName: 'Name',
@@ -105,9 +104,8 @@ const ContextManager = () => {
         );
         updateContextsData(updatedContext);
         setSelectedRows([]);
-        setOpen(false);
+        setOpenDelete(false);
     };
-
 
     const createContextMutation = useMutation(createContext, {
         onSuccess: (data) => {
@@ -115,7 +113,7 @@ const ContextManager = () => {
         },
     });
     
-    const fetchWithToken = (url, options) => fetch(url, {
+    const fetchWithToken = (url, options) => fetch(url, {           // fetchWithToken to get the user data
         headers: {
             'Authorization': `Token ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
@@ -124,26 +122,37 @@ const ContextManager = () => {
         ...options,
     });
 
-    const handleAdd = async () => {
+    const handleSubmit = async () => {
         const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
         const userData = await userResponse.json();
         const userId = userData.id;
         const newContext = {
-            name: 'new context',
-            description: '',
+            name: name,
+            description: description,
             user: userId,
         };
         createContextMutation.mutate(newContext);
+        setOpenAdd(false);
+        setName(''); // reset name
+        setDescription(''); // reset description
     };
 
 
 
-    const [open, setOpen] = React.useState(false);                // useState hook to store and update the open state of the delete confirmation dialog
-    const handleClickOpen = () => {
-        setOpen(true);
+    const [openAdd, setOpenAdd] = useState(false); // useState hook to store and update the open state of the add context dialog
+    const [openDelete, setOpenDelete] = useState(false); // useState hook to store and update the open state of the delete confirmation dialog
+
+    const handleAdd = () => {
+        setOpenAdd(true);
     };
+
+    const handleClickOpenDelete = () => {
+        setOpenDelete(true);
+    };
+
     const handleClose = () => {
-        setOpen(false);
+        setOpenAdd(false);
+        setOpenDelete(false);
     };
 
     return (
@@ -170,12 +179,48 @@ const ContextManager = () => {
                         <AddIcon />
                     </Fab>
                     {selectedRows.length > 0 && (
-                        <Fab color="secondary" aria-label="delete" onClick={handleClickOpen}>
+                        <Fab color="secondary" aria-label="delete" onClick={handleClickOpenDelete}>
                             <DeleteIcon />
                         </Fab>
                     )}
                     <Dialog
-                        open={open}
+                        open={openAdd}
+                        onClose={handleClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title">{"Add Context"}</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                Please enter the name and description for the new context.
+                            </DialogContentText>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                label="Name"
+                                type="text"
+                                fullWidth
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <TextField
+                                margin="dense"
+                                label="Description"
+                                type="text"
+                                fullWidth
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button onClick={handleSubmit} autoFocus>
+                                Add
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog
+                        open={openDelete}
                         onClose={handleClose}
                         aria-labelledby="alert-dialog-title"
                         aria-describedby="alert-dialog-description"
