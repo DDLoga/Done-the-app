@@ -23,7 +23,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class ContextSerializer(serializers.ModelSerializer):
     class Meta:
         model = Context
-        fields = ['name', 'id']
+        fields = ['name', 'id', 'description', 'user']
         
 class AssigneeSerializer(serializers.ModelSerializer):
     class Meta:

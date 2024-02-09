@@ -53,7 +53,7 @@ function SideMenu() {
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faBook} />
-                        <span> Contexts</span>
+                        <span onClick={() => navigate('/contextmanager')}> Contexts</span>
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faDatabase} />

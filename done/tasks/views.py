@@ -752,12 +752,35 @@ def get_new_tasks(request):                 # get all tasks for the new task org
     serializer = TaskSerializer(tasks, many=True)
     return JsonResponse(serializer.data, safe=False)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_contexts(request):              # get all contexts for the new task organizer wizard and prioritizer
-    contexts = Context.objects.filter(user=request.user)
-    serializer = ContextSerializer(contexts, many=True)
-    return JsonResponse(serializer.data, safe=False)
+class ContextView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        contexts = Context.objects.filter(user=request.user)
+        serializer = ContextSerializer(contexts, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        serializer = ContextSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk=None):
+        context = get_object_or_404(Context, pk=pk, user=request.user)
+        serializer = ContextSerializer(context, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        context = get_object_or_404(Context, pk=pk, user=request.user)
+        context.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
