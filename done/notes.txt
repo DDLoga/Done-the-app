@@ -1,1 +1,112 @@
-filter the table of _prioritizerTasks.js on the parent column with the selected project from _prioritizerProjects.js
+add an "Add" button using Add Icon from @mui/icons-material/
+It will be shown permanently next to the delete Icon:
+    <Fab color="secondary" aria-label="delete" onClick={handleClickOpen} style={{ position: 'absolute', top: 0, right: 0 }}>
+        <DeleteIcon />
+    </Fab>
+
+By clicking on the add button, create a new row on the table with defaults values:
+name: "new context"
+description: "" (should be blank)
+
+The new row, will create a new entry on the backend, using "createContext" from './_fetchContexts'
+
+import axios from 'axios';
+
+export const fetchContexts = async () => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get_contexts`, {
+        headers: {
+            'Authorization': `Token ${localStorage.getItem('token')}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const createContext = async (context) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/create_context`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(context)
+    });
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const updateContextAPI = async (contextId) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get_contexts/${contextId.contextId}/`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(contextId.updatedContext)
+    });
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const deleteContextAPI = async (contextId) => {
+    const responses = await Promise.all(contextId.map(contextIdSingle =>
+        axios.delete(`${process.env.REACT_APP_API_URL}/get_contexts/${contextIdSingle}/`, {
+            headers: {
+                'Authorization': `Token ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+            },
+        })
+    ));
+
+    return responses.map(response => response.data);
+};
+
+django serializer is:
+class ContextSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Context
+        fields = ['name', 'id', 'description', 'user']
+
+Django view is:
+class ContextView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        contexts = Context.objects.filter(user=request.user)
+        serializer = ContextSerializer(contexts, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        serializer = ContextSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk=None):
+        context = get_object_or_404(Context, pk=pk, user=request.user)
+        serializer = ContextSerializer(context, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        context = get_object_or_404(Context, pk=pk, user=request.user)
+        context.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

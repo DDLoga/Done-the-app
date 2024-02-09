@@ -761,10 +761,12 @@ class ContextView(APIView):
         return JsonResponse(serializer.data, safe=False)
 
     def post(self, request):
+        print(request.data)
         serializer = ContextSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(serializer.errors)  # print validation errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None):

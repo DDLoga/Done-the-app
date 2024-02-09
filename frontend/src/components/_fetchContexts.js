@@ -1,3 +1,7 @@
+import axios from 'axios';
+
+
+
 export const fetchContexts = async () => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/get_contexts`, {
         headers: {
@@ -14,7 +18,8 @@ export const fetchContexts = async () => {
 };
 
 export const createContext = async (context) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/create_context`, {
+    
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get_contexts/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -49,17 +54,15 @@ export const updateContextAPI = async (contextId) => {
     return data;
 };
 
-export const deleteContext = async (id) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/get_contexts/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`
-        }
-    });
+export const deleteContextAPI = async (contextId) => {
+    const responses = await Promise.all(contextId.map(contextIdSingle =>
+        axios.delete(`${process.env.REACT_APP_API_URL}/get_contexts/${contextIdSingle}/`, {
+            headers: {
+                'Authorization': `Token ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+            },
+        })
+    ));
 
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-
-    return response.status;
+    return responses.map(response => response.data);
 };
