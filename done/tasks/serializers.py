@@ -28,7 +28,7 @@ class ContextSerializer(serializers.ModelSerializer):
 class AssigneeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignee
-        fields = ['name', 'id']
+        fields = ['name', 'id', 'description', 'user']
         
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:

@@ -57,7 +57,7 @@ function SideMenu() {
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faDatabase} />
-                        <span> Resources</span>
+                        <span onClick={() => navigate('/assigneemanager')}> Resource </span>
                     </li>
                 </ul>
             </div>  

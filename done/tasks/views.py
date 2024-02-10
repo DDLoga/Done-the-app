@@ -775,6 +775,7 @@ class ContextView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+        print(serializer.errors)  # print validation errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None):
@@ -782,14 +783,34 @@ class ContextView(APIView):
         context.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class AssigneeView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        assignees = Assignee.objects.filter(user=request.user)
+        serializer = AssigneeSerializer(assignees, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_assignees(request):              # get all assignees for the new task organizer wizard and prioritizer
-    assignees = Assignee.objects.filter(user=request.user)
-    serializer = AssigneeSerializer(assignees, many=True)
-    return JsonResponse(serializer.data, safe=False)
+    def post(self, request):
+        print(request.data)
+        serializer = AssigneeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk=None):
+        assignee = get_object_or_404(Assignee, pk=pk, user=request.user)
+        serializer = AssigneeSerializer(assignee, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        assignee = get_object_or_404(Assignee, pk=pk, user=request.user)
+        assignee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

@@ -10,6 +10,7 @@ import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
 import Prioritizer from './components/prioritizer';
 import ContextManager from './components/ContextManager';
+import AssigneeManager from './components/AssigneeManager';
 import WelcomeMessage from './components/welcomeMessage';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
@@ -146,6 +147,10 @@ const App = () => {
                                 <Route 
                                     path="/contextmanager" 
                                     element={user ? <ContextManager /> : <Navigate to="/login" replace />}
+                                />
+                                <Route 
+                                    path="/assigneemanager" 
+                                    element={user ? <AssigneeManager /> : <Navigate to="/login" replace />}
                                 />
                             </Routes>
                         </UserContext.Provider>
