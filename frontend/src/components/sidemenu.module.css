@@ -5,7 +5,7 @@
     z-index: 1;
     left: 1vw;
     top: 1vw;
-    height: 98vh;
+    height: 80px;
     margin: 5px;
     background: #18283b;
     border-radius: 16px;
@@ -22,6 +22,7 @@
 
 .side-menu:hover {
     width: 250px;
+    height: 98vh;
 }
 
 .side-menu .menu-icon {
