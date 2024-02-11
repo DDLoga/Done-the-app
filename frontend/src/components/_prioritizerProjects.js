@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'react-query';
 
-import { fetchProjects } from './_fetchProjects';
-import { updateProjectAPI } from './_updateProject';
-import { deleteProjectsAPI } from './_deleteProjects';
+import { fetchProjectsAPI, updateProjectAPI, deleteProjectsAPI } from './_fetchProjects';
 
 
 
@@ -28,7 +26,7 @@ const ProjectsPrioritizer = () => {
         data: fetchedProjectsData, 
         isLoading:isLoadingProjects, 
         error:errorLoadingProjects 
-    } = useQuery('fetchedProjectsData', fetchProjects);             // use the function { fetchProjects } from './_fetchProjects' and stores data into fetchedProjectsData
+    } = useQuery('fetchedProjectsData', fetchProjectsAPI);             // use the function { fetchProjectsAPI } from './_fetchProjects' and stores data into fetchedProjectsData
     
     const [projectsData, updateProjectsData] = useState([]);        // useState hook to store and update the projects data
     

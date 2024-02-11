@@ -5,7 +5,7 @@ import { fetchTasks } from './_fetchTasks';
 import { updateTaskAPI } from './_updateTask';
 import { deleteTasksAPI } from './_deleteTasks';
 
-import { fetchProjects } from './_fetchProjects';
+import { fetchProjectsAPI } from './_fetchProjects';
 import { fetchContexts } from './_fetchContexts';
 import { fetchAssignees } from './_fetchAssignees';
 import { SelectedRowsContext } from './_prioritizerSelectedRowsContext';    // import the SelectedRowsContext from './SelectedRowsContext'
@@ -69,7 +69,7 @@ const TasksPrioritizer = () => {
     };
 
     //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const { data: projectsData } = useQuery('fetchProjects', fetchProjects); // Fetch the Projects data
+    const { data: projectsData } = useQuery('fetchProjects', fetchProjectsAPI); // Fetch the Projects data
 
     const getProjectName = (parentId) => {              // Function to get the project name from the project id
         const project = projectsData.find((project) => project.id === parentId);
