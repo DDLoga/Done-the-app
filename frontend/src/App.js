@@ -8,6 +8,7 @@ import LoginPage from './components/LoginPage';
 import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
+import NextTaskCapture from './components/NextTaskCapture';
 import Prioritizer from './components/prioritizer';
 import ContextManager from './components/ContextManager';
 import AssigneeManager from './components/AssigneeManager';
@@ -135,6 +136,10 @@ const App = () => {
                                 <Route 
                                     path="/quickTask" 
                                     element={user ? <QuickTaskForm /> : <Navigate to="/login" replace />}
+                                />
+                                <Route 
+                                    path="/nexttaskcapture" 
+                                    element={user ? <NextTaskCapture /> : <Navigate to="/login" replace />}
                                 />
                                 <Route 
                                     path="/newtaskorganizer" 

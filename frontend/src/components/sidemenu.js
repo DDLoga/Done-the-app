@@ -40,8 +40,8 @@ function SideMenu() {
                         <span onClick={() => navigate('/quicktask')}> Quick Task Entry</span>
                     </li>
                     <li>
-                        <FontAwesomeIcon icon={faClipboard} />
-                        <span> New Task capture</span>
+                        <FontAwesomeIcon icon={faClipboard} onClick={() => navigate('nexttaskcapture')}/>
+                        <span onClick={() => navigate('nexttaskcapture')}> New Task capture</span>
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faCalendar} onClick={() => navigate('/newtaskorganizer')}/>
