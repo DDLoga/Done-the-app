@@ -32,7 +32,7 @@ export const updateTaskAPI = async (taskId) => {
 };
 
 export const createTask = async (task) => {
-    return await apiCall('NtoTask/', 'POST', task);
+    return await apiCall('/NtoTask/', 'POST', task);
 };
 
 export const deleteTasksAPI = async (taskIds) => {

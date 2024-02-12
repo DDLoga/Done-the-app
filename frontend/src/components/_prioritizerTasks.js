@@ -4,6 +4,7 @@ import { useQuery, useMutation } from 'react-query';
 import { fetchTasks } from './_fetchTasks';
 import { deleteTasksAPI } from './_fetchTasks';
 import { updateTaskAPI } from './_fetchTasks';
+import { createTask } from './_fetchTasks'
 
 import { fetchProjectsAPI } from './_fetchProjects';
 import { fetchContexts } from './_fetchContexts';
@@ -18,6 +19,7 @@ import { isValid, parseISO, format } from 'date-fns';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import AddIcon from '@mui/icons-material/Add';
 
 const TasksPrioritizer = () => {
 
@@ -306,6 +308,44 @@ const TasksPrioritizer = () => {
         },
     ];
 
+    /////////////////////////////////////////////////////////////// handle creation of task////////////////////////
+    const createTaskMutation = useMutation(createTask, {
+        onSuccess: (data) => {
+            console.log('taskID', data.task_id); // log the new pk
+            setFilteredTasksData((prevTasksData) => [...prevTasksData, { ...data, id: data.task_id }]);
+        },
+    });
+    const fetchWithToken = (url, options) => fetch(url, {           // fetchWithToken to get the user data
+        headers: {
+            'Authorization': `Token ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+        ...options,
+    });
+
+    const handleSubmit = async () => {
+        const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
+        const userData = await userResponse.json();
+        const userId = userData.id;
+        const newTask = {
+            name: newTaskName,
+            parent: projectSelectedRows[0],
+            effort: 0,
+            user: userId,
+        };
+        createTaskMutation.mutate(newTask);
+        setOpenAdd(false);
+        setName(''); // reset name
+    };
+    
+    const [newTaskName, setName] = useState('');                           // dialog box form fields
+    const [openAdd, setOpenAdd] = useState(false); // useState hook to store and update the open state of the add assignee dialog
+    
+    const handleAdd = () => {
+        setOpenAdd(true);
+    };
+
     return (
         <div style={{ position: 'relative', height: 400, width: '100%', overflow: 'auto' }}>
             {isLoadingTasks ? (
@@ -350,6 +390,45 @@ const TasksPrioritizer = () => {
                     </Dialog>
                 </div>
             )}
+            <Fab color="primary" aria-label="add" onClick={handleAdd} style={{ marginRight: 10 }}>
+                <AddIcon />
+            </Fab>
+            <Dialog
+                open={openAdd}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Add Assignee"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Please enter the name and description for the new assignee.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Name"
+                        type="text"
+                        fullWidth
+                        value={newTaskName}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                    {/* <TextField
+                        margin="dense"
+                        label="Description"
+                        type="text"
+                        fullWidth
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                    /> */}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleSubmit} autoFocus>
+                        Add
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
