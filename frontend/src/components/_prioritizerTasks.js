@@ -37,9 +37,12 @@ const TasksPrioritizer = () => {
 
     const [projectSelectedRows, ] = useContext(SelectedRowsContext); // get the projectSelectedRows
 
-    useEffect(() => {                                               // update the filtered tasks data state when the projectSelectedRows changes
-            const updatedTasksData = projectSelectedRows.length > 0 ? tasksData.filter(task => projectSelectedRows.includes(task.parent)) : tasksData;
-            setFilteredTasksData(updatedTasksData);
+    useEffect(() => {                                               
+        const tasks = tasksData || [];                              // initialize with default value to prevent error
+        const updatedTasksData = projectSelectedRows.length > 0 ? 
+            tasks.filter(task => projectSelectedRows.includes(task.parent)) : tasks;
+            
+        setFilteredTasksData(updatedTasksData);
     }, [projectSelectedRows, tasksData]);
 
     const updateTaskMutation = useMutation(updateTaskAPI, {         // function to update task data on the API using useMutation hook with { updateTaskAPI } from './_updateTask';
