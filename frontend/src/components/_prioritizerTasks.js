@@ -2,8 +2,8 @@ import React, { useState, useEffect,useContext } from 'react';
 import { useQuery, useMutation } from 'react-query';
 
 import { fetchTasks } from './_fetchTasks';
-import { updateTaskAPI } from './_updateTask';
-import { deleteTasksAPI } from './_deleteTasks';
+import { deleteTasksAPI } from './_fetchTasks';
+import { updateTaskAPI } from './_fetchTasks';
 
 import { fetchProjectsAPI } from './_fetchProjects';
 import { fetchContexts } from './_fetchContexts';

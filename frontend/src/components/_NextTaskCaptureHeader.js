@@ -92,8 +92,8 @@ const NextTaskCaptureHeader = () => {
                     <StatusSelect 
                         value={project.project_status} 
                         onChange={(e) => setProject({ ...project, project_status: e.target.value })} />
-                    <Button onClick={handlePrevious}>Previous</Button>
-                    <Button onClick={handleNext}>Next</Button>
+                    {currentProjectIndex > 0 && <Button onClick={handlePrevious}>Previous</Button>}
+                    {currentProjectIndex < totalProjects - 1 && <Button onClick={handleNext}>Next</Button>}
                 </div>
                 {/* <TasksPrioritizer projectId={project.id} /> */}
             </LocalizationProvider>
