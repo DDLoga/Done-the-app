@@ -62,7 +62,6 @@ const App = () => {
                 setUser(data.username);  // Set the user state
                 localStorage.setItem('username', data.username);  // Store the username
                 localStorage.setItem('token', data.token);  // Store the token
-                console.log('Login successful:', data);
                 setOpen(false); // Close the dialog box if the login is successful
                 setError(null);  // Clear any previous errors
                 return true;

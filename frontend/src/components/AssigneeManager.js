@@ -7,6 +7,7 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import { fetchWithToken } from './_api';
 import { TextField, Fab, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 
 const AssigneeManager = () => {
@@ -113,14 +114,6 @@ const AssigneeManager = () => {
         },
     });
     
-    const fetchWithToken = (url, options) => fetch(url, {           // fetchWithToken to get the user data
-        headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-        ...options,
-    });
 
     const handleSubmit = async () => {
         const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });

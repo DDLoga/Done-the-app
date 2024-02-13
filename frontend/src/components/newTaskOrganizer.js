@@ -8,6 +8,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import PrioritySelect from './_PrioritySelect';  //importing the priority select component (refactor)
 import DatePicker from './_DatePicker';          //importing the date picker component (refactor)
 import { commonStyles } from './_commonStyles';
+import { fetchWithToken } from './_api';
 
 
 const NewTaskOrganizer = () => {
@@ -44,8 +45,7 @@ const NewTaskOrganizer = () => {
             return response.json();
         })
         .then(data => setTasks(data))
-        // print the details to the console
-        // .then(data => console.log(data))
+
         .catch(error => console.error('Error:', error));
     }, []);
 
@@ -123,14 +123,6 @@ const NewTaskOrganizer = () => {
         setNextAction(event.target.value);
     };
 
-    const fetchWithToken = (url, options) => fetch(url, {
-        headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-        ...options,
-    });
 
     const handleResponse = () => {
         setTasks(tasks.filter(task => task.id !== currentTask.id));
@@ -169,7 +161,6 @@ const NewTaskOrganizer = () => {
         fetchWithToken(url, { method: 'POST', body: JSON.stringify(body) })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 if (taskType === 'project' && nextAction !== '') {
                     fetchWithToken(`${process.env.REACT_APP_API_URL}/quickTask/`, {
                         method: 'POST',
@@ -180,7 +171,6 @@ const NewTaskOrganizer = () => {
                         }),
                     })
                     .then(response => response.json())
-                    .then(data => console.log(data))
                     .catch((error) => {
                         console.error('Error:', error);
                     });

@@ -20,6 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import AddIcon from '@mui/icons-material/Add';
+import { fetchWithToken } from './_api';
 
 const TasksPrioritizer = () => {
 
@@ -76,8 +77,6 @@ const TasksPrioritizer = () => {
     /////////////////////////////////////////////////////////////// handle creation of task BUILDING ////////////////////////
     const createTaskMutation = useMutation(createTask, {
         onSuccess: (data) => {
-            console.log('data', data); // log the new task
-            console.log('taskID', data.task_id); // log the new pk
             const newTask = {
                 assignee: null,
                 complete: false,
@@ -96,14 +95,6 @@ const TasksPrioritizer = () => {
         },
     });
 
-    const fetchWithToken = (url, options) => fetch(url, {           // fetchWithToken to get the user data
-        headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-        ...options,
-    });
 
     const handleSubmit = async () => {
         const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });

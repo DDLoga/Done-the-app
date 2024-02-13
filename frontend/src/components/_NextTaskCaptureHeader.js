@@ -28,11 +28,9 @@ const NextTaskCaptureHeader = () => {
     // selectedRows is used to store the selected rows in the data grid
     const [, setSelectedRowsContext] = React.useContext(SelectedRowsContext); //pass the selectedRows state to the SelectedRowsContext  
     
-    console.log(SelectedRowsContext);
 
     useEffect(() => {
         if (project) {
-            console.log('we got a project ID: ',project.id); 
             setSelectedRowsContext([project.id]);
         }
     }, [project, setProject, setSelectedRowsContext]);

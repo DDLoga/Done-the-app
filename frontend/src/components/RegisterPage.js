@@ -28,13 +28,11 @@ const RegisterPage = () => {
             });
             const data = await response.json();
             if (response.ok && !data.error) {
-                console.log('Registration successful:', data);
                 setError(null);
                 setSuccessDialogMessage('Registration successful. You can now proceed to login');
                 setSuccessDialogOpen(true);
                 return true;
             } else {
-                console.error('Registration failed:', data);
                 setError(data.error || 'Registration failed');
                 const errorMessage = data.username ? data.username[0] : 'Registration failed';
                 setDialogMessage(errorMessage);
