@@ -24,31 +24,31 @@ import AddIcon from '@mui/icons-material/Add';
 const TasksPrioritizer = () => {
 
     //////////////////////////////////////////////////////////////  // TASKS API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const {                                                        // useQuery hook to fetch the tasks data into fetchedTasksData
+    const {                                                        // fetching tasks data to fetchedTasksData by using { fetchTasks } from './_fetchTasks'
         data: fetchedTasksData, 
         isLoading:isLoadingTasks, 
         error:errorLoadingTasks 
-    } = useQuery('fetchedTasksData', fetchTasks);                   // use the function { fetchTasks } from './_fetchTasks' and store the result in fetchedTasksData
+    } = useQuery('fetchedTasksData', fetchTasks);
     
-    const [tasksData, updateTasksData] = useState([]);              // manage the tasks data state
-    const [filteredTasksData, setFilteredTasksData] = useState([]); // manage the filtered tasks data (from projects selection)
+    const [tasksData, updateTasksData] = useState([]);              // declare the tasks data variable and the function to update it
+    const [filteredTasksData, setFilteredTasksData] = useState([]); // filtering tasks based on selected project
 
-    useEffect(() => {                                               // update the tasks data state when the fetchedTasksData changes
+    useEffect(() => {                                               // set tasksData once fetched
         updateTasksData(fetchedTasksData); 
     }, [fetchedTasksData]);
 
-    const [projectSelectedRows, ] = useContext(SelectedRowsContext); // get the projectSelectedRows
+    const [projectSelectedRows, ] = useContext(SelectedRowsContext); // get the selected project IDs from the project table
 
-    useEffect(() => {                                               
-        const tasks = tasksData || [];                              // initialize with default value to prevent error
+    useEffect(() => {                                               // update the filteredTasksData when the projectSelectedRows or tasksData change
+        const tasks = tasksData || [];                              
         const updatedTasksData = projectSelectedRows.length > 0 ? 
             tasks.filter(task => projectSelectedRows.includes(task.parent)) : tasks;
             
         setFilteredTasksData(updatedTasksData);
     }, [projectSelectedRows, tasksData]);
 
-    const updateTaskMutation = useMutation(updateTaskAPI, {         // function to update task data on the API using useMutation hook with { updateTaskAPI } from './_updateTask';
-        onSuccess: (data) => {                                      // onSuccess function to update the tasks data state when the mutation is successful
+    const updateTaskMutation = useMutation(updateTaskAPI, {         // update tasks on the server and locally without refetching
+        onSuccess: (data) => {                                      
             const updatedTasksData = filteredTasksData.map((task) =>
                 task.id === data.id ? data : task
             );
@@ -56,7 +56,7 @@ const TasksPrioritizer = () => {
         },
     });
 
-    const updateTask = (params, field, value) => {                  // Function to update the task data on table edit (used in columns definition)
+    const updateTask = (params, field, value) => {                  // function to collect the updated task and fire the updateTaskMutation
         const updatedTask = filteredTasksData.find((task) => task.id === params.id);
         if (updatedTask) {
             updatedTask[field] = value;
@@ -73,16 +73,65 @@ const TasksPrioritizer = () => {
         setOpen(false);
     };
 
-    //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const { data: projectsData } = useQuery('fetchProjects', fetchProjectsAPI); // Fetch the Projects data
+    /////////////////////////////////////////////////////////////// handle creation of task BUILDING ////////////////////////
+    const createTaskMutation = useMutation(createTask, {
+        onSuccess: (data) => {
+            console.log('data', data); // log the new task
+            console.log('taskID', data.task_id); // log the new pk
+            const newTask = {
+                assignee: null,
+                complete: false,
+                context: null,
+                deadline: null,
+                effort: 0,
+                id: data.task_id,
+                name: data.task_name,
+                new_task: false,
+                parent: data.parent,
+                priority: null,
+                status: "Ns",
+                user: 1
+            };
+            updateTasksData((prevTasksData) => [...prevTasksData, newTask]);
+        },
+    });
 
-    const getProjectName = (parentId) => {              // Function to get the project name from the project id
+    const fetchWithToken = (url, options) => fetch(url, {           // fetchWithToken to get the user data
+        headers: {
+            'Authorization': `Token ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+        ...options,
+    });
+
+    const handleSubmit = async () => {
+        const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
+        const userData = await userResponse.json();
+        const userId = userData.id;
+        const newTask = {
+            name: newTaskName,
+            parent: projectSelectedRows[0],
+            effort: 0,
+            user: userId,
+        };
+        createTaskMutation.mutate(newTask);
+        setOpenAdd(false);
+        setName(''); // reset name
+    };
+
+    //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
+    const {                                                         // fetch project data from the server
+        data: projectsData 
+    } = useQuery('fetchProjects', fetchProjectsAPI); 
+
+    const getProjectName = (parentId) => {                          // Function translate the project id to the project name
         const project = projectsData.find((project) => project.id === parentId);
         return project ? project.project_name : '';
     };
 
     ///////////////////////////////////////////////////////////////////////  // DIALOG BOX //  ///////////////////////////////////////////////////////////////////////
-    const [open, setOpen] = React.useState(false);                // useState hook to store and update the open state of the delete confirmation dialog
+    const [open, setOpen] = React.useState(false);                  // delete dialog states
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -91,13 +140,15 @@ const TasksPrioritizer = () => {
     };
 
     //////////////////////////////////////////////////////////////  // CONTEXTS AND ASSIGNEES API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const {                                                             // useQuery hook to fetch the contexts data into contextsData
+    const {                                                             // fetch contexts data from the server
         data: contextsData, 
         isLoading:isLoadingContexts, 
         error:errorLoadingContexts
     } = useQuery('fetchContexts', fetchContexts);
-    const [contextToIdMapping, setContextToIdMapping] = useState({});   // useState hook to store and update the contexts data
-    useEffect(() => {                                                   // useEffect hook to update the contexts data state when the fetchedContextsData changes
+    
+    const [contextToIdMapping, setContextToIdMapping] = useState({});   // populating the context list dropdown
+    
+    useEffect(() => {                                                   // load the context list once the contextsData is fetched
         if (contextsData) {
             let mapping = {};
             contextsData.forEach(context => {
@@ -107,13 +158,14 @@ const TasksPrioritizer = () => {
         }
     }, [contextsData]);
 
-    const {                                                             // useQuery hook to fetch the assignees data into assigneesData
+    const {                                                             // fetch assignees data from the server
         data: assigneesData, 
         isLoading:isLoadingAssignees, 
         error:errorLoadingAssignees 
     } = useQuery('fetchAssignees', fetchAssignees);
-    const [assigneeToIdMapping, setAssigneeToIdMapping] = useState({}); // useState hook to store and update the assignees data
-    useEffect(() => {                                                   // useEffect hook to update the assignees data state when the fetchedAssigneesData changes
+
+    const [assigneeToIdMapping, setAssigneeToIdMapping] = useState({}); // populating the assignee list dropdown
+    useEffect(() => {                                                   // fetch the assignee list once the assigneesData is fetched
         if (assigneesData) {
             let mapping = {};
             assigneesData.forEach(assignee => {
@@ -123,11 +175,9 @@ const TasksPrioritizer = () => {
         }
     }, [assigneesData]);
 
-    // selectedRows is used to store the selected rows in the data grid
-    const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
-
     ///////////////////////////////////////////////////////////////////////  // task table columns definition//  ///////////////////////////////////////////////////////////////////////
-    const taskColumns = [
+    const [selectedRows, setSelectedRows] = useState([]);               // Initialize tasks selectedRows with an empty array
+    const taskColumns = [                                               // Define the columns for the task table
         // name
         {
             field: 'name',
@@ -308,36 +358,12 @@ const TasksPrioritizer = () => {
         },
     ];
 
-    /////////////////////////////////////////////////////////////// handle creation of task////////////////////////
-    const createTaskMutation = useMutation(createTask, {
-        onSuccess: (data) => {
-            console.log('taskID', data.task_id); // log the new pk
-            setFilteredTasksData((prevTasksData) => [...prevTasksData, { ...data, id: data.task_id }]);
-        },
-    });
-    const fetchWithToken = (url, options) => fetch(url, {           // fetchWithToken to get the user data
-        headers: {
-            'Authorization': `Token ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-        ...options,
-    });
 
-    const handleSubmit = async () => {
-        const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
-        const userData = await userResponse.json();
-        const userId = userData.id;
-        const newTask = {
-            name: newTaskName,
-            parent: projectSelectedRows[0],
-            effort: 0,
-            user: userId,
-        };
-        createTaskMutation.mutate(newTask);
+    // create the handleCloseNewTask function to close the dialog box
+    const handleCloseNewTask = () => {
         setOpenAdd(false);
-        setName(''); // reset name
     };
+
     
     const [newTaskName, setName] = useState('');                           // dialog box form fields
     const [openAdd, setOpenAdd] = useState(false); // useState hook to store and update the open state of the add assignee dialog
@@ -395,7 +421,7 @@ const TasksPrioritizer = () => {
             </Fab>
             <Dialog
                 open={openAdd}
-                onClose={handleClose}
+                onClose={handleCloseNewTask}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -423,7 +449,7 @@ const TasksPrioritizer = () => {
                     /> */}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleCloseNewTask}>Cancel</Button>
                     <Button onClick={handleSubmit} autoFocus>
                         Add
                     </Button>

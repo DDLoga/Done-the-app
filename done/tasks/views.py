@@ -690,10 +690,13 @@ class NtoTaskView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print(request.data)
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             task = serializer.save(user=request.user)
-            return Response({'task_id': task.id}, status=status.HTTP_201_CREATED)
+            # print task and all its fields
+            print(task.__dict__)
+            return Response({'task_id': task.id, 'task_name': task.name, 'parent': task.parent_id}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None):
