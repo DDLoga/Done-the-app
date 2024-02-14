@@ -72,28 +72,35 @@ const NextTaskCaptureHeader = () => {
 
     return (
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <div>
-                    <p>Project {currentProjectIndex + 1} of {totalProjects}</p>
-                    <TextField
-                        label="Project Name" 
-                        value={project.project_name} 
-                        onChange={(e) => setProject({ ...project, project_name: e.target.value })} />
-                    <DatePicker 
-                        label="Deadline"
-                        value={new Date(project.project_deadline)} 
-                        onChange={(date) => setProject({ ...project, project_deadline: date.toISOString().split('T')[0] })} 
-                    />
-                    <PrioritySelect 
-                        value={project.project_priority} 
-                        onChange={(e) => setProject({ ...project, project_priority: e.target.value })} 
-                    />
-                    <StatusSelect 
-                        value={project.project_status} 
-                        onChange={(e) => setProject({ ...project, project_status: e.target.value })} />
-                    {currentProjectIndex > 0 && <Button onClick={handlePrevious}>Previous</Button>}
-                    {currentProjectIndex < totalProjects - 1 && <Button onClick={handleNext}>Next</Button>}
+                <div className="flex flex-col space-y-4">
+                    <div>
+                        <p className="mb-12">Project <span className="font-bold text-yellow-300 text-4xl ">{currentProjectIndex + 1}</span> of <span className="font-bold text-blue-500 text-4xl">{totalProjects}</span></p>
+                        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4">
+                            <TextField
+                                label="Project Name" 
+                                value={project.project_name} 
+                                onChange={(e) => setProject({ ...project, project_name: e.target.value })} 
+                            />
+                            <DatePicker 
+                                label="Deadline"
+                                value={new Date(project.project_deadline)} 
+                                onChange={(date) => setProject({ ...project, project_deadline: date.toISOString().split('T')[0] })} 
+                            />
+                            <PrioritySelect 
+                                value={project.project_priority} 
+                                onChange={(e) => setProject({ ...project, project_priority: e.target.value })} 
+                            />
+                            <StatusSelect 
+                                value={project.project_status} 
+                                onChange={(e) => setProject({ ...project, project_status: e.target.value })} 
+                            />
+                        </div>
+                    </div>
+                    <div className="flex">
+                        {currentProjectIndex > 0 && <Button onClick={handlePrevious}>Previous</Button>}
+                        {currentProjectIndex < totalProjects - 1 && <Button onClick={handleNext}>Next</Button>}
+                    </div>
                 </div>
-                {/* <TasksPrioritizer projectId={project.id} /> */}
             </LocalizationProvider>
     );
 };
