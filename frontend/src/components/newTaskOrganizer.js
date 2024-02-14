@@ -9,6 +9,7 @@ import PrioritySelect from './_PrioritySelect';  //importing the priority select
 import DatePicker from './_DatePicker';          //importing the date picker component (refactor)
 import { commonStyles } from './_commonStyles';
 import { fetchWithToken } from './_api';
+import { Slider, Box } from '@mui/material';
 
 
 const NewTaskOrganizer = () => {
@@ -214,7 +215,7 @@ const NewTaskOrganizer = () => {
 
     return (
         <BaseLayout headerContent={headerContent}>
-            <div className="flex flex-col text-white p-6 space-y-4">
+            <div className="flex flex-col text-white p-6 space-y-4 space-x-12 ">
                 <div>
                     <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 max-w-screen-sm">
                         <div>
@@ -293,9 +294,8 @@ const NewTaskOrganizer = () => {
             
                 {taskType === "task" && (
                     <>
-                    <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 space-x-12 max-w-screen-sm">
-                    {/* <div className="flex flex-row space-x-12 justify-center"> */}
-                        <div className="flex flex-col space-y-4">
+                    <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 max-w-screen-sm">
+                        <div className="flex flex-col space-y-4 w-full sm:w-auto">
                             <TextField
                                 value={filter}
                                 onChange={(e) => setFilter(e.target.value)}
@@ -327,7 +327,7 @@ const NewTaskOrganizer = () => {
                                 ))}
                             </List>
                         </div>
-                        <div className="flex flex-col space-y-4">
+                        <div className="flex flex-col space-y-4 w-full sm:w-auto">
                             <div className="flex flex-col space-y-4">
                                 <PrioritySelect value={priority} onChange={handlePriorityChange} />
                                 <DatePicker value={deadline} onChange={handleDeadlineChange} />
@@ -348,12 +348,22 @@ const NewTaskOrganizer = () => {
                                     ))}
                                     </Select>
                                 </FormControl>
-                                <TextField
-                                    value={effort}
-                                    label="Effort (min)"
-                                    onChange={handleEffortChange}
-                                    sx={{ ...commonStyles, maxWidth: 100 }}
-                                />
+                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ...commonStyles, maxWidth: '100%' }}>
+                                    <TextField
+                                        value={effort}
+                                        label="Effort (min)"
+                                        onChange={handleEffortChange}
+                                        fullWidth
+                                    />
+                                    <Slider
+                                        value={effort}
+                                        min={0}
+                                        max={60}
+                                        step={5}
+                                        onChange={handleEffortChange}
+                                        valueLabelDisplay="auto"
+                                    />
+                                </Box>
                             </div>
                         </div>
                     </div>
