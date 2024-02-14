@@ -6,7 +6,7 @@ function BaseLayout({ children, headerContent }) {
             <header className="p-6 bg-gray-800 border-b border-gray-700 pl-24">
                 {headerContent}
             </header>
-            <main className="flex-grow pl-24 p-6">
+            <main className="flex-grow p-6"> 
                 {children}
             </main>
             <footer className="pl-24 p-6 bg-gray-800 border-t border-gray-700">
