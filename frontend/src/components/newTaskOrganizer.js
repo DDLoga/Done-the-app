@@ -299,7 +299,7 @@ const NewTaskOrganizer = () => {
                             <TextField
                                 value={filter}
                                 onChange={(e) => setFilter(e.target.value)}
-                                label="Filter projects"
+                                label="Find a related project"
                                 sx={commonStyles}
                             />
 

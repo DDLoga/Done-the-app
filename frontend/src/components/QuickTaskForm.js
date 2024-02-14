@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert';
 import { TextField, Button, CircularProgress } from '@mui/material';
 
 const QuickTaskForm = () => {
+    const headerContent = "New Task Capture";
     const [task, setTask] = useState('');
     const [isLoading, setIsLoading] = useState(false);                  // handle loading state for the spinner
 
@@ -56,10 +57,10 @@ const QuickTaskForm = () => {
     };
 
     return (
-        <BaseLayout>
+        <BaseLayout headerContent={headerContent}>
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <div className={styles.logo}>Logo</div>
+                    {/* <div className={styles.logo}>Logo</div> */}
                     <h2 className={styles.subtitle}>Clear your mind</h2>
                 </div>
                 <div className={styles.formBlock} onSubmit={handleSubmit}>
@@ -72,7 +73,7 @@ const QuickTaskForm = () => {
                             variant="outlined"
                             fullWidth
                             color="primary"
-                            placeholder="Write your task here, separate with a new line"
+                            placeholder="Write here your task, thoughts or whatever is in your head. We'll figure it out together."
                         />
                         <Button 
                             type="submit" 
