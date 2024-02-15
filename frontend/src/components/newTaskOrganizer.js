@@ -215,10 +215,10 @@ const NewTaskOrganizer = () => {
 
     return (
         <BaseLayout headerContent={headerContent}>
-            <div className="flex flex-col text-white p-6 space-y-4 space-x-12 ">
+            <div className="flex flex-col text-white p-6 space-y-4 ">
                 <div>
-                    <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 max-w-screen-sm">
-                        <div>
+                <div className="flex flex-col sm:flex-row justify-center mx-auto space-y-4 sm:space-y-6 space-x-0 sm:space-x-12 max-w-screen-sm">
+                        <div className="flex flex-col space-y-4 w-full sm:w-auto">
                             <h1 className="text-2xl mb-4" style={{ color: "#579BFC" }}>
                             {tasks.length} remaining entries
                             </h1>
@@ -235,7 +235,7 @@ const NewTaskOrganizer = () => {
                             />
                             )}
                         </div>
-                        <div>
+                        <div className="flex flex-col space-y-4 w-full sm:w-auto">
                             <h2 className="text-lg mb-4" style={{ color: "#579BFC" }}>
                             What is this?
                             </h2>
@@ -294,7 +294,7 @@ const NewTaskOrganizer = () => {
             
                 {taskType === "task" && (
                     <>
-                    <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 max-w-screen-sm">
+                    <div className="flex flex-col sm:flex-row justify-between mx-auto space-y-4 sm:space-y-0 space-x-0 sm:space-x-6 max-w-screen-sm">
                         <div className="flex flex-col space-y-4 w-full sm:w-auto">
                             <TextField
                                 value={filter}
