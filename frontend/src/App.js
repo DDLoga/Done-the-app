@@ -13,6 +13,7 @@ import Prioritizer from './components/prioritizer';
 import ContextManager from './components/ContextManager';
 import AssigneeManager from './components/AssigneeManager';
 import WelcomeMessage from './components/welcomeMessage';
+import Calendar from './components/Calendar';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -155,6 +156,10 @@ const App = () => {
                                 <Route 
                                     path="/assigneemanager" 
                                     element={user ? <AssigneeManager /> : <Navigate to="/login" replace />}
+                                />
+                                <Route 
+                                    path="/calendar" 
+                                    element={user ? <Calendar /> : <Navigate to="/login" replace />}
                                 />
                             </Routes>
                         </UserContext.Provider>

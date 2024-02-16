@@ -21,6 +21,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import AddIcon from '@mui/icons-material/Add';
 import { fetchWithToken } from './_api';
+import { getProjectPriority, getTaskDeadline, getTodayDate, getTaskPriority, calculateUrgency, calculateProjectPriorityScore, calculateTaskPriorityScore, calculateCompoundPriority } from './_prioritizerCompoundPriority';
 
 const TasksPrioritizer = () => {
 
@@ -74,20 +75,19 @@ const TasksPrioritizer = () => {
         setOpen(false);
     };
 
-    /////////////////////////////////////////////////////////////// handle creation of task BUILDING ////////////////////////
-    const createTaskMutation = useMutation(createTask, {
+    const createTaskMutation = useMutation(createTask, {            // create a new task on the server and locally without refetching
         onSuccess: (data) => {
             const newTask = {
                 assignee: null,
                 complete: false,
                 context: null,
                 deadline: null,
-                effort: 0,
+                effort: 30,
                 id: data.task_id,
                 name: data.task_name,
                 new_task: false,
                 parent: data.parent,
-                priority: null,
+                priority: 'A',
                 status: "Ns",
                 user: 1
             };
@@ -95,13 +95,13 @@ const TasksPrioritizer = () => {
         },
     });
 
-
     const handleSubmit = async () => {
         const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
         const userData = await userResponse.json();
         const userId = userData.id;
         const newTask = {
             name: newTaskName,
+            priority: 'A',
             parent: projectSelectedRows[0],
             effort: 0,
             user: userId,
@@ -120,6 +120,7 @@ const TasksPrioritizer = () => {
         const project = projectsData.find((project) => project.id === parentId);
         return project ? project.project_name : '';
     };
+
 
     ///////////////////////////////////////////////////////////////////////  // DIALOG BOX //  ///////////////////////////////////////////////////////////////////////
     const [open, setOpen] = React.useState(false);                  // delete dialog states
@@ -210,6 +211,34 @@ const TasksPrioritizer = () => {
                     <MenuItem value="C">C</MenuItem>
                     <MenuItem value="D">D</MenuItem>
                 </Select>
+            ),
+        },
+        {
+            field: 'compoundPriority',
+            headerName: 'Compound Priority',
+            width: 130,
+            valueGetter: (params) => {
+                // list the whole attribute lists of params
+                const projectPriority = getProjectPriority(params.row.parent, projectsData);
+                const taskDeadline = getTaskDeadline(params.row.deadline);
+                const todayDate = getTodayDate();
+                const taskPriority = getTaskPriority(params.row.priority);
+                const urgency = calculateUrgency(taskDeadline, todayDate);
+            
+                const projectPriorityScore = calculateProjectPriorityScore(projectPriority);
+                console.log('projectPriority', projectPriority);
+                console.log('projectPriorityScore', projectPriorityScore);
+                const taskPriorityScore = calculateTaskPriorityScore(taskPriority);
+
+
+                return calculateCompoundPriority(taskPriorityScore, projectPriorityScore, urgency);
+            },
+            renderCell: (params) => (
+                <Tooltip title={params.value ? params.value.toString() : ''} enterDelay={500}>
+                    <div>
+                        {params.value}
+                    </div>
+                </Tooltip>
             ),
         },
         // deadline date picker

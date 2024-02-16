@@ -10,47 +10,46 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { SelectedRowsContext } from './_prioritizerSelectedRowsContext';
 
 const NextTaskCaptureHeader = () => {
-    const { 
+    const {                                                                 // fetch projects data
         data: fetchedProjectsData, 
         isLoading: isLoadingProjects, 
         error: errorLoadingProjects, 
         refetch
     } = useQuery('fetchedProjectsData', fetchProjectsAPI);
-    const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
-    const [project, setProject] = useState(fetchedProjectsData ? fetchedProjectsData[currentProjectIndex] : null);
-    useEffect(() => {
+
+    const [currentProjectIndex, setCurrentProjectIndex] = useState(0);      // project index counter
+
+    const [project, setProject] = useState(                                 // load the current project data    
+        fetchedProjectsData ? 
+        fetchedProjectsData[currentProjectIndex] : null);
+    
+    useEffect(() => {                                                       // load project data when the project index changes
         if (fetchedProjectsData) {
             setProject(fetchedProjectsData[currentProjectIndex]);
         }
     }, [fetchedProjectsData, currentProjectIndex]);
 
-
-    // selectedRows is used to store the selected rows in the data grid
-    const [, setSelectedRowsContext] = React.useContext(SelectedRowsContext); //pass the selectedRows state to the SelectedRowsContext  
+    const [, setSelectedRowsContext] = React.useContext(SelectedRowsContext); //pass project ID as filter for tasks
     
-
-    useEffect(() => {
+    useEffect(() => {                                                        // update the project ID to pass to context    
         if (project) {
             setSelectedRowsContext([project.id]);
         }
     }, [project, setProject, setSelectedRowsContext]);
 
-
-
-
-    const handleNext = async () => {
+    const handleNext = async () => {                                            // handle next project 
         await handleUpdate();
         setCurrentProjectIndex((prevIndex) => prevIndex + 1);
         setProject(fetchedProjectsData[currentProjectIndex]);
     };
 
-    const handlePrevious = async () => {
+    const handlePrevious = async () => {                                    // handle previous project
         await handleUpdate();
         setCurrentProjectIndex((prevIndex) => prevIndex - 1);
         setProject(fetchedProjectsData[currentProjectIndex]);
     };
 
-    const handleUpdate = async () => {
+    const handleUpdate = async () => {                                      // save to API
         try {
             await updateProjectAPI({ projectId: project.id, updatedProject: project });
             refetch();
@@ -79,20 +78,24 @@ const NextTaskCaptureHeader = () => {
                             <TextField
                                 label="Project Name" 
                                 value={project.project_name} 
-                                onChange={(e) => setProject({ ...project, project_name: e.target.value })} 
+                                onChange={(e) => setProject({ ...project, project_name: e.target.value })}
+                                onBlur={handleUpdate} 
                             />
                             <DatePicker 
                                 label="Deadline"
                                 value={new Date(project.project_deadline)} 
-                                onChange={(date) => setProject({ ...project, project_deadline: date.toISOString().split('T')[0] })} 
+                                onChange={(date) => setProject({ ...project, project_deadline: date.toISOString().split('T')[0] })}
+                                onBlur={handleUpdate} 
                             />
                             <PrioritySelect 
                                 value={project.project_priority} 
-                                onChange={(e) => setProject({ ...project, project_priority: e.target.value })} 
+                                onChange={(e) => setProject({ ...project, project_priority: e.target.value })}
+                                onBlur={handleUpdate} 
                             />
                             <StatusSelect 
                                 value={project.project_status} 
-                                onChange={(e) => setProject({ ...project, project_status: e.target.value })} 
+                                onChange={(e) => setProject({ ...project, project_status: e.target.value })}
+                                onBlur={handleUpdate} 
                             />
                         </div>
                     </div>
