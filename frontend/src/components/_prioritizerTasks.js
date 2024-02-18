@@ -219,6 +219,9 @@ const TasksPrioritizer = () => {
             valueGetter: (params) => {
                 // list the whole attribute lists of params
                 const projectPriority = getProjectPriority(params.row.parent, projectsData);
+                console.log('projectsData', projectsData);
+                console.log('params.row.parent', params.row.parent);
+                console.log('projectPriority', projectPriority);
                 const taskDeadline = getTaskDeadline(params.row.deadline);
                 const todayDate = getTodayDate();
                 const taskPriority = getTaskPriority(params.row.priority);

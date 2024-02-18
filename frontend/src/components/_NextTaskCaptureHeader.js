@@ -38,33 +38,40 @@ const NextTaskCaptureHeader = () => {
     useEffect(() => {                                                        // update the project ID to pass to context    
         if (project) {
             setSelectedRowsContext([project.id]);
+            console.log('SelectedRowsContext updated:', [project.id]);
         }
     }, [project, setProject, setSelectedRowsContext]);
 
-    const handleNext = async () => {                                            // handle next project 
-        await handleUpdate();
+    const handleNext = () => {                                           
         setCurrentProjectIndex((prevIndex) => prevIndex + 1);
         setProject(fetchedProjectsData[currentProjectIndex]);
     };
-
-    const handlePrevious = async () => {                                    // handle previous project
-        await handleUpdate();
+    
+    const handlePrevious = () => {                                   
         setCurrentProjectIndex((prevIndex) => prevIndex - 1);
         setProject(fetchedProjectsData[currentProjectIndex]);
     };
 
-    const [inputValue, setInputValue] = useState(project.project_name);     // allow project text field to be editable
+    const [inputValue, setInputValue] = useState('');                           // allow project text field to be editable
 
-    
-    const handleUpdate = async () => {                                      // save to API
-        try {
-            await updateProjectAPI({ projectId: project.id, updatedProject: project });
-            refetch();
-            // handle success
-        } catch (error) {
-            // handle error
+    useEffect(() => {                                                           // load the project name into the text field  
+        if (project) {
+            setInputValue(project.project_name);
         }
-    };
+    }, [project]);    
+
+    useEffect(() => {
+        const handleUpdate = async () => {                                      // save to API
+            try {
+                await updateProjectAPI({ projectId: project.id, updatedProject: project });
+                refetch();
+                // handle success
+            } catch (error) {
+                // handle error
+            }
+        };
+        handleUpdate();
+    }, [project, refetch]);
 
     if (isLoadingProjects) return 'Loading...';
     if (errorLoadingProjects) return 'An error has occurred: ' + errorLoadingProjects.message;
