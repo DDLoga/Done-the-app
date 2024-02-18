@@ -45,7 +45,6 @@ const TasksPrioritizer = () => {
         const tasks = tasksData || [];                              
         const updatedTasksData = projectSelectedRows.length > 0 ? 
             tasks.filter(task => projectSelectedRows.includes(task.parent)) : tasks;
-            
         setFilteredTasksData(updatedTasksData);
     }, [projectSelectedRows, tasksData]);
 
@@ -226,8 +225,7 @@ const TasksPrioritizer = () => {
                 const urgency = calculateUrgency(taskDeadline, todayDate);
             
                 const projectPriorityScore = calculateProjectPriorityScore(projectPriority);
-                console.log('projectPriority', projectPriority);
-                console.log('projectPriorityScore', projectPriorityScore);
+
                 const taskPriorityScore = calculateTaskPriorityScore(taskPriority);
 
 

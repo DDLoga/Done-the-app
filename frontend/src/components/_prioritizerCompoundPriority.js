@@ -60,9 +60,6 @@ export const calculateTaskPriorityScore = (taskPriority) => {
 };
 
 export const calculateCompoundPriority = (taskPriorityScore, projectPriorityScore, urgency) => {
-    console.log('taskPriorityScore', taskPriorityScore);
-    console.log('projectPriorityScore', projectPriorityScore);
-    console.log('urgency', urgency);
     return Math.round(taskPriorityScore * projectPriorityScore * urgency * 100);
 };
 

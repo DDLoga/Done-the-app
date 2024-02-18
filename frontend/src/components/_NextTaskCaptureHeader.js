@@ -22,7 +22,11 @@ const NextTaskCaptureHeader = () => {
     const [project, setProject] = useState(                                 // load the current project data    
         fetchedProjectsData ? 
         fetchedProjectsData[currentProjectIndex] : null);
-    
+
+    useEffect(() => {
+        console.log('Project updated:', project);
+    }, [project]);
+
     useEffect(() => {                                                       // load project data when the project index changes
         if (fetchedProjectsData) {
             setProject(fetchedProjectsData[currentProjectIndex]);
@@ -49,6 +53,9 @@ const NextTaskCaptureHeader = () => {
         setProject(fetchedProjectsData[currentProjectIndex]);
     };
 
+    const [inputValue, setInputValue] = useState(project.project_name);     // allow project text field to be editable
+
+    
     const handleUpdate = async () => {                                      // save to API
         try {
             await updateProjectAPI({ projectId: project.id, updatedProject: project });
@@ -75,27 +82,27 @@ const NextTaskCaptureHeader = () => {
                     <div>
                         <p className="mb-12">Project <span className="font-bold text-yellow-300 text-4xl ">{currentProjectIndex + 1}</span> of <span className="font-bold text-blue-500 text-4xl">{totalProjects}</span></p>
                         <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4">
+                            
                             <TextField
                                 label="Project Name" 
-                                value={project.project_name} 
-                                onChange={(e) => setProject({ ...project, project_name: e.target.value })}
-                                onBlur={handleUpdate} 
+                                value={inputValue} 
+                                onChange={(e) => setInputValue(e.target.value)}
+                                onBlur={(e) => setProject({ ...project, project_name: inputValue })}
                             />
                             <DatePicker 
                                 label="Deadline"
                                 value={new Date(project.project_deadline)} 
                                 onChange={(date) => setProject({ ...project, project_deadline: date.toISOString().split('T')[0] })}
-                                onBlur={handleUpdate} 
                             />
                             <PrioritySelect 
                                 value={project.project_priority} 
-                                onChange={(e) => setProject({ ...project, project_priority: e.target.value })}
-                                onBlur={handleUpdate} 
+                                onChange={(e) => {
+                                    setProject({ ...project, project_priority: e.target.value });
+                                }}
                             />
                             <StatusSelect 
                                 value={project.project_status} 
                                 onChange={(e) => setProject({ ...project, project_status: e.target.value })}
-                                onBlur={handleUpdate} 
                             />
                         </div>
                     </div>
