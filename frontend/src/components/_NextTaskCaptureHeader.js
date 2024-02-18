@@ -23,9 +23,6 @@ const NextTaskCaptureHeader = () => {
         fetchedProjectsData ? 
         fetchedProjectsData[currentProjectIndex] : null);
 
-    useEffect(() => {
-        console.log('Project updated:', project);
-    }, [project]);
 
     useEffect(() => {                                                       // load project data when the project index changes
         if (fetchedProjectsData) {
@@ -38,7 +35,6 @@ const NextTaskCaptureHeader = () => {
     useEffect(() => {                                                        // update the project ID to pass to context    
         if (project) {
             setSelectedRowsContext([project.id]);
-            console.log('SelectedRowsContext updated:', [project.id]);
         }
     }, [project, setProject, setSelectedRowsContext]);
 

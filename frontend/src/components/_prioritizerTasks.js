@@ -111,9 +111,16 @@ const TasksPrioritizer = () => {
     };
 
     //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const {                                                         // fetch project data from the server
-        data: projectsData 
-    } = useQuery('fetchProjects', fetchProjectsAPI); 
+
+    const { 
+        data: projectsData,
+        refetch: refetchProjects 
+    } = useQuery('fetchProjects', fetchProjectsAPI);
+
+    useEffect(() => {
+        refetchProjects();
+        console.log('refetchProjects');
+    }, [projectSelectedRows, refetchProjects]);
 
     const getProjectName = (parentId) => {                          // Function translate the project id to the project name
         const project = projectsData.find((project) => project.id === parentId);
@@ -219,9 +226,8 @@ const TasksPrioritizer = () => {
             valueGetter: (params) => {
                 // list the whole attribute lists of params
                 const projectPriority = getProjectPriority(params.row.parent, projectsData);
-                console.log('projectsData', projectsData);
-                console.log('params.row.parent', params.row.parent);
                 console.log('projectPriority', projectPriority);
+                console.log('params.row', params.row); 
                 const taskDeadline = getTaskDeadline(params.row.deadline);
                 const todayDate = getTodayDate();
                 const taskPriority = getTaskPriority(params.row.priority);
