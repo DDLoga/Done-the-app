@@ -1,0 +1,37 @@
+/* BigCalendarMondayDarkTheme.css */
+
+.rbc-calendar {
+    background-color: #17181A;
+    color: #FFFFFF;
+}
+
+.rbc-header {
+    background-color: #1F2123;
+    color: #FFFFFF;
+}
+
+.rbc-today {
+    background-color: #2B2D30;
+}
+
+.rbc-event {
+    background-color: #00C875;
+    color: #FFFFFF;
+}
+
+.rbc-toolbar button {
+    color: #FFFFFF;
+}
+
+.rbc-btn-group button {
+    color: #FFFFFF;
+    background-color: #1F2123;
+}
+
+.rbc-off-range {
+    color: #888888;
+}
+
+.rbc-off-range-bg {
+    background: #1F2123;
+}

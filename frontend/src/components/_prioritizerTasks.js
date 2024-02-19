@@ -221,7 +221,7 @@ const TasksPrioritizer = ({ columns }) => {
         },
         {
             field: 'compoundPriority',
-            headerName: 'Compound Priority',
+            headerName: 'Priority Score',
             width: 130,
             valueGetter: (params) => {
                 // list the whole attribute lists of params
@@ -230,12 +230,8 @@ const TasksPrioritizer = ({ columns }) => {
                 const todayDate = getTodayDate();
                 const taskPriority = getTaskPriority(params.row.priority);
                 const urgency = calculateUrgency(taskDeadline, todayDate);
-            
                 const projectPriorityScore = calculateProjectPriorityScore(projectPriority);
-
                 const taskPriorityScore = calculateTaskPriorityScore(taskPriority);
-
-
                 return calculateCompoundPriority(taskPriorityScore, projectPriorityScore, urgency);
             },
             renderCell: (params) => (
@@ -399,7 +395,7 @@ const TasksPrioritizer = ({ columns }) => {
     };
 
     return (
-        <div className="relative h-1/2 w-full overflow-auto">
+        <div>
             {isLoadingTasks ? (
                 <CircularProgress /> // Display a loading spinner if the tasks are still loading
             ) : errorLoadingTasks ? (
