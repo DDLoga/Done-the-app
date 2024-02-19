@@ -9,7 +9,8 @@ import UserContext from './components/UserContext';
 import QuickTaskForm from './components/QuickTaskForm';
 import NewTaskOrganizer from './components/newTaskOrganizer';
 import NextTaskCapture from './components/NextTaskCapture';
-import Prioritizer from './components/prioritizer';
+import PrioritizerTasks from './components/prioritizerTasks';
+import PrioritizerProjects from './components/prioritizerProjects';
 import ContextManager from './components/ContextManager';
 import AssigneeManager from './components/AssigneeManager';
 import WelcomeMessage from './components/welcomeMessage';
@@ -145,9 +146,17 @@ const App = () => {
                                     path="/newtaskorganizer" 
                                     element={user ? <NewTaskOrganizer /> : <Navigate to="/login" replace />}
                                 />
-                                <Route 
+                                {/* <Route                                              // discontinued, too complex and useless
                                     path="/prioritizer" 
                                     element={user ? <Prioritizer /> : <Navigate to="/login" replace />}
+                                /> */}
+                                <Route 
+                                    path="/prioritizerProjects" 
+                                    element={user ? <PrioritizerProjects /> : <Navigate to="/login" replace />}
+                                />
+                                <Route 
+                                    path="/prioritizerTasks" 
+                                    element={user ? <PrioritizerTasks /> : <Navigate to="/login" replace />}
                                 />
                                 <Route 
                                     path="/contextmanager" 

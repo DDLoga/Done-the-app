@@ -40,8 +40,6 @@ const ProjectsPrioritizer = () => {
                 project.id === data.id ? data : project
             );
             updateProjectsData(updatedProjectsData);
-            console.log('Project updated successfully', updatedProjectsData);
-            setSelectedRowsContext(selectedRows);
         },
     });
     

@@ -46,7 +46,6 @@ const TasksPrioritizer = () => {
         const updatedTasksData = projectSelectedRows.length > 0 ? 
             tasks.filter(task => projectSelectedRows.includes(task.parent)) : tasks;
         setFilteredTasksData(updatedTasksData);
-        console.log('projectSelectedRows on the task', projectSelectedRows);
     }, [projectSelectedRows, tasksData]);
 
     const updateTaskMutation = useMutation(updateTaskAPI, {         // update tasks on the server and locally without refetching
@@ -398,7 +397,7 @@ const TasksPrioritizer = () => {
     };
 
     return (
-        <div className="relative h-96 w-full overflow-auto">
+        <div className="relative h-1/2 w-full overflow-auto">
             {isLoadingTasks ? (
                 <CircularProgress /> // Display a loading spinner if the tasks are still loading
             ) : errorLoadingTasks ? (

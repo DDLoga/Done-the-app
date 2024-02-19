@@ -47,9 +47,17 @@ function SideMenu() {
                         <FontAwesomeIcon icon={faClipboard} onClick={() => navigate('nexttaskcapture')}/>
                         <span onClick={() => navigate('nexttaskcapture')}> New Task capture</span>
                     </li>
-                    <li>
+                    {/* <li>                                    // discontinued, too complex and useless
                         <FontAwesomeIcon icon={faList} />
                         <span onClick={() => navigate('/prioritizer')}> Prioritizer </span>
+                    </li> */}
+                    <li>
+                        <FontAwesomeIcon icon={faList} />
+                        <span onClick={() => navigate('/prioritizerProjects')}> Manage your Projects </span>
+                    </li>
+                    <li>
+                        <FontAwesomeIcon icon={faList} />
+                        <span onClick={() => navigate('/prioritizerTasks')}> Manage your Tasks </span>
                     </li>
                     <li>
                         <FontAwesomeIcon icon={faBook} />
