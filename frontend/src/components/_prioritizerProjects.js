@@ -171,7 +171,7 @@ const ProjectsPrioritizer = () => {
 
 
     return (
-        <div style={{ position: 'relative', height: 400, width: '100%', overflow: 'auto' }}>
+        <div className="relative h-1/2 w-full overflow-auto">
             {isLoadingProjects ? (
                 <CircularProgress /> // Display a loading spinner if the projects are still loading
             ) : errorLoadingProjects ? (
