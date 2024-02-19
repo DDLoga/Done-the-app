@@ -13,16 +13,17 @@ const Calendar = () => {
     const events = []; // You can replace this with your events data
     const [selectedRowsContext, setSelectedRowsContext] = useState([]);
     const headerContent = "Calendar";
+    const columns = ['Name', 'Compound Priority'];
     return (
         <BaseLayout headerContent={headerContent}>
         <div className="flex flex-row justify-between">
                 <div className="flex flex-col text-white p-6 space-y-4 w-full">
                     <SelectedRowsContext.Provider value={[selectedRowsContext, setSelectedRowsContext]}>
-                        <div>
+                        {/* <div>
                             <NextTaskCaptureHeader />
-                        </div>
+                        </div> */}
                         <div>
-                            <TasksPrioritizer />
+                            <TasksPrioritizer columns={columns} />
                         </div>
                     </SelectedRowsContext.Provider>
                 </div>

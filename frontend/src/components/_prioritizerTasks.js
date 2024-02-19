@@ -23,8 +23,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { fetchWithToken } from './_api';
 import { getProjectPriority, getTaskDeadline, getTodayDate, getTaskPriority, calculateUrgency, calculateProjectPriorityScore, calculateTaskPriorityScore, calculateCompoundPriority } from './_prioritizerCompoundPriority';
 
-const TasksPrioritizer = () => {
+const TasksPrioritizer = ({ columns }) => {
 
+      // Filter the columns based on the columns prop
     //////////////////////////////////////////////////////////////  // TASKS API COMMUNICATION //  //////////////////////////////////////////////////////////////
     const {                                                        // fetching tasks data to fetchedTasksData by using { fetchTasks } from './_fetchTasks'
         data: fetchedTasksData, 
@@ -381,7 +382,8 @@ const TasksPrioritizer = () => {
             ),
         },
     ];
-
+    // const filteredColumns = taskColumns.filter(column => columns.includes(column.headerName));
+    const filteredColumns = columns ? taskColumns.filter(column => columns.includes(column.headerName)) : taskColumns;
 
     // create the handleCloseNewTask function to close the dialog box
     const handleCloseNewTask = () => {
@@ -405,7 +407,7 @@ const TasksPrioritizer = () => {
             ) : filteredTasksData !== undefined ? (
                 <DataGrid
                     rows={filteredTasksData}
-                    columns={taskColumns}
+                    columns={filteredColumns}
                     checkboxSelection
                     disableRowSelectionOnClick
                     pageSize={filteredTasksData.length}
