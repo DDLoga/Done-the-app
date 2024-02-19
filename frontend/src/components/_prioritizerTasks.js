@@ -46,6 +46,7 @@ const TasksPrioritizer = () => {
         const updatedTasksData = projectSelectedRows.length > 0 ? 
             tasks.filter(task => projectSelectedRows.includes(task.parent)) : tasks;
         setFilteredTasksData(updatedTasksData);
+        console.log('projectSelectedRows on the task', projectSelectedRows);
     }, [projectSelectedRows, tasksData]);
 
     const updateTaskMutation = useMutation(updateTaskAPI, {         // update tasks on the server and locally without refetching
@@ -119,7 +120,6 @@ const TasksPrioritizer = () => {
 
     useEffect(() => {
         refetchProjects();
-        console.log('refetchProjects');
     }, [projectSelectedRows, refetchProjects]);
 
     const getProjectName = (parentId) => {                          // Function translate the project id to the project name
@@ -226,8 +226,6 @@ const TasksPrioritizer = () => {
             valueGetter: (params) => {
                 // list the whole attribute lists of params
                 const projectPriority = getProjectPriority(params.row.parent, projectsData);
-                console.log('projectPriority', projectPriority);
-                console.log('params.row', params.row); 
                 const taskDeadline = getTaskDeadline(params.row.deadline);
                 const todayDate = getTodayDate();
                 const taskPriority = getTaskPriority(params.row.priority);

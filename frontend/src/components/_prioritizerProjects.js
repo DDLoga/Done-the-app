@@ -40,6 +40,8 @@ const ProjectsPrioritizer = () => {
                 project.id === data.id ? data : project
             );
             updateProjectsData(updatedProjectsData);
+            console.log('Project updated successfully', updatedProjectsData);
+            setSelectedRowsContext(selectedRows);
         },
     });
     
@@ -47,10 +49,6 @@ const ProjectsPrioritizer = () => {
         const updatedProject = projectsData.find((project) => project.id === params.id);
         if (updatedProject) {
             updatedProject[field] = value;
-            console.log('updatedProject',updatedProject);
-            console.log('params.id',params.id);
-            console.log('field',field);
-            console.log('value',value);
             updateProjectMutation.mutate({ projectId: params.id, updatedProject });
         }
     };
