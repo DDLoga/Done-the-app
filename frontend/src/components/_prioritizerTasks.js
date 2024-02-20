@@ -37,7 +37,6 @@ const TasksPrioritizer = ({ columns }) => {
     
     const [tasksData, updateTasksData] = useState([]);              // declare the tasks data variable and the function to update it
     const [filteredTasksData, setFilteredTasksData] = useState([]); // filtering tasks based on selected project
-    console.log('filteredTasksData:', filteredTasksData);
     useEffect(() => {                                               // set tasksData once fetched
         updateTasksData(fetchedTasksData); 
     }, [fetchedTasksData]);
