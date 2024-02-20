@@ -17,6 +17,7 @@ function Calendar() {
     }, [fetchedTasksData]);
 
     const onDragEnd = (result) => {
+        console.log('drag end fired', result);
         const { destination, source, draggableId } = result;
 
         // If there's no destination (i.e., the user cancelled the drag), do nothing
@@ -74,7 +75,7 @@ function Calendar() {
                                         <Draggable key={task.id.toString()} draggableId={task.id.toString()} index={index}>
                                             {(providedDraggable) => (
                                                 <React.Fragment>
-                                                    <td ref={providedDraggable.innerRef} {...providedDraggable.draggableProps} {...providedDraggable.dragHandleProps}>{task.name}</td>
+                                                    <td ref={providedDraggable.innerRef} {...providedDraggable.draggableProps} {...providedDraggable.dragHandleProps} data-id={task.id} data-title={task.name}>{task.name}</td>
                                                     <td>{task.compound_priority}</td>
                                                 </React.Fragment>
                                             )}
@@ -89,15 +90,16 @@ function Calendar() {
                 <FullCalendar
                     plugins={[dayGridPlugin, interactionPlugin]}
                     droppable={true}
-                    eventReceive={function(info) {
+                    drop={function(info) {
                         let newEvent = {
-                            id: info.event.id,
-                            title: info.event.title,
-                            start: info.event.start,
-                            end: info.event.end
+                            id: info.draggedEl.getAttribute('data-id'),
+                            title: info.draggedEl.getAttribute('data-title'),
+                            start: info.date,
+                            allDay: info.allDay
                         };
+                        console.log('drop fired', newEvent);
                         setEvents([...events, newEvent]);
-                        setTasks(tasks.filter(task => task.id !== info.event.id));
+                        setTasks(tasks.filter(task => task.id !== newEvent.id));
                     }}
                     // Add more FullCalendar options here
                 />
