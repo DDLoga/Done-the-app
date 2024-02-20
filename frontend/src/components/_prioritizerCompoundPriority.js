@@ -65,7 +65,6 @@ export const calculateCompoundPriority = (taskPriorityScore, projectPriorityScor
 
 const CompoundPriority = ({ taskPriorityScore, projectPriorityScore, urgency }) => {
     const compoundPriority = calculateCompoundPriority(taskPriorityScore, projectPriorityScore, urgency);
-
     return (
         <div>
             Compound Priority: {compoundPriority}

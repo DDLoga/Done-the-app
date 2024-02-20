@@ -23,6 +23,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { fetchWithToken } from './_api';
 import { getProjectPriority, getTaskDeadline, getTodayDate, getTaskPriority, calculateUrgency, calculateProjectPriorityScore, calculateTaskPriorityScore, calculateCompoundPriority } from './_prioritizerCompoundPriority';
 
+const previousCompoundPriorityValues = {};
+
 const TasksPrioritizer = ({ columns }) => {
 
       // Filter the columns based on the columns prop
@@ -35,7 +37,7 @@ const TasksPrioritizer = ({ columns }) => {
     
     const [tasksData, updateTasksData] = useState([]);              // declare the tasks data variable and the function to update it
     const [filteredTasksData, setFilteredTasksData] = useState([]); // filtering tasks based on selected project
-
+    console.log('filteredTasksData:', filteredTasksData);
     useEffect(() => {                                               // set tasksData once fetched
         updateTasksData(fetchedTasksData); 
     }, [fetchedTasksData]);
@@ -175,6 +177,7 @@ const TasksPrioritizer = ({ columns }) => {
 
     ///////////////////////////////////////////////////////////////////////  // task table columns definition//  ///////////////////////////////////////////////////////////////////////
     const [selectedRows, setSelectedRows] = useState([]);               // Initialize tasks selectedRows with an empty array
+    
     const taskColumns = [                                               // Define the columns for the task table
         // name
         {
@@ -232,7 +235,15 @@ const TasksPrioritizer = ({ columns }) => {
                 const urgency = calculateUrgency(taskDeadline, todayDate);
                 const projectPriorityScore = calculateProjectPriorityScore(projectPriority);
                 const taskPriorityScore = calculateTaskPriorityScore(taskPriority);
-                return calculateCompoundPriority(taskPriorityScore, projectPriorityScore, urgency);
+                const newCompoundPriority = calculateCompoundPriority(taskPriorityScore, projectPriorityScore, urgency);
+
+                // If the value has changed, log it and update the previous value
+                if (previousCompoundPriorityValues[params.row.id] !== newCompoundPriority) {
+                    updateTask(params.row, 'compound_priority', newCompoundPriority);
+                    previousCompoundPriorityValues[params.row.id] = newCompoundPriority;
+                }
+
+                return newCompoundPriority;
             },
             renderCell: (params) => (
                 <Tooltip title={params.value ? params.value.toString() : ''} enterDelay={500}>
