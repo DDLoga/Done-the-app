@@ -1,93 +1,108 @@
-import React, { useState } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useDrag, useDrop } from 'react-dnd';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
-import { fetchTasks } from './_fetchTasks';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import BaseLayout from './baselayout';
+import { fetchTasks } from './_fetchTasks';
 
-const DraggableTaskRow = ({ task, handleDrop }) => {
-    const [{ isDragging }, drag] = useDrag({
-        type: 'task',
-        item: { task },
-        collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
-        }),
-    });
-
-    return (
-        <tr ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
-            <td>{task.name}</td>
-            <td>{task.compound_priority}</td>
-        </tr>
-    );
-};
-
-const Calendar = () => {
-    const [events, setEvents] = useState([]);
-    const [currentTask, setCurrentTask] = useState(null);
-    const headerContent = "Calendar";
-
+function Calendar() {
     const { data: fetchedTasksData, isLoading: isLoadingTasks, error: errorLoadingTasks } = useQuery('fetchedTasksData', fetchTasks);
 
-    const handleDrop = (task) => {
-        setCurrentTask(task);
-    };
+    const [tasks, setTasks] = useState([]);
+    const [events, setEvents] = useState([]);
+    useEffect(() => {
+        setTasks(fetchedTasksData);
+    }, [fetchedTasksData]);
 
-    const handleDateClick = (info) => {
-        if (currentTask) {
-            const newEvent = {
-                title: currentTask.name,
-                start: info.dateStr,
-                allDay: info.allDay,
-            };
+    const onDragEnd = (result) => {
+        const { destination, source, draggableId } = result;
 
-            console.log('Dropped event:', newEvent); // Add this line
-
-            setEvents(prevEvents => [...prevEvents, newEvent]);
-            setCurrentTask(null);
+        // If there's no destination (i.e., the user cancelled the drag), do nothing
+        if (!destination) {
+            return;
         }
+
+        // If the source and destination are the same, do nothing
+        if (
+            destination.droppableId === source.droppableId &&
+            destination.index === source.index
+        ) {
+            return;
+        }
+
+        function mapDroppableIdToDate(droppableId) {
+            // Assume droppableId is a string in the format 'day-YYYY-MM-DD'
+            const dateStr = droppableId.split('-').slice(1).join('-');
+            return new Date(dateStr);
+        }
+        // Find the task that was dragged
+        const task = fetchedTasksData.find((task) => task.id === draggableId);
+
+        // Update the task's date based on where it was dropped
+        // This will depend on how your FullCalendar component is set up
+        // For example, you might have a mapping from droppableId to date
+        const newDate = mapDroppableIdToDate(destination.droppableId);
+        task.date = newDate;
+
+        // Update the state with the new task list
+        setTasks((currentTasks) => {
+            return currentTasks.map((task) => {
+                if (task.id === draggableId) {
+                    return { ...task, date: newDate };
+                } else {
+                    return task;
+                }
+            });
+        });
     };
 
+    if (isLoadingTasks) return 'Loading...';
+    if (errorLoadingTasks) return 'An error occurred.';
+
+    console.log(tasks);
     return (
-        <BaseLayout headerContent={headerContent}>
-            <div className="flex flex-row justify-between">
-                <div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Priority Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {fetchedTasksData && fetchedTasksData.map(task => (
-                                <DraggableTaskRow key={task.id} task={task} handleDrop={handleDrop} />
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="w-1/2">
-                    <FullCalendar
-                        plugins={[dayGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        events={events}
-                        dateClick={handleDateClick} // Add this line
-                    />
-                </div>
+        <DragDropContext onDragEnd={onDragEnd}>
+            <div style={{ display: 'flex' }}>
+                <table>
+                    <tbody>
+                        {tasks && tasks.map((task, index) => (
+                            <Droppable key={task.id.toString()} droppableId={task.id.toString()}>
+                                {(provided) => (
+                                    <tr ref={provided.innerRef} {...provided.droppableProps}>
+                                        <Draggable key={task.id.toString()} draggableId={task.id.toString()} index={index}>
+                                            {(providedDraggable) => (
+                                                <React.Fragment>
+                                                    <td ref={providedDraggable.innerRef} {...providedDraggable.draggableProps} {...providedDraggable.dragHandleProps}>{task.name}</td>
+                                                    <td>{task.compound_priority}</td>
+                                                </React.Fragment>
+                                            )}
+                                        </Draggable>
+                                        {provided.placeholder}
+                                    </tr>
+                                )}
+                            </Droppable>
+                        ))}
+                    </tbody>
+                </table>
+                <FullCalendar
+                    plugins={[dayGridPlugin, interactionPlugin]}
+                    droppable={true}
+                    eventReceive={function(info) {
+                        let newEvent = {
+                            id: info.event.id,
+                            title: info.event.title,
+                            start: info.event.start,
+                            end: info.event.end
+                        };
+                        setEvents([...events, newEvent]);
+                        setTasks(tasks.filter(task => task.id !== info.event.id));
+                    }}
+                    // Add more FullCalendar options here
+                />
             </div>
-        </BaseLayout>
+        </DragDropContext>
     );
-};
-
-const App = () => (
-    <DndProvider backend={HTML5Backend}>
-        <Calendar />
-    </DndProvider>
-);
-
-export default App;
+}
+export default Calendar;
