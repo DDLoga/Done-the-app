@@ -6,9 +6,10 @@ import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 
 import { fetchTasks } from './_fetchTasks';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import BaseLayout from './baselayout';
 
 function Calendar() {
-    console.log('Calendar');
+    const headerContent = "Calendar";
     const { data: fetchedTasksData, isLoading: isLoadingTasks, error: errorLoadingTasks } = useQuery('fetchedTasksData', fetchTasks);
 
     const [tasks, setTasks] = useState([]);
@@ -18,6 +19,10 @@ function Calendar() {
     useEffect(() => {
         setTasks(fetchedTasksData);
     }, [fetchedTasksData]);
+
+    useEffect(() => {
+        console.log('events', events);
+    }, [events]);
 
     useEffect(() => {
         let draggableEl = document.getElementById("external-events");
@@ -38,90 +43,105 @@ function Calendar() {
     const handleDrop = (info) => {
         // Stop the propagation of the drop event
         info.jsEvent.stopPropagation();
-        console.log('handleDrop fired with: ', info);
-        const { event } = info;
         const draggedEl = info.draggedEl;
         const id = draggedEl.getAttribute('data-id');
 
+            // Calculate the end time based on the start time and the duration of the event
+        const duration = 60 * 60 * 1000; // 1 hour in milliseconds
+        const end = new Date(info.date.getTime() + duration);
+
         if (lastDropEvent === id) {
-            console.log('lastDropEvent: ', lastDropEvent);
-            console.log('current id: ', id);
-            console.log('we should stop here!');
             return;
         }
 
-        console.log('setting tasks with: ', tasks);
         setTasks(tasks.filter(task => task.id !== id));
-        console.log('tasks set as: ', tasks);
-        console.log('setting lastDropEvent with: ', id)
         setLastDropEvent(id);
-        console.log('lastDropEvent set as: ', lastDropEvent);
+
 
         // Add the event to the calendar
         setEvents([...events, {
             title: draggedEl.title,
-            start: info.date,
+            start: new Date(info.date.getTime()), // Create a new Date object for the start time
+            end: new Date(end.getTime()), // Create a new Date object for the end time
             allDay: info.allDay
         }]);
     };
 
     const handleEventDrop = (info) => {
         const { event } = info;
-    
+
+        // Manually set the event's start and end times
+        event.setStart(new Date(event.start.getTime()));
+        event.setEnd(new Date(event.end.getTime()));
+
         // Update the event in the events state
-        setEvents(events.map((e) => {
+        const updatedEvents = events.map((e) => {
             if (e.id === event.id) {
                 return {
                     ...e,
-                    start: event.start,
-                    end: event.end
+                    start: new Date(event.start.getTime()), // Create a new Date object for the start time
+                    end: new Date(event.end.getTime()) // Create a new Date object for the end time
                 };
             }
             return e;
-        }));
+        });
+        setEvents(updatedEvents);
+
+        // Log the updated events
+        console.log('Updated events:', updatedEvents);
     };
-    
+
     const handleEventResize = (info) => {
         const { event } = info;
-    
+
+        // Manually set the event's start and end times
+        event.setStart(new Date(event.start.getTime()));
+        event.setEnd(new Date(event.end.getTime()));
+
         // Update the event in the events state
-        setEvents(events.map((e) => {
+        const updatedEvents = events.map((e) => {
             if (e.id === event.id) {
                 return {
                     ...e,
-                    start: event.start,
-                    end: event.end
+                    start: new Date(event.start.getTime()), // Create a new Date object for the start time
+                    end: new Date(event.end.getTime()) // Create a new Date object for the end time
                 };
             }
             return e;
-        }));
+        });
+        setEvents(updatedEvents);
+
+        // Log the updated events
+        console.log('Updated events:', updatedEvents);
     };
 
     return (
-        <div style={{ display: 'flex' }}>
-            <div id="external-events">
-                {tasks && tasks.map((task, index) => (
-                    <div key={task.id} title={task.name} data-id={task.id} className="fc-event">
-                        {task.name}
-                    </div>
-                ))}
+        <BaseLayout headerContent={headerContent}>
+            <div style={{ display: 'flex' }}>
+                <div id="external-events">
+                    {tasks && tasks.map((task, index) => (
+                        <div key={task.id} title={task.name} data-id={task.id} className="fc-event">
+                            {task.name}
+                        </div>
+                    ))}
+                </div>
+                <FullCalendar
+                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                    headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    }}
+                    droppable={true}
+                    editable={true}
+                    events={events}
+                    drop={handleDrop}
+                    eventDrop={handleEventDrop}
+                    eventResize={handleEventResize}
+                    // Add more FullCalendar options here
+                />
             </div>
-            <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                headerToolbar={{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }}
-                droppable={true}
-                editable={true}
-                events={events}
-                drop={handleDrop}
-                eventDrop={handleEventDrop}
-                eventResize={handleEventResize}
-                // Add more FullCalendar options here
-            />
-        </div>
+        </BaseLayout>
     );
 }
 export default Calendar;
