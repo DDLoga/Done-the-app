@@ -5,8 +5,10 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 
 import { fetchTasks } from './_fetchTasks';
+import timeGridPlugin from '@fullcalendar/timegrid';
 
 function Calendar() {
+    console.log('Calendar');
     const { data: fetchedTasksData, isLoading: isLoadingTasks, error: errorLoadingTasks } = useQuery('fetchedTasksData', fetchTasks);
 
     const [tasks, setTasks] = useState([]);
@@ -33,14 +35,66 @@ function Calendar() {
         });
     }, [tasks]);
 
-    const handleDrop = ({event, draggedEl}) => {
-        if (lastDropEvent === event) {
+    const handleDrop = (info) => {
+        // Stop the propagation of the drop event
+        info.jsEvent.stopPropagation();
+        console.log('handleDrop fired with: ', info);
+        const { event } = info;
+        const draggedEl = info.draggedEl;
+        const id = draggedEl.getAttribute('data-id');
+
+        if (lastDropEvent === id) {
+            console.log('lastDropEvent: ', lastDropEvent);
+            console.log('current id: ', id);
+            console.log('we should stop here!');
             return;
         }
 
-        const id = draggedEl.getAttribute('data-id');
+        console.log('setting tasks with: ', tasks);
         setTasks(tasks.filter(task => task.id !== id));
-        setLastDropEvent(event);
+        console.log('tasks set as: ', tasks);
+        console.log('setting lastDropEvent with: ', id)
+        setLastDropEvent(id);
+        console.log('lastDropEvent set as: ', lastDropEvent);
+
+        // Add the event to the calendar
+        setEvents([...events, {
+            title: draggedEl.title,
+            start: info.date,
+            allDay: info.allDay
+        }]);
+    };
+
+    const handleEventDrop = (info) => {
+        const { event } = info;
+    
+        // Update the event in the events state
+        setEvents(events.map((e) => {
+            if (e.id === event.id) {
+                return {
+                    ...e,
+                    start: event.start,
+                    end: event.end
+                };
+            }
+            return e;
+        }));
+    };
+    
+    const handleEventResize = (info) => {
+        const { event } = info;
+    
+        // Update the event in the events state
+        setEvents(events.map((e) => {
+            if (e.id === event.id) {
+                return {
+                    ...e,
+                    start: event.start,
+                    end: event.end
+                };
+            }
+            return e;
+        }));
     };
 
     return (
@@ -53,10 +107,18 @@ function Calendar() {
                 ))}
             </div>
             <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                headerToolbar={{
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                }}
                 droppable={true}
+                editable={true}
                 events={events}
                 drop={handleDrop}
+                eventDrop={handleEventDrop}
+                eventResize={handleEventResize}
                 // Add more FullCalendar options here
             />
         </div>
