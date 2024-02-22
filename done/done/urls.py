@@ -26,6 +26,8 @@ urlpatterns = [
         path('get_contexts/<int:pk>/', views.ContextView.as_view(), name='ger_contexts_detail'),
         path('get_assignees/', views.AssigneeView.as_view(), name='get_assignees'),
         path('get_assignee/<int:pk>/', views.AssigneeView.as_view(), name='ger_assignees_detail'),
+        path('get_calendars/', views.CalendarView.as_view(), name='get_calendars'),
+        path('get_calendar/<int:pk>/', views.CalendarView.as_view(), name='get_calendar_detail'),
         path('get_projects/', views.get_projects, name='get_projects'),
         path('tasks/<int:task_id>/', views.delete_task, name='delete_task'),
     ])),

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tasks, Context, Projects, Assignee
+from .models import Tasks, Context, Projects, Assignee, Calendar
 from django.contrib.auth.models import User
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,7 +41,16 @@ class ProjectSerializer(serializers.ModelSerializer):
                 'project_deadline',
                 'project_status',
                 'project_complete']
-        
+
+class CalendarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Calendar
+        fields = ['user', 
+                'event_title', 
+                'event_start', 
+                'event_end', 
+                'event_allDay', 
+                'event_taskId']
         
 class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)

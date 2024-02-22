@@ -623,12 +623,13 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token as AuthToken
 from rest_framework.views import APIView
-from .serializers import TaskSerializer, ContextSerializer, ProjectSerializer, AssigneeSerializer
+from .serializers import TaskSerializer, ContextSerializer, ProjectSerializer, AssigneeSerializer, CalendarSerializer
 from django.contrib.auth.models import User
 from rest_framework import status
 from django.db import IntegrityError
 from .serializers import UserSerializer
 from rest_framework import generics
+from .models import Calendar
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -814,6 +815,38 @@ class AssigneeView(APIView):
         assignee = get_object_or_404(Assignee, pk=pk, user=request.user)
         assignee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CalendarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        calendars = Calendar.objects.filter(user=request.user)
+        serializer = CalendarSerializer(calendars, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        serializer = CalendarSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk=None):
+        calendar = get_object_or_404(Calendar, pk=pk, user=request.user)
+        serializer = CalendarSerializer(calendar, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        calendar = get_object_or_404(Calendar, pk=pk, user=request.user)
+        calendar.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
