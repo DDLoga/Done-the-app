@@ -825,10 +825,12 @@ class CalendarView(APIView):
         return JsonResponse(serializer.data, safe=False)
 
     def post(self, request):
+        print('request is: ' ,request.data)
         serializer = CalendarSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(f"Error: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None):

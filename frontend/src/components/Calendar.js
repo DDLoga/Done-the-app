@@ -5,6 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 import { fetchTasks } from './_fetchTasks';
 import { fetchEvents, createEvent, updateEventAPI, deleteEventsAPI } from './_fetchEvents';
+import { fetchWithToken } from './_api';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import BaseLayout from './baselayout';
 
@@ -25,9 +26,9 @@ function Calendar() {
         setTasks(fetchedTasksData);
     }, [fetchedTasksData]);
 
-useEffect(() => {                                                   // make the tasks as draggable table rows
+    useEffect(() => {                                                   // make the tasks as draggable table rows
         let draggableEl = document.getElementById("external-events");   // create a table with Draggable rows rendered on JSX
-        new Draggable(draggableEl, {                                    
+        let draggable = new Draggable(draggableEl, {                                    
             itemSelector: '.fc-event',
             eventData: function(eventEl) {                              // create an event object for the calendar
                 let title = eventEl.getAttribute('title');              // get the title of the task    
@@ -39,12 +40,16 @@ useEffect(() => {                                                   // make the 
                 };
             }
         });
+
+        return () => {
+            draggable.destroy();
+        };
     }, [tasks]);
 
 
     ///////////////////////////////////////////////////////////////////////   Manage events /////////////////////////////////////////////////////////////////
     const {                                                         // fetch events data from the API
-        data: fetchedEventsData, 
+        data: fetchedEventsData,
         isLoading:isLoadingContexts, 
         error:errorLoadingContexts 
     } = useQuery('fetchedEventsData', fetchEvents); 
@@ -52,42 +57,71 @@ useEffect(() => {                                                   // make the 
     const [events, setEvents] = useState([]);                       // update events dataset
 
     useEffect(() => {                                               // load events dataset once fetched
-        setEvents(fetchedEventsData);
+        if (fetchedEventsData) {
+            const formattedEvents = fetchedEventsData.map(event => ({
+                title: event.event_title,
+                start: event.event_start,
+                end: event.event_end,
+                allDay: event.event_allDay,
+                id: event.id
+            }));
+            setEvents(formattedEvents);
+        }
     }, [fetchedEventsData]);
+
+    useEffect(() => {                                               // update the events dataset once the events are updated
+        console.log('Events updated: ', events);
+    }, [events]);
 
     const createEventMutation = useMutation(createEvent, {
         onSuccess: (data) => {
-            setEvents((prevContextsData) => [...prevContextsData, data]);
+            console.log('Event created successfully', data);
+            const newEvent = {
+                title: data.event_title,
+                start: data.event_start,
+                end: data.event_end,
+                allDay: data.event_allDay,
+                id: data.id
+            };
+            setEvents((prevEventsData) => [...prevEventsData, newEvent]);
+            console.log('Events now: ', events);
         },
     });
 
 /////////////////////////////////////////////////////////////////////   Handle events /////////////////////////////////////////////////////////////////
-    const handleDrop = (info) => {
-        // Stop the propagation of the drop event
-        info.jsEvent.stopPropagation();
+    const handleDrop = async (info) => {
+        
+        info.jsEvent.stopPropagation();                 // Stop the propagation of the drop event
         const draggedEl = info.draggedEl;
         const id = draggedEl.getAttribute('data-id');
-        console.log('id', id);
-
-            // Calculate the end time based on the start time and the duration of the event
         const duration = 60 * 60 * 1000; // 1 hour in milliseconds
         const end = new Date(info.date.getTime() + duration);
+        const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
+        const userData = await userResponse.json();
+        const userId = userData.id;
 
-        // if (lastDropEvent === id) {
-        //     return;
-        // }
+        const newEvent = {
+            event_title: draggedEl.title,
+            event_start: new Date(info.date.getTime()), // Create a new Date object for the start time
+            event_end: new Date(end.getTime()), // Create a new Date object for the end time
+            event_allDay: info.allDay,
+            user: userId,
+            event_taskId: id
+        };
 
-        setTasks(tasks.filter(task => task.id !== id));
-        // setLastDropEvent(id);
+        console.log('new event is: ', newEvent);
+
+        createEventMutation.mutate(newEvent);
+
 
 
         // Add the event to the calendar
-        setEvents([...events, {
-            title: draggedEl.title,
-            start: new Date(info.date.getTime()), // Create a new Date object for the start time
-            end: new Date(end.getTime()), // Create a new Date object for the end time
-            allDay: info.allDay
-        }]);
+        // setEvents([...events, {
+        //     title: draggedEl.title,
+        //     start: new Date(info.date.getTime()), // Create a new Date object for the start time
+        //     end: new Date(end.getTime()), // Create a new Date object for the end time
+        //     allDay: info.allDay
+        // }]);
     };
 
     const handleEventDrop = (info) => {
@@ -110,8 +144,6 @@ useEffect(() => {                                                   // make the 
         });
         setEvents(updatedEvents);
 
-        // Log the updated events
-        console.log('Updated events:', updatedEvents);
     };
 
     const handleEventResize = (info) => {
@@ -123,11 +155,7 @@ useEffect(() => {                                                   // make the 
 
         // Update the event in the events state
         const updatedEvents = events.map((e) => {
-            console.log('e', e);
-            console.log('e.id', e.id);
-            console.log('event.id', event.id);
             if (e.id === event.id) {
-                console.log('e.id === event.id');
                 return {
                     ...e,
                     start: new Date(event.start.getTime()), // Create a new Date object for the start time
@@ -138,8 +166,7 @@ useEffect(() => {                                                   // make the 
         });
         setEvents(updatedEvents);
 
-        // Log the updated events
-        console.log('Updated events:', updatedEvents);
+
     };
 
     return (
@@ -172,7 +199,7 @@ useEffect(() => {                                                   // make the 
                     }}
                     droppable={true}
                     editable={true}
-                    events={events}
+                    eventSources={[{ events }]}
                     drop={handleDrop}
                     eventDrop={handleEventDrop}
                     eventResize={handleEventResize}
