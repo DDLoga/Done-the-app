@@ -45,13 +45,14 @@ class ProjectSerializer(serializers.ModelSerializer):
 class CalendarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Calendar
-        fields = ['user', 
+        fields = ['id',  # Include the primary key
+                'user', 
                 'event_title', 
                 'event_start', 
                 'event_end', 
                 'event_allDay', 
                 'event_taskId']
-        
+    
 class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 

@@ -59,11 +59,11 @@ function Calendar() {
     useEffect(() => {                                               // load events dataset once fetched
         if (fetchedEventsData) {
             const formattedEvents = fetchedEventsData.map(event => ({
+                id: event.id,
                 title: event.event_title,
                 start: event.event_start,
                 end: event.event_end,
                 allDay: event.event_allDay,
-                id: event.id
             }));
             setEvents(formattedEvents);
         }
@@ -75,7 +75,6 @@ function Calendar() {
 
     const createEventMutation = useMutation(createEvent, {
         onSuccess: (data) => {
-            console.log('Event created successfully', data);
             const newEvent = {
                 title: data.event_title,
                 start: data.event_start,
@@ -84,66 +83,63 @@ function Calendar() {
                 id: data.id
             };
             setEvents((prevEventsData) => [...prevEventsData, newEvent]);
-            console.log('Events now: ', events);
         },
     });
 
 /////////////////////////////////////////////////////////////////////   Handle events /////////////////////////////////////////////////////////////////
     const handleDrop = async (info) => {
-        
-        info.jsEvent.stopPropagation();                 // Stop the propagation of the drop event
-        const draggedEl = info.draggedEl;
-        const id = draggedEl.getAttribute('data-id');
-        const duration = 60 * 60 * 1000; // 1 hour in milliseconds
-        const end = new Date(info.date.getTime() + duration);
-        const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
-        const userData = await userResponse.json();
-        const userId = userData.id;
+        const draggedEl = info.draggedEl;                           // get the dragged element
+        const id = draggedEl.getAttribute('data-id');               // get the id of the task
+        const duration = 60 * 60 * 1000;                            // 1 hour in milliseconds
+        const end = new Date(info.date.getTime() + duration);       // calculate the end time of the event
+        const userResponse = await fetchWithToken(                  // get request to get the user data
+            `${process.env.REACT_APP_API_URL}/getUser/`,
+            { method: 'GET' });
+        const userData = await userResponse.json();                 // get the user data
+        const userId = userData.id;                                 // get the user id
 
-        const newEvent = {
+        const newEvent = {                                          // convert the event for the API
             event_title: draggedEl.title,
-            event_start: new Date(info.date.getTime()), // Create a new Date object for the start time
-            event_end: new Date(end.getTime()), // Create a new Date object for the end time
+            event_start: new Date(info.date.getTime()), 
+            event_end: new Date(end.getTime()),
             event_allDay: info.allDay,
             user: userId,
             event_taskId: id
         };
 
-        console.log('new event is: ', newEvent);
+        createEventMutation.mutate(newEvent);                       // send the event to the API
+    };
 
-        createEventMutation.mutate(newEvent);
-
-
-
-        // Add the event to the calendar
-        // setEvents([...events, {
-        //     title: draggedEl.title,
-        //     start: new Date(info.date.getTime()), // Create a new Date object for the start time
-        //     end: new Date(end.getTime()), // Create a new Date object for the end time
-        //     allDay: info.allDay
-        // }]);
+    const handleEventReceive = (info) => {                          // used to avoid duplicated item on calendar on drop
+        info.revert();
     };
 
     const handleEventDrop = (info) => {
         const { event } = info;
 
+
         // Manually set the event's start and end times
-        event.setStart(new Date(event.start.getTime()));
-        event.setEnd(new Date(event.end.getTime()));
+        const newStart = info.event.start;
+        const newEnd = info.event.end;
+
 
         // Update the event in the events state
         const updatedEvents = events.map((e) => {
-            if (e.id === event.id) {
+            // console.log('e: ', e.id);
+            // console.log('Event: ', event.id);
+            if (Number(e.id) === Number(event.id)) {
+                console.log('Event updated: ', e);
+                console.log('New start: ', newStart);
+                console.log('New end: ', newEnd);
                 return {
                     ...e,
-                    start: new Date(event.start.getTime()), // Create a new Date object for the start time
-                    end: new Date(event.end.getTime()) // Create a new Date object for the end time
+                    start: newStart,
+                    end: newEnd
                 };
             }
             return e;
         });
         setEvents(updatedEvents);
-
     };
 
     const handleEventResize = (info) => {
@@ -155,6 +151,7 @@ function Calendar() {
 
         // Update the event in the events state
         const updatedEvents = events.map((e) => {
+
             if (e.id === event.id) {
                 return {
                     ...e,
@@ -201,6 +198,7 @@ function Calendar() {
                     editable={true}
                     eventSources={[{ events }]}
                     drop={handleDrop}
+                    eventReceive={handleEventReceive} // Add this line
                     eventDrop={handleEventDrop}
                     eventResize={handleEventResize}
                     // Add more FullCalendar options here
