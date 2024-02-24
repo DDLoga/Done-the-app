@@ -69,9 +69,9 @@ function Calendar() {
         }
     }, [fetchedEventsData]);
 
-    useEffect(() => {                                               // update the events dataset once the events are updated
-        console.log('Events updated: ', events);
-    }, [events]);
+    // useEffect(() => {                                               // update the events dataset once the events are updated
+    //     console.log('Events updated: ', events);
+    // }, [events]);
 
     const createEventMutation = useMutation(createEvent, {
         onSuccess: (data) => {
@@ -114,27 +114,29 @@ function Calendar() {
         info.revert();
     };
 
-    const handleEventDrop = (info) => {
+    const handleEventEdit = (info) => {
         const { event } = info;
+        let newStart = info.event.start;
+        let newEnd = info.event.end;
+
+        newStart = newStart.toISOString().slice(0, -5) + 'Z';
+
+        if (newEnd === null) {
+            const newEndDate = new Date(newStart);
+            newEndDate.setHours(newEndDate.getHours() + 1);
+            newEnd = newEndDate.toISOString().slice(0, -5) + 'Z';
+        } else {
+            newEnd = newEnd.toISOString().slice(0, -5) + 'Z';
+        }
 
 
-        // Manually set the event's start and end times
-        const newStart = info.event.start;
-        const newEnd = info.event.end;
-
-
-        // Update the event in the events state
         const updatedEvents = events.map((e) => {
-            // console.log('e: ', e.id);
-            // console.log('Event: ', event.id);
             if (Number(e.id) === Number(event.id)) {
-                console.log('Event updated: ', e);
-                console.log('New start: ', newStart);
-                console.log('New end: ', newEnd);
                 return {
                     ...e,
                     start: newStart,
-                    end: newEnd
+                    end: newEnd,
+                    allDay: info.event.allDay,
                 };
             }
             return e;
@@ -142,29 +144,6 @@ function Calendar() {
         setEvents(updatedEvents);
     };
 
-    const handleEventResize = (info) => {
-        const { event } = info;
-
-        // Manually set the event's start and end times
-        event.setStart(new Date(event.start.getTime()));
-        event.setEnd(new Date(event.end.getTime()));
-
-        // Update the event in the events state
-        const updatedEvents = events.map((e) => {
-
-            if (e.id === event.id) {
-                return {
-                    ...e,
-                    start: new Date(event.start.getTime()), // Create a new Date object for the start time
-                    end: new Date(event.end.getTime()) // Create a new Date object for the end time
-                };
-            }
-            return e;
-        });
-        setEvents(updatedEvents);
-
-
-    };
 
     return (
         <BaseLayout headerContent={headerContent}>
@@ -199,8 +178,8 @@ function Calendar() {
                     eventSources={[{ events }]}
                     drop={handleDrop}
                     eventReceive={handleEventReceive} // Add this line
-                    eventDrop={handleEventDrop}
-                    eventResize={handleEventResize}
+                    eventDrop={handleEventEdit}
+                    eventResize={handleEventEdit}
                     // Add more FullCalendar options here
                 />
             </div>
