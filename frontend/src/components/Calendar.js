@@ -64,6 +64,7 @@ function Calendar() {
                 start: event.event_start,
                 end: event.event_end,
                 allDay: event.event_allDay,
+                taskId: event.event_taskId,
             }));
             setEvents(formattedEvents);
         }
@@ -83,6 +84,20 @@ function Calendar() {
                 id: data.id
             };
             setEvents((prevEventsData) => [...prevEventsData, newEvent]);   // update the events dataset
+        },
+    });
+
+    const updateEventMutation = useMutation(updateEventAPI, {
+        onSuccess: (data) => {
+            const updatedEvent = {
+                title: data.event_title,
+                start: data.event_start,
+                end: data.event_end,
+                allDay: data.event_allDay,
+                id: data.id,
+                taskId: data.event_taskId,
+            };
+            setEvents((prevEventsData) => prevEventsData.map(event => event.id === data.id ? updatedEvent : event));
         },
     });
 
@@ -114,11 +129,10 @@ function Calendar() {
         info.revert();
     };
 
-    const handleEventEdit = (info) => {
+    const handleEventEdit = async (info) => {
         const { event } = info;
         let newStart = info.event.start;
         let newEnd = info.event.end;
-        console.log('event title: ', event.title);
 
         newStart = newStart.toISOString().slice(0, -5) + 'Z';
 
@@ -130,18 +144,23 @@ function Calendar() {
             newEnd = newEnd.toISOString().slice(0, -5) + 'Z';
         }
 
-        const updatedEvents = events.map((e) => {
-            if (Number(e.id) === Number(event.id)) {
-                return {
-                    ...e,
-                    start: newStart,
-                    end: newEnd,
-                    allDay: info.event.allDay,
-                };
-            }
-            return e;
-        });
-        setEvents(updatedEvents);
+        const userResponse = await fetchWithToken(                  // get request to get the user data
+        `${process.env.REACT_APP_API_URL}/getUser/`,
+        { method: 'GET' });
+        const userData = await userResponse.json();                 // get the user data
+        const userId = userData.id;                                 // get the user id
+
+        const updatedEvent = {
+            id: event.id,
+            event_title: event.title,
+            event_start: newStart,
+            event_end: newEnd,
+            event_allDay: info.event.allDay,
+            user: userId, // You need to provide the user id here
+            event_taskId: info.event.extendedProps.taskId,
+            // You need to provide the task id here
+        };
+        updateEventMutation.mutate({ eventId: event.id, updatedEvent: updatedEvent });
     };
 
 
