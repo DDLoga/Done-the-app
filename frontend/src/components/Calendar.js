@@ -8,6 +8,8 @@ import { fetchEvents, createEvent, updateEventAPI, deleteEventsAPI } from './_fe
 import { fetchWithToken } from './_api';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import BaseLayout from './baselayout';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import { TrashIcon } from '@heroicons/react/24/solid';
 
 
 function Calendar() {
@@ -54,7 +56,7 @@ function Calendar() {
         error:errorLoadingContexts 
     } = useQuery('fetchedEventsData', fetchEvents); 
 
-    const [events, setEvents] = useState([]);                       // update events dataset
+    const [events, setEvents] = useState([]);                       // update events dataset function
 
     useEffect(() => {                                               // load events dataset once fetched
         if (fetchedEventsData) {
@@ -70,24 +72,22 @@ function Calendar() {
         }
     }, [fetchedEventsData]);
 
-    // useEffect(() => {                                               // update the events dataset once the events are updated
-    //     console.log('Events updated: ', events);
-    // }, [events]);
-
-    const createEventMutation = useMutation(createEvent, {              // send the event to the API
+    const createEventMutation = useMutation(createEvent, {          // send the event to the API
         onSuccess: (data) => {
             const newEvent = {                                          // convert the event the local dataset
                 title: data.event_title,
                 start: data.event_start,
                 end: data.event_end,
                 allDay: data.event_allDay,
-                id: data.id
+                id: data.id,
+                taskId: data.event_taskId,
             };
+            console.log('New event retrieved from api: ', newEvent);
             setEvents((prevEventsData) => [...prevEventsData, newEvent]);   // update the events dataset
         },
     });
 
-    const updateEventMutation = useMutation(updateEventAPI, {
+    const updateEventMutation = useMutation(updateEventAPI, {       // update the event in the API
         onSuccess: (data) => {
             const updatedEvent = {
                 title: data.event_title,
@@ -100,6 +100,16 @@ function Calendar() {
             setEvents((prevEventsData) => prevEventsData.map(event => event.id === data.id ? updatedEvent : event));
         },
     });
+
+    const [selectedEvent, setSelectedEvent] = useState(null);       // set the selected event to be deleted
+
+    const deleteEventMutation = useMutation(deleteEventsAPI, {      // delete the event from the API
+        onSuccess: () => {
+            setEvents((prevEventsData) => prevEventsData.filter(event => event.id !== Number(selectedEvent.id)));
+            setSelectedEvent(null);
+        },
+    });
+    
 
 /////////////////////////////////////////////////////////////////////   Handle events /////////////////////////////////////////////////////////////////
     const handleDrop = async (info) => {
@@ -121,7 +131,7 @@ function Calendar() {
             user: userId,
             event_taskId: id
         };
-
+        console.log('New event dropped sending to API: ', newEvent);
         createEventMutation.mutate(newEvent);                       // send the event to the API
     };
 
@@ -160,9 +170,25 @@ function Calendar() {
             event_taskId: info.event.extendedProps.taskId,
             // You need to provide the task id here
         };
+        console.log('Updated event: ', updatedEvent);
         updateEventMutation.mutate({ eventId: event.id, updatedEvent: updatedEvent });
     };
 
+    const handleDeleteEvent = () => {
+        deleteEventMutation.mutate([selectedEvent.id]);
+    };
+
+    function renderEventContent(eventInfo) {
+        return (
+            <>
+                <b>{eventInfo.event.title}</b>
+                <TrashIcon className="h-5 w-5 text-red-500 hover:text-red-700 absolute top-0 right-0 cursor-pointer" onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedEvent(eventInfo.event);
+                }} />
+            </>
+        );
+    }
 
     return (
         <BaseLayout headerContent={headerContent}>
@@ -199,8 +225,31 @@ function Calendar() {
                     eventReceive={handleEventReceive} // Add this line
                     eventDrop={handleEventEdit}
                     eventResize={handleEventEdit}
+                    eventContent={renderEventContent}
+                    eventClick={(info) => setSelectedEvent(info.event)}
                     // Add more FullCalendar options here
                 />
+                {selectedEvent && (
+                    <Dialog
+                        open={true}
+                        onClose={() => setSelectedEvent(null)}
+                    >
+                        <DialogTitle>Delete Event</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Are you sure you want to delete this event?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setSelectedEvent(null)} color="primary">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDeleteEvent} color="primary" autoFocus>
+                                Delete
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                )}
             </div>
         </BaseLayout>
     );

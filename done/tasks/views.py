@@ -630,6 +630,7 @@ from django.db import IntegrityError
 from .serializers import UserSerializer
 from rest_framework import generics
 from .models import Calendar
+import logging
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -841,11 +842,17 @@ class CalendarView(APIView):
         print(f"Error: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk=None):
-        calendar = get_object_or_404(Calendar, pk=pk, user=request.user)
-        calendar.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
+    def delete(self, request, pk=None):
+        try:
+            print('request is: ' ,request.data)
+            calendar = get_object_or_404(Calendar, pk=pk, user=request.user)
+            calendar.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
+            raise
 
 
 
