@@ -226,7 +226,22 @@ function Calendar() {
                     eventDrop={handleEventEdit}
                     eventResize={handleEventEdit}
                     eventContent={renderEventContent}
-                    eventClick={(info) => setSelectedEvent(info.event)}
+                    windowResize={function(view) {
+                        if (window.innerWidth < 768){
+                            this.setOption('headerToolbar', {
+                                left: 'prev,next',
+                                center: 'title',
+                                right: ''
+                            });
+                        } else {
+                            this.setOption('headerToolbar', {
+                                left: 'prev,next today',
+                                center: 'title',
+                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                            });
+                        }
+                    }}
+                    // eventClick={(info) => setSelectedEvent(info.event)}
                     // Add more FullCalendar options here
                 />
                 {selectedEvent && (
