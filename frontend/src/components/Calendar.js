@@ -73,16 +73,16 @@ function Calendar() {
     //     console.log('Events updated: ', events);
     // }, [events]);
 
-    const createEventMutation = useMutation(createEvent, {
+    const createEventMutation = useMutation(createEvent, {              // send the event to the API
         onSuccess: (data) => {
-            const newEvent = {
+            const newEvent = {                                          // convert the event the local dataset
                 title: data.event_title,
                 start: data.event_start,
                 end: data.event_end,
                 allDay: data.event_allDay,
                 id: data.id
             };
-            setEvents((prevEventsData) => [...prevEventsData, newEvent]);
+            setEvents((prevEventsData) => [...prevEventsData, newEvent]);   // update the events dataset
         },
     });
 
@@ -118,6 +118,7 @@ function Calendar() {
         const { event } = info;
         let newStart = info.event.start;
         let newEnd = info.event.end;
+        console.log('event title: ', event.title);
 
         newStart = newStart.toISOString().slice(0, -5) + 'Z';
 
@@ -128,7 +129,6 @@ function Calendar() {
         } else {
             newEnd = newEnd.toISOString().slice(0, -5) + 'Z';
         }
-
 
         const updatedEvents = events.map((e) => {
             if (Number(e.id) === Number(event.id)) {
