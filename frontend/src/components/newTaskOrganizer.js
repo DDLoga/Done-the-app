@@ -175,6 +175,8 @@ const NewTaskOrganizer = () => {
                     .catch((error) => {
                         console.error('Error:', error);
                     });
+                } else if (taskType === 'task') {
+                    handleDelete();
                 }
             })
             .then(handleResponse)
