@@ -200,7 +200,7 @@ function Calendar() {
                 <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
                     <TasksTable tasks={tasks} />
                 </div>
-                <div className="flex-grow">
+                <div className="flex-grow" style={{ height: '80vh', maxHeight: '100%' }}>
                     <EventsCalendar 
                         events={events} 
                         handleDrop={handleDrop} 
@@ -220,7 +220,7 @@ function Calendar() {
                         <DialogContentText>
                             Are you sure you want to delete this event?
                         </DialogContentText>
-                    </DialogContent>
+                    </DialogContent>    
                     <DialogActions>
                         <Button onClick={() => setSelectedEvent(null)} color="primary">
                             Cancel

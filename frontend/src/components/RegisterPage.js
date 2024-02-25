@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BaseLayout from './baselayout';
 import loginPageStyle from './loginPage.module.css';
+import { Link } from 'react-router-dom';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
 const RegisterPage = () => {
@@ -98,6 +99,7 @@ const RegisterPage = () => {
                         <input type="submit" value="Submit" className={loginPageStyle.submit} />
 
                     </form>
+                    <p>Already have an account? <Link to="/login" className="text-blue-500 underline hover:text-blue-800">Login</Link></p>
                     {loading && <div>Loading...</div>}
                     {error && <div>Error: {error}</div>}
                 </div>
