@@ -10,6 +10,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import BaseLayout from './baselayout';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { TrashIcon } from '@heroicons/react/24/solid';
+import TasksTable from './_calendarTasksTable';
+import EventsCalendar from './_CalendarEventsCalendar';
 
 
 function Calendar() {
@@ -193,56 +195,13 @@ function Calendar() {
     return (
         <BaseLayout headerContent={headerContent}>
             <div style={{ display: 'flex' }}>
-                <table id="external-events" className="bg-gray-800 text-white my-4 rounded shadow-lg w-full">
-                    <thead>
-                        <tr>
-                            <th className="border-gray-700 border p-2">Task Name</th>
-                            <th className="border-gray-700 border p-2">Compound Priority</th>
-                            <th className="border-gray-700 border p-2">Deadline</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tasks && [...tasks].sort((a, b) => b.compound_priority - a.compound_priority).map((task, index) => (
-                            <tr key={task.id} title={task.name} data-id={task.id} className="fc-event draggable bg-gray-700 hover:bg-gray-600 cursor-move" draggable="true">
-                                <td className="border-gray-700 border p-2">{task.name}</td>
-                                <td className="border-gray-700 border p-2">{task.compound_priority}</td>
-                                <td className="border-gray-700 border p-2">{task.deadline}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <FullCalendar
-                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                    headerToolbar={{
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    }}
-                    droppable={true}
-                    editable={true}
-                    eventSources={[{ events }]}
-                    drop={handleDrop}
-                    eventReceive={handleEventReceive} // Add this line
-                    eventDrop={handleEventEdit}
-                    eventResize={handleEventEdit}
-                    eventContent={renderEventContent}
-                    windowResize={function(view) {
-                        if (window.innerWidth < 768){
-                            this.setOption('headerToolbar', {
-                                left: 'prev,next',
-                                center: 'title',
-                                right: ''
-                            });
-                        } else {
-                            this.setOption('headerToolbar', {
-                                left: 'prev,next today',
-                                center: 'title',
-                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                            });
-                        }
-                    }}
-                    // eventClick={(info) => setSelectedEvent(info.event)}
-                    // Add more FullCalendar options here
+                <TasksTable tasks={tasks} />
+                <EventsCalendar 
+                    events={events} 
+                    handleDrop={handleDrop} 
+                    handleEventReceive={handleEventReceive} 
+                    handleEventEdit={handleEventEdit} 
+                    renderEventContent={renderEventContent} 
                 />
                 {selectedEvent && (
                     <Dialog
