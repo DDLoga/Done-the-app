@@ -116,6 +116,7 @@ function Calendar() {
 /////////////////////////////////////////////////////////////////////   Handle events /////////////////////////////////////////////////////////////////
     const handleDrop = async (info) => {
         const draggedEl = info.draggedEl;                           // get the dragged element
+        console.log('Dropped event: ', draggedEl);
         const id = draggedEl.getAttribute('data-id');               // get the id of the task
         const duration = 60 * 60 * 1000;                            // 1 hour in milliseconds
         const end = new Date(info.date.getTime() + duration);       // calculate the end time of the event

@@ -2,29 +2,35 @@ import React from 'react';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 
+function formatDate(date) {
+    // tweak date to display in the format dd-mm-yyyy
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+
 function TasksTable({ tasks }) {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // set time to 00:00:00
+    today.setHours(0, 0, 0, 0); // to be a date without time
 
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1); // set date to tomorrow
+
     const defaultDate = new Date(1970, 0, 1); // Thu Jan 01 1970
-    defaultDate.setHours(0, 0, 0, 0); // set time to 00:00:00
+    defaultDate.setHours(0, 0, 0, 0); // set the default date to be replaced by 'non later on'
 
     return (
-        <table id="external-events" className="table-auto bg-gray-800 text-white my-4 rounded shadow-lg w-full">
+        <table id="external-events" className="table-auto bg-gray-800 text-white my-4 rounded shadow-lg">
             <thead>
                 <tr>
                     <th className="border-gray-700 border p-2">Task Name</th>
-                    <th className="border-gray-700 border p-2">Compound Priority</th>
-                    <th className="border-gray-700 border p-2">Deadline</th>
                 </tr>
             </thead>
             <tbody>
                 {tasks && [...tasks].sort((a, b) => b.compound_priority - a.compound_priority).map((task, index) => {
                     const taskDeadline = new Date(task.deadline);
                     taskDeadline.setHours(0, 0, 0, 0); // set time to 00:00:00
-                    console.log(taskDeadline);
 
                     let chipLabel = '';
                     let chipColor = '';
@@ -43,15 +49,16 @@ function TasksTable({ tasks }) {
                     }
 
                     return (
-                        <tr key={task.id} data-id={task.id} className="fc-event draggable bg-gray-700 hover:bg-gray-600 cursor-move" draggable="true">
+                        <tr key={task.id} title={task.name} data-id={task.id} className="fc-event draggable bg-gray-700 hover:bg-gray-600 cursor-move" draggable="true">
                             <td className="border-gray-700 border p-2">
-                                <Tooltip title={<div style={{ fontSize: '1.25em' }}>Compound Priority: {task.compound_priority}<br/>Due Date: {task.deadline}</div>}>
-                                    <span>{task.name}</span>
+                                <Tooltip title={<div style={{ fontSize: '1.25em' }}>
+                                    Compound Priority: {task.compound_priority}<br/>
+                                    Due Date: {taskDeadline.getTime() === defaultDate.getTime() ? 'none' : formatDate(taskDeadline)}
+                                </div>}>
+                                    <span >{task.name}</span>
                                 </Tooltip>
                                 {chipLabel && <Chip className="ml-2" label={chipLabel} color={chipColor} size="small" />}
                             </td>
-                            <td className="border-gray-700 border p-2">{task.compound_priority}</td>
-                            <td className="border-gray-700 border p-2">{task.deadline}</td>
                         </tr>
                     );
                 })}
