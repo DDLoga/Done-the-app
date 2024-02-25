@@ -2,7 +2,7 @@ import React from 'react';
 
 function BaseLayout({ children, headerContent }) {
     return (
-        <div className="flex flex-col h-screen w-screen bg-gray-900 text-white">
+        <div className="flex flex-col w-screen bg-gray-900 text-white min-h-screen">
             <header className="p-6 bg-gray-800 border-b border-gray-700 pl-24">
                 {headerContent}
             </header>

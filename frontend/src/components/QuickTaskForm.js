@@ -3,6 +3,8 @@ import styles from "./QuickTaskForm.module.css";
 import BaseLayout from './baselayout';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { Link } from 'react-router-dom';
+import Tooltip from '@mui/material/Tooltip';
 import { TextField, Button, CircularProgress } from '@mui/material';
 
 const QuickTaskForm = () => {
@@ -63,27 +65,51 @@ const QuickTaskForm = () => {
                     {/* <div className={styles.logo}>Logo</div> */}
                     <h2 className={styles.subtitle}>Clear your mind</h2>
                 </div>
-                <div className={styles.formBlock} onSubmit={handleSubmit}>
-                    <form>
+                <div className={styles.formBlock}>
+                    <form onSubmit={handleSubmit}>
                         <TextField
-                            multiline
-                            rows={15}
                             value={task}
                             onChange={(e) => setTask(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleSubmit(e);
+                                }
+                            }}
                             variant="outlined"
                             fullWidth
                             color="primary"
-                            placeholder="Write here your task, thoughts or whatever is in your head. We'll figure it out together."
+                            placeholder="Write here your task, thoughts or whatever is in your head. We'll figure it out later together."
                         />
-                        <Button 
-                            type="submit" 
-                            variant="contained" 
-                            color="primary"
-                            style={{ marginTop: '10px' }}
-                            disabled={isLoading} // disable the button while loading
-                        >
-                            {isLoading ? <CircularProgress size={24} /> : 'Submit'}
-                        </Button>
+                        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <Tooltip title="Submit your new thought or just press enter">
+                                <span>
+                                    <Button 
+                                        type="submit" 
+                                        variant="contained" 
+                                        color="primary"
+                                        style={{ marginTop: '10px', marginRight: '10px' }}
+                                        disabled={isLoading} // disable the button while loading
+                                    >
+                                        {isLoading ? <CircularProgress size={24} /> : 'Submit'}
+                                    </Button>
+                                </span>
+                            </Tooltip>
+                            <p style={{ alignSelf: 'center', margin: '10px' }}>or</p>
+                            <Link to="/newtaskorganizer">
+                                <Tooltip title="Your mind is clear? Proceed to the new task Organizer wizard">
+                                    <span>
+                                        <Button 
+                                            variant="contained" 
+                                            color="primary"
+                                            style={{ marginTop: '10px' }}
+                                        >
+                                            Organize
+                                        </Button>
+                                    </span>
+                                </Tooltip>
+                            </Link>
+                        </div>
                     </form>
                 </div>
             </div>
