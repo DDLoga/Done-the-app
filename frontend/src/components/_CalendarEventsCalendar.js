@@ -21,6 +21,9 @@ function EventsCalendar({ events, handleDrop, handleEventReceive, handleEventEdi
             eventDrop={handleEventEdit}
             eventResize={handleEventEdit}
             eventContent={renderEventContent}
+            height="100%"
+            width="100%"
+            firstDay={1} // Monday is the first day of the week
             windowResize={function(view) {
                 if (window.innerWidth < 768){
                     this.setOption('headerToolbar', {

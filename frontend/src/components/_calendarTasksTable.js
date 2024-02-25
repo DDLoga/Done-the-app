@@ -24,7 +24,7 @@ function TasksTable({ tasks }) {
         <table id="external-events" className="table-auto bg-gray-800 text-white my-4 rounded shadow-lg">
             <thead>
                 <tr>
-                    <th className="border-gray-700 border p-2">Task Name</th>
+                    <th className="border-gray-700 border p-2">Task Names</th>
                 </tr>
             </thead>
             <tbody>

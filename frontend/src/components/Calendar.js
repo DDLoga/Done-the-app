@@ -195,11 +195,11 @@ function Calendar() {
 
     return (
         <BaseLayout headerContent={headerContent}>
-            <div className="flex flex-col md:flex-row md:space-x-4">
-                <div className="w-full md:w-3/10">
+            <div className="flex flex-col md:flex-row md:space-x-4 max-w-screen-xl mx-auto">
+                <div>
                     <TasksTable tasks={tasks} />
                 </div>
-                <div className="w-full md:w-7/10">
+                <div className="flex-grow">
                     <EventsCalendar 
                         events={events} 
                         handleDrop={handleDrop} 
