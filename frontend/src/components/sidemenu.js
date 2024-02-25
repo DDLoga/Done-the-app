@@ -5,12 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faTasks,
-    faClipboard,
-    faCalendar,
-    faList,
-    faBook,
+    faClipboardCheck,
+    faCalendarAlt,
+    faListAlt,
+    faBookOpen,
     faDatabase,
     faBars,
+    faUserCircle,
+    faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
 
 
@@ -40,27 +42,27 @@ function SideMenu() {
                         <span onClick={() => navigate('/quicktask')}> Quick Task Entry</span>
                     </li>
                     <li>
-                        <FontAwesomeIcon icon={faCalendar} onClick={() => navigate('/newtaskorganizer')}/>
+                        <FontAwesomeIcon icon={faCalendarAlt} onClick={() => navigate('/newtaskorganizer')}/>
                         <span onClick={() => navigate('/newtaskorganizer')}> New Task Organizer</span>
                     </li>
                     <li>
-                        <FontAwesomeIcon icon={faClipboard} onClick={() => navigate('nexttaskcapture')}/>
-                        <span onClick={() => navigate('nexttaskcapture')}> New Task capture</span>
+                        <FontAwesomeIcon icon={faClipboardCheck} onClick={() => navigate('nexttaskcapture')}/>
+                        <span onClick={() => navigate('nexttaskcapture')}> Next Task capture</span>
                     </li>
-                    {/* <li>                                    // discontinued, too complex and useless
-                        <FontAwesomeIcon icon={faList} />
-                        <span onClick={() => navigate('/prioritizer')}> Prioritizer </span>
-                    </li> */}
                     <li>
-                        <FontAwesomeIcon icon={faList} />
+                        <FontAwesomeIcon icon={faListAlt} />
                         <span onClick={() => navigate('/prioritizerProjects')}> Manage your Projects </span>
                     </li>
                     <li>
-                        <FontAwesomeIcon icon={faList} />
+                        <FontAwesomeIcon icon={faListAlt} />
                         <span onClick={() => navigate('/prioritizerTasks')}> Manage your Tasks </span>
                     </li>
                     <li>
-                        <FontAwesomeIcon icon={faBook} />
+                        <FontAwesomeIcon icon={faBookOpen} />
+                        <span onClick={() => navigate('/calendar')}> Calendar</span>
+                    </li>
+                    <li>
+                        <FontAwesomeIcon icon={faBookOpen} />
                         <span onClick={() => navigate('/contextmanager')}> Contexts</span>
                     </li>
                     <li>
@@ -79,7 +81,7 @@ function SideMenu() {
                         className={styles["login-button"]} 
                         onClick={handleLogout}
                     >
-                        {user ? 'Log Out' : 'Log In'}
+                        {user ?  'Log Out' : 'Log In'}
                 </button>
         </div>
     );

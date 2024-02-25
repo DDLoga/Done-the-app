@@ -194,37 +194,41 @@ function Calendar() {
 
     return (
         <BaseLayout headerContent={headerContent}>
-            <div style={{ display: 'flex' }}>
-                <TasksTable tasks={tasks} />
-                <EventsCalendar 
-                    events={events} 
-                    handleDrop={handleDrop} 
-                    handleEventReceive={handleEventReceive} 
-                    handleEventEdit={handleEventEdit} 
-                    renderEventContent={renderEventContent} 
-                />
-                {selectedEvent && (
-                    <Dialog
-                        open={true}
-                        onClose={() => setSelectedEvent(null)}
-                    >
-                        <DialogTitle>Delete Event</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                Are you sure you want to delete this event?
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={() => setSelectedEvent(null)} color="primary">
-                                Cancel
-                            </Button>
-                            <Button onClick={handleDeleteEvent} color="primary" autoFocus>
-                                Delete
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-                )}
+            <div className="flex flex-col md:flex-row md:space-x-4">
+                <div className="w-full md:w-3/10">
+                    <TasksTable tasks={tasks} />
+                </div>
+                <div className="w-full md:w-7/10">
+                    <EventsCalendar 
+                        events={events} 
+                        handleDrop={handleDrop} 
+                        handleEventReceive={handleEventReceive} 
+                        handleEventEdit={handleEventEdit} 
+                        renderEventContent={renderEventContent} 
+                    />
+                </div>
             </div>
+            {selectedEvent && (
+                <Dialog
+                    open={true}
+                    onClose={() => setSelectedEvent(null)}
+                >
+                    <DialogTitle>Delete Event</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Are you sure you want to delete this event?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setSelectedEvent(null)} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleDeleteEvent} color="primary" autoFocus>
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </BaseLayout>
     );
 }
