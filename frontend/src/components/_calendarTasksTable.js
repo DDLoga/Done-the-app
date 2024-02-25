@@ -49,7 +49,7 @@ function TasksTable({ tasks }) {
                     }
 
                     return (
-                        <tr key={task.id} title={task.name} data-id={task.id} className="fc-event draggable bg-gray-700 hover:bg-gray-600 cursor-move" draggable="true">
+                        <tr key={task.id} data-title={task.name} data-id={task.id} className="fc-event draggable bg-gray-700 hover:bg-gray-600 cursor-move" draggable="true">
                             <td className="border-gray-700 border p-2">
                                 <Tooltip title={<div style={{ fontSize: '1.25em' }}>
                                     Compound Priority: {task.compound_priority}<br/>

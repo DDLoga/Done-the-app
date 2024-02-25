@@ -118,6 +118,7 @@ function Calendar() {
         const draggedEl = info.draggedEl;                           // get the dragged element
         console.log('Dropped event: ', draggedEl);
         const id = draggedEl.getAttribute('data-id');               // get the id of the task
+        const title = draggedEl.getAttribute('data-title');              // get the title of the task   
         const duration = 60 * 60 * 1000;                            // 1 hour in milliseconds
         const end = new Date(info.date.getTime() + duration);       // calculate the end time of the event
         const userResponse = await fetchWithToken(                  // get request to get the user data
@@ -127,7 +128,7 @@ function Calendar() {
         const userId = userData.id;                                 // get the user id
 
         const newEvent = {                                          // convert the event for the API
-            event_title: draggedEl.title,
+            event_title: title,
             event_start: new Date(info.date.getTime()), 
             event_end: new Date(end.getTime()),
             event_allDay: info.allDay,
@@ -196,7 +197,7 @@ function Calendar() {
     return (
         <BaseLayout headerContent={headerContent}>
             <div className="flex flex-col md:flex-row md:space-x-4 max-w-screen-xl mx-auto">
-                <div>
+                <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
                     <TasksTable tasks={tasks} />
                 </div>
                 <div className="flex-grow">
