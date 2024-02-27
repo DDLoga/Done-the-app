@@ -405,7 +405,7 @@ const TasksPrioritizer = ({ columns }) => {
     };
 
     return (
-        <div>
+        <div className="relative">
             {isLoadingTasks ? (
                 <CircularProgress /> // Display a loading spinner if the tasks are still loading
             ) : errorLoadingTasks ? (
@@ -423,7 +423,7 @@ const TasksPrioritizer = ({ columns }) => {
                 />
             ) : null}
             {selectedRows.length > 0 && (
-                <div className="absolute top-0 right-16 flex space-x-2">
+                <div className="absolute top-0 right-16 flex space-x-2" style={{ top: '-50px' }}>
                     <Fab color="secondary" aria-label="delete" onClick={handleClickOpen}>
                         <DeleteIcon />
                     </Fab>
@@ -448,7 +448,7 @@ const TasksPrioritizer = ({ columns }) => {
                     </Dialog>
                 </div>
             )}
-            <div className="absolute top-0 right-0 flex space-x-0">
+            <div className="absolute right-0 flex space-x-0" style={{ top: '-50px' }}>
                 <Fab color="primary" aria-label="add" onClick={handleAdd} style={{ marginRight: 10 }}>
                     <AddIcon />
                 </Fab>
