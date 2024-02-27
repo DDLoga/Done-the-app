@@ -10,30 +10,36 @@ import DatePicker from './_DatePicker';          //importing the date picker com
 import { commonStyles } from './_commonStyles';
 import { fetchWithToken } from './_api';
 import { Slider, Box } from '@mui/material';
-
+import { useMutation } from 'react-query';
+import { createContext} from './_fetchContexts';
+import { Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 
 const NewTaskOrganizer = () => {
+
     const headerContent = "New Task Organizer Wizard";
-    const [tasks, setTasks] = useState([]);
-    const [currentTask, setCurrentTask] = useState(null);
-    const [taskType, setTaskType] = useState('');
-    const [priority, setPriority] = useState('A');
-    const [effort, setEffort] = useState(0);
-    const today = new Date();                       //setting the default due date to today
+
+    const [tasksList, setTasksList] = useState([]);                         //array of tasks fetched by the API
+    const [currentTask, setCurrentTask] = useState(null);           //current task to be processed
+    const [taskType, setTaskType] = useState('');                   //used to selects task/project/nonActionable
+    const [priority, setPriority] = useState('A');                  //used as default priority
+    const [effort, setEffort] = useState(0);                        //used as default effort
+    const today = new Date();                                       //setting the default due date to today
     const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const [deadline, setDeadline] = useState(formattedDate);
-    const [context, setContext] = useState('');     //used for the form
-    const [contexts, setContexts] = useState([]);   //used for the API to collect the list
-    const [relatedProject, setRelatedProject] = useState('');
-    const [projects, setProjects] = useState([]);   //used for the API to collect the list
-    const [nextAction, setNextAction] = useState('');
-    const [filter, setFilter] = useState('');       //used for the filter of projects
-    const filteredProjects = projects.filter(project =>
+    const [deadline, setDeadline] = useState(formattedDate);        //used as default deadline
+    const [context, setContext] = useState('');                     //the selected context for the task
+    const [contexts, setContexts] = useState([]);                   //list of contexts fetched by the API
+    const [relatedProject, setRelatedProject] = useState('');       //the selected project for the task
+    const [projects, setProjects] = useState([]);                   //list of projects fetched by the API
+    const [nextAction, setNextAction] = useState('');               //the next action for the project
+    const [filter, setFilter] = useState('');                       //used for the filter of projects
+    const filteredProjects = projects.filter(project =>             //filtering the projects
         project.project_name.toLowerCase().includes(filter.toLowerCase())
     );
-
-    // collect tasks from API
-    useEffect(() => {
+    const [newContextDialogOpen, setNewContextDialogOpen] = useState(false);    //used to open the dialog for the new context
+    const [newContextName, setNewContextName] = useState("");                   //used to set the new context name
+    const [newContextDescription, setNewContextDescription] = useState("");     //used to set the new context description
+    
+    useEffect(() => {                                               //fetching the tasks from the API                                               
         fetch(`${process.env.REACT_APP_API_URL}/get_new_tasks`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -45,13 +51,12 @@ const NewTaskOrganizer = () => {
             }
             return response.json();
         })
-        .then(data => setTasks(data))
+        .then(data => setTasksList(data))
 
         .catch(error => console.error('Error:', error));
     }, []);
 
-    // collect contexts from API
-    useEffect(() => {
+    useEffect(() => {                                               //fetching the contexts from the API
         fetch(`${process.env.REACT_APP_API_URL}/get_contexts`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -67,8 +72,7 @@ const NewTaskOrganizer = () => {
         .catch(error => console.error('Error:', error));
     }, []);
 
-    // collect projects from API
-    const fetchProjects = () => {
+    const fetchProjects = () => {                                   //fetching the projects from the API
         fetch(`${process.env.REACT_APP_API_URL}/get_projects`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -85,51 +89,50 @@ const NewTaskOrganizer = () => {
         .catch(error => console.error('Error:', error));
     };
     
-    useEffect(() => {
+    useEffect(() => {                                               //loading the projects into an array at page load
         fetchProjects();
     }, []);
 
-    // set the current task to the first task in the list
-    useEffect(() => {
-        if (tasks.length > 0) {
-            setCurrentTask(tasks[0]);
+    useEffect(() => {                                               //pick the first task from the list
+        if (tasksList.length > 0) {
+            setCurrentTask(tasksList[0]);
         }
-    }, [tasks]);
+    }, [tasksList]);
+
+
 
     const handleTaskTypeChange = (event) => {
         setTaskType(event.target.value);
     };
-
     const handlePriorityChange = (event) => {
         setPriority(event.target.value);
     };
-
     const handleEffortChange = (event) => {
         setEffort(event.target.value);
     };
-
     const handleDeadlineChange = (event) => {
         setDeadline(event.target.value);
     };
-
     const handleContextChange = (event) => {
         setContext(event.target.value);
     };
-
     const handleRelatedProjectChange = (projectId) => {
         setRelatedProject(projectId);
     };
-
     const handleNextActionChange = (event) => {
         setNextAction(event.target.value);
     };
 
 
-    const handleResponse = () => {
-        setTasks(tasks.filter(task => task.id !== currentTask.id));
-        setCurrentTask(tasks.length > 1 ? tasks[0] : null);
+
+
+    const handleApiResponse = () => {
+        setTasksList(tasksList.filter(task => task.id !== currentTask.id));
+        setCurrentTask(tasksList.length > 1 ? tasksList[0] : null);
         setTaskType([]);
         setNextAction([])
+        setContext([])
+        setDeadline(formattedDate)
         if (taskType !== 'task') {
             handleDelete();
         }
@@ -172,6 +175,23 @@ const NewTaskOrganizer = () => {
                         }),
                     })
                     .then(response => response.json())
+                    .then(() => {
+                        if (taskType === 'project') {
+                            fetch(`${process.env.REACT_APP_API_URL}/get_projects`, {
+                                headers: {
+                                    'Authorization': `Token ${localStorage.getItem('token')}`
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => setProjects(data))
+                            .catch(error => console.error('Error:', error));
+                        }
+                    })
                     .catch((error) => {
                         console.error('Error:', error);
                     });
@@ -179,7 +199,7 @@ const NewTaskOrganizer = () => {
                     handleDelete();
                 }
             })
-            .then(handleResponse)
+            .then(handleApiResponse)
             .catch((error) => {
                 console.error('Error:', error);
             });
@@ -202,10 +222,10 @@ const NewTaskOrganizer = () => {
             })
             .then(() => {
                 // Remove the deleted task from the tasks state
-                setTasks(tasks.filter(task => task.id !== currentTask.id));
+                setTasksList(tasksList.filter(task => task.id !== currentTask.id));
                 // If there are any tasks left, set the current task to the first one
                 // Otherwise, set the current task to null
-                setCurrentTask(tasks.length > 1 ? tasks[0] : null);
+                setCurrentTask(tasksList.length > 1 ? tasksList[0] : null);
                 setTaskType([]);
             })
             .catch(error => console.error('Error:', error));
@@ -214,15 +234,70 @@ const NewTaskOrganizer = () => {
 
 
 
+    const handleAddContext = () => {
+        setNewContextDialogOpen(true);
+    };
+
+    const handleClose = () => {
+        setNewContextDialogOpen(false);
+    };
+
+    const createContextMutation = useMutation(createContext, {
+        onSuccess: async () => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/get_contexts`, {
+                    headers: {
+                        'Authorization': `Token ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                setContexts(data);
+                setContext(data[data.length - 1].id); // set the last context
+                setNewContextName("");
+                setNewContextDescription("");
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+    });
+
+    const handleSubmit = async () => {
+        const userResponse = await fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' });
+        const userData = await userResponse.json();
+        const userId = userData.id;
+        const newContext = {
+            name: newContextName,
+            description: newContextDescription,
+            user: userId,
+        };
+        createContextMutation.mutate(newContext);
+        setNewContextDialogOpen(false);
+    };
+
 
     return (
         <BaseLayout headerContent={headerContent}>
+                {tasksList.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full bg-gray-800 text-white px-4 sm:px-0">
+                        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-8">
+                            <span className="text-yellow-300">No new entries to be processed.</span>
+                        </h1>
+                        <h2 className="text-xl sm:text-2xl md:text-3xl mb-4 sm:mb-8 text-center">
+                            You can now review your projects, tasks or schedule.
+                        </h2>
+                    </div>
+                ) : (
             <div className="flex flex-col text-white p-6 space-y-4 ">
                 <div>
                 <div className="flex flex-col sm:flex-row justify-center mx-auto space-y-4 sm:space-y-6 space-x-0 sm:space-x-12 max-w-screen-sm">
                         <div className="flex flex-col space-y-4 w-full sm:w-auto">
                             <h1 className="text-2xl mb-4" style={{ color: "#579BFC" }}>
-                            {tasks.length} remaining entries
+                            {tasksList.length} remaining entries
                             </h1>
                             <h2 className="text-lg mb-4">Current: {currentTask?.name}</h2>
                             {currentTask && (
@@ -338,17 +413,48 @@ const NewTaskOrganizer = () => {
                                 <FormControl variant="outlined" sx={{ ...commonStyles, minWidth: 180 }}>
                                     <InputLabel id="context-label">Context</InputLabel>
                                     <Select
-                                    label="Context"
-                                    value={context}
-                                    onChange={handleContextChange}
-                                    input={<OutlinedInput label="Context" />}
+                                        label="Context"
+                                        value={context}
+                                        onChange={handleContextChange}
+                                        input={<OutlinedInput label="Context" />}
                                     >
-                                    {contexts.map((context) => (
-                                        <MenuItem key={context.id} value={context.id}>
-                                        {context.name}
-                                        </MenuItem>
-                                    ))}
+                                        {contexts.map((context) => (
+                                            <MenuItem key={context.id} value={context.id}>
+                                                {context.name}
+                                            </MenuItem>
+                                        ))}
+                                        <MenuItem onClick={handleAddContext}>+ add context</MenuItem>
                                     </Select>
+                                    <Dialog open={newContextDialogOpen} onClose={handleClose}>
+                                    <DialogContent>
+                                        <DialogContentText id="alert-dialog-description">
+                                            Please enter the name and description for the new context.
+                                        </DialogContentText>
+                                        <TextField
+                                            autoFocus
+                                            margin="dense"
+                                            label="Name"
+                                            type="text"
+                                            fullWidth
+                                            value={newContextName}
+                                            onChange={(e) => setNewContextName(e.target.value || "")}
+                                        />
+                                        <TextField
+                                            margin="dense"
+                                            label="Description"
+                                            type="text"
+                                            fullWidth
+                                            value={newContextDescription}
+                                            onChange={(e) => setNewContextDescription(e.target.value || "")}
+                                        />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleClose}>Cancel</Button>
+                                        <Button onClick={handleSubmit} autoFocus>
+                                            Add
+                                        </Button>
+                                    </DialogActions>
+                                </Dialog>
                                 </FormControl>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', ...commonStyles, maxWidth: '100%' }}>
                                     <TextField
@@ -400,6 +506,7 @@ const NewTaskOrganizer = () => {
                 </Button>
             )}
             </div>
+            )}
         </BaseLayout>
         );
     };
