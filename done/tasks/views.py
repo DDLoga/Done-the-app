@@ -631,6 +631,10 @@ from .serializers import UserSerializer
 from rest_framework import generics
 from .models import Calendar
 import logging
+import requests
+import os
+from .models import UserToken
+from rest_framework.authtoken.models import Token
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -883,3 +887,48 @@ def delete_task(request, task_id):    # delete a task on the new task organizer 
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def OAuth2CallbackView(request):
+    print('request:', request.GET)
+    code = request.GET.get('code')
+
+
+    clientId = os.getenv('REACT_APP_CLIENT_ID')
+    clientSecret = os.getenv('REACT_APP_CLIENT_SECRET')
+    redirectUri = os.getenv('REACT_APP_REDIRECT_URI')
+        
+    print('code:', code)
+    print('clientId:', clientId)
+    print('clientSecret:', clientSecret)
+    print('redirectUri:', redirectUri)
+    print('user:', request.user)
+
+    data = {
+        'code': code,
+        'client_id': clientId,
+        'client_secret': clientSecret,
+        'redirect_uri': redirectUri,
+        'grant_type': 'authorization_code',
+    }
+
+    response = requests.post('https://oauth2.googleapis.com/token', data=data)
+
+    if response.status_code == 200:
+        access_token = response.json()['access_token']
+        refresh_token = response.json()['refresh_token']
+        print('access_token:', access_token)
+        print('refresh_token:', refresh_token)
+        user_token, created = UserToken.objects.get_or_create(user=request.user)
+        user_token.access_token = access_token
+        user_token.refresh_token = refresh_token
+        user_token.save()
+        print('tokens saved')
+
+        return JsonResponse({'message': 'Google Calendar linked successfully'})
+    else:
+        print('error:', response.status_code, response.json())
+        return JsonResponse({'error': 'Failed to exchange authorization code for tokens'}, status=400)
