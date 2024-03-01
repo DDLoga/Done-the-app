@@ -15,6 +15,7 @@ import ContextManager from './components/ContextManager';
 import AssigneeManager from './components/AssigneeManager';
 import WelcomeMessage from './components/welcomeMessage';
 import Calendar from './components/Calendar';
+import OAuth2Callback from './components/_OAuth2Callback';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -124,6 +125,7 @@ const App = () => {
                             <SideMenu />
                             
                             <Routes>
+                                <Route path="/oauth2callback" element={<OAuth2Callback />} />
                                 <Route 
                                     path="/" 
                                     element={user ? <WelcomeMessage /> : <Login />}

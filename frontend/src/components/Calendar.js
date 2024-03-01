@@ -194,12 +194,22 @@ function Calendar() {
         );
     }
 
+    const clientId = process.env.REACT_APP_CLIENT_ID;
+    const redirectUri = process.env.REACT_APP_REDIRECT_URI;
+    console.log('Client ID: ', clientId);
+    console.log('Redirect URI: ', redirectUri);
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&response_type=code&scope=https://www.googleapis.com/auth/calendar&redirect_uri=${redirectUri}&access_type=offline&prompt=consent`;
+    const handleAuthRedirect = () => {
+        window.location.href = authUrl;
+    };
+    
     return (
         <BaseLayout headerContent={headerContent}>
             <div className="flex flex-col md:flex-row md:space-x-4 max-w-screen-xl mx-auto">
                 <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
                     <TasksTable tasks={tasks} />
                 </div>
+                <div><button onClick={handleAuthRedirect}>Link Google Calendar</button></div>
                 <div className="flex-grow" style={{ height: '80vh', maxHeight: '100%' }}>
                     <EventsCalendar 
                         events={events} 

@@ -30,5 +30,6 @@ urlpatterns = [
         path('get_calendar/<int:pk>/', views.CalendarView.as_view(), name='get_calendar_detail'),
         path('get_projects/', views.get_projects, name='get_projects'),
         path('tasks/<int:task_id>/', views.delete_task, name='delete_task'),
+        path('oauth2callback/', views.OAuth2CallbackView, name='oauth2callback'),
     ])),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

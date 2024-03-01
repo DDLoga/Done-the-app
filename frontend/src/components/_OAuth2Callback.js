@@ -1,7 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function OAuth2Callback() {
+    const [hasRequested, setHasRequested] = useState(false);
+
     useEffect(() => {
+        if (hasRequested) {
+            return;
+        }
+
         console.log('useEffect triggered');
 
         // Extract the 'code' from the URL query parameters
@@ -32,11 +38,12 @@ function OAuth2Callback() {
         })
         .then(data => {
             console.log('data:', data);
+            setHasRequested(true);
         })
         .catch((error) => {
             console.error('Error:', error);
         });
-    }, []);
+    }, [hasRequested]);
 
     return <div>OAuth2 Callback</div>;
 }
