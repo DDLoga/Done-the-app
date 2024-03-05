@@ -31,5 +31,8 @@ urlpatterns = [
         path('get_projects/', views.get_projects, name='get_projects'),
         path('tasks/<int:task_id>/', views.delete_task, name='delete_task'),
         path('oauth2callback/', views.OAuth2CallbackView, name='oauth2callback'),
+        path('user-token/', views.user_token_view, name='user-token'),
+        path('IsConnectedToGoogleApiView/', views.IsConnectedToGoogleApiView.as_view(), name='IsConnectedToGoogleApiView'),
+        path('sync-google-calendar/', views.SyncGoogleCalendarView.as_view(), name='sync-google-calendar'),
     ])),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -73,19 +73,22 @@ class Tasks(models.Model):
     new_task = models.BooleanField(default=True)
     compound_priority = models.IntegerField(null=True, blank=True)
     
+
 class Calendar(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event_title = models.CharField(max_length=200)
     event_start = models.DateTimeField()
     event_end = models.DateTimeField()
     event_allDay = models.BooleanField(default=False)
-    event_taskId = models.ForeignKey(Tasks, on_delete=models.CASCADE)
+    event_taskId = models.ForeignKey(Tasks, on_delete=models.CASCADE, null=True)
+    last_updated = models.DateTimeField(auto_now=True)  # existing field
+    last_sync = models.DateTimeField(null=True)  # new field
+    recurrence_rule = models.TextField(null=True)  # new field
 
     def __str__(self):
         return self.event_title
     
-    from django.db import models
-    from django.contrib.auth.models import User
+
 
 class UserToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

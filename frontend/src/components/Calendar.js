@@ -182,7 +182,7 @@ function Calendar() {
         deleteEventMutation.mutate([selectedEvent.id]);
     };
 
-    function renderEventContent(eventInfo) {
+    function renderEventContent(eventInfo) {                        // add a trash icon to the event
         return (
             <>
                 <b>{eventInfo.event.title}</b>
@@ -194,22 +194,73 @@ function Calendar() {
         );
     }
 
-    const clientId = process.env.REACT_APP_CLIENT_ID;
-    const redirectUri = process.env.REACT_APP_REDIRECT_URI;
-    console.log('Client ID: ', clientId);
-    console.log('Redirect URI: ', redirectUri);
+
+/////////////////////////////////////////////////////////////////////   Google Calendar /////////////////////////////////////////////////////////////////
+    const clientId = process.env.REACT_APP_CLIENT_ID;               // get the google client id from the environment
+    const redirectUri = process.env.REACT_APP_REDIRECT_URI;         // get the redirect uri from the environment
+
+    // button link to connect to google calendar
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&response_type=code&scope=https://www.googleapis.com/auth/calendar&redirect_uri=${redirectUri}&access_type=offline&prompt=consent`;
     const handleAuthRedirect = () => {
         window.location.href = authUrl;
     };
     
+
+    const [isConnected, setIsConnected] = useState(false);          // confirm if the user is connected to google calendar
+
+    useEffect(() => {                                               // check if the user is connected to google calendar on page load
+        fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
+            .then(response => response.json())
+            .then(userData => {
+                const userId = userData.id;
+                console.log('userId:', userId);
+                if (userId) {
+                    fetchWithToken(`http://127.0.0.1:8000/api/IsConnectedToGoogleApiView?userId=${userId}`, { method: 'GET' })
+                        .then(response => response.json())
+                        .then(data => {
+                            setIsConnected(data.is_connected);
+                            console.log('isConnected:', data.is_connected);
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }, []);
+    
+    useEffect(() => {
+        if (isConnected) {
+            fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
+                .then(response => response.json())
+                .then(userData => {
+                    const userId = userData.id;
+                    console.log('userId:', userId);
+                    if (userId) {
+                        fetchWithToken(`http://127.0.0.1:8000/api/sync-google-calendar?userId=${userId}`, { method: 'GET' })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    console.log('Google Calendar synced successfully');
+                                } else {
+                                    console.error('Error syncing Google Calendar:', data.message);
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }, [isConnected]);
+
     return (
         <BaseLayout headerContent={headerContent}>
             <div className="flex flex-col md:flex-row md:space-x-4 max-w-screen-xl mx-auto">
                 <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
                     <TasksTable tasks={tasks} />
                 </div>
-                <div><button onClick={handleAuthRedirect}>Link Google Calendar</button></div>
+                <div>
+                    {isConnected ? "Connected to Google Calendar" : 
+                        <button onClick={handleAuthRedirect}>Link Google Calendar</button>}
+                </div>
                 <div className="flex-grow" style={{ height: '80vh', maxHeight: '100%' }}>
                     <EventsCalendar 
                         events={events} 

@@ -632,10 +632,19 @@ from rest_framework import generics
 from .models import Calendar
 import logging
 import requests
+# from google.auth.transport import requests
 import os
 from .models import UserToken
 from rest_framework.authtoken.models import Token
-
+from google.oauth2 import id_token
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2 import BackendApplicationClient
+from googleapiclient.discovery import build
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -932,3 +941,138 @@ def OAuth2CallbackView(request):
     else:
         print('error:', response.status_code, response.json())
         return JsonResponse({'error': 'Failed to exchange authorization code for tokens'}, status=400)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_token_view(request):
+    user = request.user
+    try:
+        user_token = UserToken.objects.get(user=user)
+    except UserToken.DoesNotExist:
+        return Response({'error': 'UserToken does not exist for this user'}, status=404)
+    except Exception as e:
+        return Response({'error': 'An error occurred'}, status=500)
+
+    print('access_token', user_token.access_token)
+    print('refresh_token', user_token.refresh_token)
+    return Response({'access_token': user_token.access_token, 'refresh_token': user_token.refresh_token})
+
+
+
+
+
+class IsConnectedToGoogleApiView(View):
+    def get(self, request, *args, **kwargs):
+        user_id = request.GET.get('userId')
+        print('user_id:', user_id)
+        user_token = UserToken.objects.get(user__id=user_id)
+        print("Client ID: ", os.getenv('REACT_APP_CLIENT_ID'))
+        print("Access token: ", user_token.access_token)
+
+        try:
+            # Verify the access token
+            response = requests.get('https://www.googleapis.com/oauth2/v2/tokeninfo', params={'access_token': user_token.access_token})
+            if response.status_code == 200:
+                # If the access token is valid, return a positive response
+                return JsonResponse({'is_connected': True})
+            else:
+                raise ValueError('Failed to verify token')
+
+        except ValueError:
+            # The access token is expired or invalid, try to refresh it
+            client = BackendApplicationClient(client_id=os.getenv('REACT_APP_CLIENT_ID'))
+            oauth = OAuth2Session(client=client)
+            token = oauth.refresh_token(token_url="https://oauth2.googleapis.com/token", refresh_token=user_token.refresh_token, client_id=os.getenv('REACT_APP_CLIENT_ID'), client_secret=os.getenv('REACT_APP_CLIENT_SECRET'))
+
+            # Update the tokens in the UserToken model
+            user_token.access_token = token['access_token']
+            user_token.refresh_token = token['refresh_token']
+            user_token.save()
+
+            # Return a positive response
+            return JsonResponse({'is_connected': True})
+        
+        
+
+
+
+class SyncGoogleCalendarView(View):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.GET.get('userId')
+        print(f"User ID: {user_id}")
+        user = User.objects.get(id=user_id)
+        user_token = UserToken.objects.get(user__id=user_id)
+
+        # Load the user's credentials from the UserToken
+        credentials = Credentials.from_authorized_user_info({
+            'access_token': user_token.access_token,
+            'refresh_token': user_token.refresh_token,
+            'client_id': os.getenv('REACT_APP_CLIENT_ID'),
+            'client_secret': os.getenv('REACT_APP_CLIENT_SECRET'),
+            'token_uri': 'https://oauth2.googleapis.com/token',
+        })
+
+        print(f"Credentials: {credentials}")
+
+        # Build the Google Calendar service
+        service = build('calendar', 'v3', credentials=credentials)
+
+        # Fetch events from local Calendar
+        local_events = Calendar.objects.filter(user=user)
+
+        # Fetch events from Google Calendar
+        now = datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+        two_weeks_ago = (datetime.utcnow() - timedelta(weeks=2)).isoformat() + 'Z'
+        one_year_later = (datetime.utcnow() + timedelta(weeks=52)).isoformat() + 'Z'
+        events_result = service.events().list(calendarId='primary', timeMin=two_weeks_ago, timeMax=one_year_later, singleEvents=True, orderBy='startTime').execute()
+        events = events_result.get('items', [])
+
+        print('events:', events)
+        print(f"Number of events fetched from Google Calendar: {len(events)}")
+
+        # Update Google Calendar with local events
+        for local_event in local_events:
+            matching_events = [event for event in events if event['summary'] == local_event.event_title]
+            if matching_events:
+                # The event exists in Google Calendar
+                gcal_event = matching_events[0]
+                if parse_datetime(gcal_event['updated']) < local_event.last_updated:
+                    # The local event is more recent, so update the Google Calendar event
+                    service.events().update(
+                        calendarId='primary',
+                        eventId=gcal_event['id'],
+                        body={
+                            'summary': local_event.event_title,
+                            'start': {'dateTime': local_event.event_start.isoformat()},
+                            'end': {'dateTime': local_event.event_end.isoformat()},
+                            # Add other fields as necessary
+                        },
+                    ).execute()
+                    print(f"Updated Google Calendar event: {local_event.event_title}")
+            else:
+                # The event does not exist in Google Calendar, so create it
+                service.events().insert(
+                    calendarId='primary',
+                    body={
+                        'summary': local_event.event_title,
+                        'start': {'dateTime': local_event.event_start.isoformat()},
+                        'end': {'dateTime': local_event.event_end.isoformat()},
+                        # Add other fields as necessary
+                    },
+                ).execute()
+                print(f"Created new Google Calendar event: {local_event.event_title}")
+
+        # Delete Google Calendar events that do not exist in local Calendar
+        for gcal_event in events:
+            if not any(local_event.event_title == gcal_event['summary'] for local_event in local_events):
+                # The event does not exist in local Calendar, so delete it from Google Calendar
+                service.events().delete(
+                    calendarId='primary',
+                    eventId=gcal_event['id'],
+                ).execute()
+                print(f"Deleted Google Calendar event: {gcal_event['summary']}")
+
+        return JsonResponse({'status': 'success'})
