@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation  } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
@@ -58,6 +58,7 @@ function Calendar() {
         error:errorLoadingContexts 
     } = useQuery('fetchedEventsData', fetchEvents); 
 
+    const queryClient = useQueryClient();                           // used to refetch the events data after an update
     const [events, setEvents] = useState([]);                       // update events dataset function
 
     useEffect(() => {                                               // load events dataset once fetched
@@ -240,6 +241,7 @@ function Calendar() {
                             .then(data => {
                                 if (data.status === 'success') {
                                     console.log('Google Calendar synced successfully');
+                                    queryClient.invalidateQueries('fetchedEventsData');
                                 } else {
                                     console.error('Error syncing Google Calendar:', data.message);
                                 }
@@ -258,8 +260,11 @@ function Calendar() {
                     <TasksTable tasks={tasks} />
                 </div>
                 <div>
-                    {isConnected ? "Connected to Google Calendar" : 
-                        <button onClick={handleAuthRedirect}>Link Google Calendar</button>}
+                    {isConnected ? (
+                        <div>Connected to Google Calendar</div>
+                    ) : (
+                        <button onClick={handleAuthRedirect}>Link Google Calendar</button>
+                    )}
                 </div>
                 <div className="flex-grow" style={{ height: '80vh', maxHeight: '100%' }}>
                     <EventsCalendar 
