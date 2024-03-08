@@ -1041,6 +1041,8 @@ class SyncGoogleCalendarView(View):
 
         # Iterate over Google Calendar events
         for gcal_event in gcal_events:
+            # print gcal_event with all its fields
+            print('gcal_event: ', gcal_event)
             gcal_updated = parse_datetime(gcal_event['updated'])
 
             if gcal_event['summary'] not in [local_event.event_title for local_event in local_events]:
@@ -1067,6 +1069,8 @@ class SyncGoogleCalendarView(View):
 
         # Iterate over local events
         for local_event in local_events:
+            # print local_event with all its fields
+            print('local_event: ', local_event.__dict__)
             # Find the corresponding Google Calendar event
             corresponding_gcal_event = next((event for event in gcal_events if event['summary'] == local_event.event_title), None)
 
@@ -1087,6 +1091,14 @@ class SyncGoogleCalendarView(View):
                         },
                     ).execute()
                     print(f"Created Google Calendar event: {local_event.event_title}")
+            elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) > local_event.last_updated:
+                # The event has been updated in Google Calendar
+                local_event.event_title = corresponding_gcal_event['summary']
+                local_event.event_start = parse_datetime(corresponding_gcal_event['start']['dateTime'])
+                local_event.event_end = parse_datetime(corresponding_gcal_event['end']['dateTime'])
+                local_event.last_updated = parse_datetime(corresponding_gcal_event['updated'])
+                local_event.save()
+                print(f"Updated local event: {local_event.event_title}")
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) < local_event.last_updated:
                 # The event has been updated in local calendar
                 service.events().update(
