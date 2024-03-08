@@ -94,3 +94,4 @@ class UserToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     access_token = models.CharField(max_length=200)
     refresh_token = models.CharField(max_length=200)
+    last_gCal_sync = models.DateTimeField(null=True, blank=True)
