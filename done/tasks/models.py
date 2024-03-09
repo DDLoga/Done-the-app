@@ -84,10 +84,10 @@ class Calendar(models.Model):
     last_updated = models.DateTimeField(auto_now=True)  # existing field
     last_sync = models.DateTimeField(null=True)  # new field
     recurrence_rule = models.TextField(null=True)  # new field
+    gcal_id = models.CharField(max_length=255, null=True, blank=True)  # new field
 
     def __str__(self):
         return self.event_title
-    
 
 
 class UserToken(models.Model):

@@ -1044,7 +1044,7 @@ class SyncGoogleCalendarView(View):
             print('gcal_event: ', gcal_event)
             gcal_updated = parse_datetime(gcal_event['updated'])
 
-            if gcal_event['summary'] not in [local_event.event_title for local_event in local_events]:
+            if gcal_event['id'] not in [local_event.gcal_id for local_event in local_events]:
                 if gcal_updated < last_gcal_sync_time_stamp:
                     # The event has been deleted in local calendar
                     service.events().delete(calendarId='primary', eventId=gcal_event['id']).execute()
@@ -1066,17 +1066,20 @@ class SyncGoogleCalendarView(View):
                         event_start=gcal_start,
                         event_end=gcal_end,
                         event_allDay=all_day,
+                        gcal_id=gcal_event['id'],  # Set the gcal_id to the Google Calendar event ID
                         last_sync=timezone.now()  # Set the last_sync to now
                     )
 
                     new_event.save()
                     print(f"Created local event: {new_event.event_title}")
+                    print('new_event: ', new_event.__dict__)
+                    
         # Iterate over local events
         for local_event in local_events:
             # Find the corresponding Google Calendar event
-            corresponding_gcal_event = next((event for event in gcal_events if event['summary'] == local_event.event_title), None)
+            corresponding_gcal_event = next((event for event in gcal_events if event['id'] == local_event.gcal_id), None)
 
-            if local_event.event_title not in gcal_event_summaries:
+            if local_event.gcal_id not in [event['id'] for event in gcal_events]:
                 if local_event.last_sync is not None:
                     # The event has been deleted in Google Calendar
                     local_event.delete()
@@ -1089,7 +1092,7 @@ class SyncGoogleCalendarView(View):
                     else:
                         start = {'dateTime': local_event.event_start.isoformat()}
                         end = {'dateTime': local_event.event_end.isoformat()}
-                    service.events().insert(
+                    gcal_event = service.events().insert(
                         calendarId='primary',
                         body={
                             'summary': local_event.event_title,
@@ -1098,7 +1101,10 @@ class SyncGoogleCalendarView(View):
                             # Add other fields as necessary
                         },
                     ).execute()
+                    local_event.gcal_id = gcal_event['id']  # Store the Google Calendar event ID
+                    local_event.save()
                     print(f"Created Google Calendar event: {local_event.event_title}")
+                    
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) > local_event.last_updated:
                 # The event has been updated in Google Calendar
                 local_event.event_title = corresponding_gcal_event['summary']
