@@ -1036,7 +1036,6 @@ class SyncGoogleCalendarView(View):
         # Create a list of Google Calendar event summaries
         gcal_event_summaries = [event['summary'] for event in gcal_events]
 
-        # Get the first available last_updated value from local events
 
 
         # Iterate over Google Calendar events
@@ -1074,8 +1073,6 @@ class SyncGoogleCalendarView(View):
                     print(f"Created local event: {new_event.event_title}")
         # Iterate over local events
         for local_event in local_events:
-            # print local_event with all its fields
-            print('local_event: ', local_event.__dict__)
             # Find the corresponding Google Calendar event
             corresponding_gcal_event = next((event for event in gcal_events if event['summary'] == local_event.event_title), None)
 
@@ -1087,7 +1084,7 @@ class SyncGoogleCalendarView(View):
                 elif local_event.last_sync is None:
                     # The event has been created in local calendar
                     if local_event.event_allDay:
-                        start = {'date': local_event.event_start.date().isoformat()}
+                        start = {'date': (local_event.event_start + timedelta(days=1)).date().isoformat()} 
                         end = {'date': (local_event.event_end + timedelta(days=1)).date().isoformat()}  # Add one day to the end date
                     else:
                         start = {'dateTime': local_event.event_start.isoformat()}
@@ -1116,14 +1113,17 @@ class SyncGoogleCalendarView(View):
                 local_event.last_updated = parse_datetime(corresponding_gcal_event['updated'])
                 local_event.save()
                 print(f"Updated local event: {local_event.event_title}")
+                print('local_event: ', local_event.__dict__)
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) < local_event.last_updated:
                 # The event has been updated in local calendar
                 if local_event.event_allDay:
-                    start = {'date': local_event.event_start.date().isoformat()}
-                    end = {'date': (local_event.event_end - timedelta(days=1)).date().isoformat()}
+                    start = {'date': (local_event.event_start + timedelta(days=1)).date().isoformat()} 
+                    end = {'date': (local_event.event_end + timedelta(days=1)).date().isoformat()}  # Add one day to the end date
                 else:
                     start = {'dateTime': local_event.event_start.isoformat()}
-                    end = {'dateTime': local_event.event_end.isoformat()}
+                    # If the event is no longer an all-day event, set the end time to be at least one hour after the start time
+                    end_time = max(local_event.event_end, local_event.event_start + timedelta(hours=1))
+                    end = {'dateTime': end_time.isoformat()}
                 service.events().update(
                     calendarId='primary',
                     eventId=corresponding_gcal_event['id'],
@@ -1135,6 +1135,7 @@ class SyncGoogleCalendarView(View):
                     },
                 ).execute()
                 print(f"Updated Google Calendar event: {local_event.event_title}")
+                print('local_event: ', local_event.__dict__)
 
         # record the last sync time
         user_token.last_gCal_sync = timezone.now()
