@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
+import { Draggable } from '@fullcalendar/interaction';
 import { fetchTasks } from './_fetchTasks';
 import { fetchEvents, createEvent, updateEventAPI, deleteEventsAPI } from './_fetchEvents';
 import { fetchWithToken } from './_api';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import BaseLayout from './baselayout';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { TrashIcon } from '@heroicons/react/24/solid';
 import TasksTable from './_calendarTasksTable';
 import EventsCalendar from './_CalendarEventsCalendar';
+import CircularProgress from '@mui/material/CircularProgress';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import SyncIcon from '@mui/icons-material/Sync';
+import Tooltip from '@mui/material/Tooltip';
 
 
 function Calendar() {
@@ -30,32 +32,32 @@ function Calendar() {
         setTasks(fetchedTasksData);
     }, [fetchedTasksData]);
 
-    useEffect(() => {                                                   // make the tasks as draggable table rows
-        let draggableEl = document.getElementById("external-events");   // create a table with Draggable rows rendered on JSX
-        let draggable = new Draggable(draggableEl, {                                    
-            itemSelector: '.fc-event',
-            eventData: function(eventEl) {                              // create an event object for the calendar
-                let title = eventEl.getAttribute('title');              // get the title of the task    
-                let id = eventEl.getAttribute('data-id');               // get the id of the task
-                return {
-                    title: title,
-                    id: id,
-                    allDay: true
-                };
-            }
-        });
+    useEffect(() => {                                                   
+        let draggableEl = document.getElementById("external-events");   
+        if (draggableEl) {
+            let draggable = new Draggable(draggableEl, {                                  
+                itemSelector: '.fc-event',
+                eventData: function(eventEl) {                              
+                    let title = eventEl.getAttribute('title');              
+                    let id = eventEl.getAttribute('data-id');               
+                    return {
+                        title: title,
+                        id: id,
+                        allDay: true
+                    };
+                }
+            });
 
-        return () => {
-            draggable.destroy();
-        };
+            return () => {
+                draggable.destroy();
+            };
+        }
     }, [tasks]);
-
 
     ///////////////////////////////////////////////////////////////////////   Manage events /////////////////////////////////////////////////////////////////
     const {                                                         // fetch events data from the API
         data: fetchedEventsData,
-        isLoading:isLoadingContexts, 
-        error:errorLoadingContexts 
+        isLoading:isLoadingEventsData, 
     } = useQuery('fetchedEventsData', fetchEvents); 
 
     const queryClient = useQueryClient();                           // used to refetch the events data after an update
@@ -216,7 +218,7 @@ function Calendar() {
                 const userId = userData.id;
                 console.log('userId:', userId);
                 if (userId) {
-                    fetchWithToken(`http://127.0.0.1:8000/api/IsConnectedToGoogleApiView?userId=${userId}`, { method: 'GET' })
+                    fetchWithToken(`${process.env.REACT_APP_API_URL}/IsConnectedToGoogleApiView?userId=${userId}`, { method: 'GET' })
                         .then(response => response.json())
                         .then(data => {
                             setIsConnected(data.is_connected);
@@ -228,7 +230,8 @@ function Calendar() {
             .catch(error => console.error('Error:', error));
     }, []);
     
-    useEffect(() => {
+
+    const syncGoogleCalendar = () => {
         if (isConnected) {
             fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
                 .then(response => response.json())
@@ -236,7 +239,7 @@ function Calendar() {
                     const userId = userData.id;
                     console.log('userId:', userId);
                     if (userId) {
-                        fetchWithToken(`http://127.0.0.1:8000/api/sync-google-calendar?userId=${userId}`, { method: 'GET' })
+                        fetchWithToken(`${process.env.REACT_APP_API_URL}/sync-google-calendar?userId=${userId}`, { method: 'GET' })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.status === 'success') {
@@ -251,31 +254,78 @@ function Calendar() {
                 })
                 .catch(error => console.error('Error:', error));
         }
-    }, [isConnected]);
+    };
+
+    useEffect(() => {
+        syncGoogleCalendar();
+    }, [isConnected, queryClient]);
+
+    function setErrorLoadingTasks(error) {
+        console.error("An error occurred while loading tasks: ", error);
+    }
+
 
     return (
         <BaseLayout headerContent={headerContent}>
-            <div className="flex flex-col md:flex-row md:space-x-4 max-w-screen-xl mx-auto">
-                <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
-                    <TasksTable tasks={tasks} />
+            {(isLoadingTasks || isLoadingEventsData) ? (
+                <div className="flex items-center justify-center min-h-screen">
+                    <CircularProgress />
                 </div>
-                <div>
-                    {isConnected ? (
-                        <div>Connected to Google Calendar</div>
-                    ) : (
-                        <button onClick={handleAuthRedirect}>Link Google Calendar</button>
-                    )}
+            ) : errorLoadingTasks ? (
+                <Dialog
+                    open={true}
+                    onClose={() => setErrorLoadingTasks(null)}
+                >
+                    <DialogTitle>Error</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            {'An error has occurred: ' + errorLoadingTasks.message}
+                        </DialogContentText>
+                    </DialogContent>    
+                    <DialogActions>
+                        <Button onClick={() => setErrorLoadingTasks(null)} color="primary">
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            ) : (
+                <div className="flex flex-col md:flex-row md:space-x-4 max-w-screen-xl mx-auto">
+                    <div className="flex flex-col">
+                        <div>
+                            {isConnected ? (
+                                <div className="flex items-center">
+                                    <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 mr-2" />
+                                    Linked to Google Calendar
+                                    <Tooltip title="Sync">
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={<SyncIcon />}
+                                            style={{ justifyContent: 'center' }}
+                                            onClick={syncGoogleCalendar}
+                                        >
+                                        </Button>
+                                    </Tooltip>
+                                </div>
+                            ) : (
+                                <button onClick={handleAuthRedirect}>Link Google Calendar</button>
+                            )}
+                        </div>
+                        <div className="overflow-auto max-h-80">
+                            <TasksTable tasks={tasks} />
+                        </div>
+                    </div>
+                    <div className="flex-grow" style={{ height: '80vh', maxHeight: '100%' }}>
+                        <EventsCalendar 
+                            events={events} 
+                            handleDrop={handleDrop} 
+                            handleEventReceive={handleEventReceive} 
+                            handleEventEdit={handleEventEdit} 
+                            renderEventContent={renderEventContent} 
+                        />
+                    </div>
                 </div>
-                <div className="flex-grow" style={{ height: '80vh', maxHeight: '100%' }}>
-                    <EventsCalendar 
-                        events={events} 
-                        handleDrop={handleDrop} 
-                        handleEventReceive={handleEventReceive} 
-                        handleEventEdit={handleEventEdit} 
-                        renderEventContent={renderEventContent} 
-                    />
-                </div>
-            </div>
+            )}
             {selectedEvent && (
                 <Dialog
                     open={true}
@@ -299,5 +349,5 @@ function Calendar() {
             )}
         </BaseLayout>
     );
-}
-export default Calendar;
+    }
+    export default Calendar;

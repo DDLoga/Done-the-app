@@ -71,7 +71,7 @@ const NextTaskCaptureHeader = () => {
 
     if (isLoadingProjects) return 'Loading...';
     if (errorLoadingProjects) return 'An error has occurred: ' + errorLoadingProjects.message;
-    if (!fetchedProjectsData) return 'Loading...'; // Add this line
+    if (!fetchedProjectsData) return 'Loading...';
 
     const totalProjects = fetchedProjectsData.length;
 

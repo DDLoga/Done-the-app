@@ -398,13 +398,11 @@ def add_project(request):
 
 @csrf_exempt
 def update_tasks(request):
-    print(request.POST)
     # try:
     if request.method == 'POST':
         id = request.POST.get('id')
         field = request.POST.get('field')
         value = request.POST.get('value')
-        print('received id, field, value as: ', id, field, value)
         tasks = Tasks.objects.get(id=id)
         
         
@@ -418,10 +416,7 @@ def update_tasks(request):
         tasks.save()
         return JsonResponse({'status': 'success'}, status=200)
     return JsonResponse({'status': 'error'}, status=400)
-    # except Exception as e:
-    #     error_message = str(e)
-    #     print(error_message)
-    #     return JsonResponse({'status': 'error'}, status=400)
+
 
 
 
@@ -487,7 +482,6 @@ def update_task_v2(request):
                 else:
                     value = False
             setattr(task, field, value)
-            print(task), print(field), print(value)
 
         task.user = request.user
         task.save()
@@ -502,7 +496,6 @@ def get_tasks_v2(request):
 @csrf_exempt
 def create_task_v2(request):
     if request.method == 'POST':
-        print(request.POST)
         name = request.POST.get('name')
         priority = request.POST.get('priority')
         try:
@@ -572,7 +565,6 @@ def update_project_v2(request):
                 else:
                     value = False
             setattr(project, field, value)
-            print(project), print(field), print(value)
 
         project.user = request.user
         project.save()
@@ -603,7 +595,6 @@ def create_project_v2(request):
     
 @csrf_exempt
 def delete_completed_projects(request):
-    print(request)
     if request.method == 'DELETE':
         Projects.objects.filter(project_complete=True).delete()
         return JsonResponse({'success': True})
@@ -694,7 +685,6 @@ class QuickTaskEntryViewAPI(APIView):
                 continue
             task_data = {'name': task_name, 'user': user_id, 'effort':0, 'parent': parent_id}
             serializer = TaskSerializer(data=task_data)
-            print(task_data)
             if serializer.is_valid():
                 serializer.save()
             else:
@@ -707,12 +697,10 @@ class NtoTaskView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        print(request.data)
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             task = serializer.save(user=request.user)
             # print task and all its fields
-            print(task.__dict__)
             return Response({'task_id': task.id, 'task_name': task.name, 'parent': task.parent_id}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -781,12 +769,10 @@ class ContextView(APIView):
         return JsonResponse(serializer.data, safe=False)
 
     def post(self, request):
-        print(request.data)
         serializer = ContextSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)  # print validation errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None):
@@ -795,7 +781,6 @@ class ContextView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        print(serializer.errors)  # print validation errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None):
@@ -812,7 +797,6 @@ class AssigneeView(APIView):
         return JsonResponse(serializer.data, safe=False)
 
     def post(self, request):
-        print(request.data)
         serializer = AssigneeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -841,12 +825,10 @@ class CalendarView(APIView):
         return JsonResponse(serializer.data, safe=False)
 
     def post(self, request):
-        print('request is: ' ,request.data)
         serializer = CalendarSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(f"Error: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None):
@@ -863,7 +845,6 @@ class CalendarView(APIView):
 
     def delete(self, request, pk=None):
         try:
-            print('request is: ' ,request.data)
             calendar = get_object_or_404(Calendar, pk=pk, user=request.user)
             calendar.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -904,7 +885,6 @@ def delete_task(request, task_id):    # delete a task on the new task organizer 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def OAuth2CallbackView(request):
-    print('request:', request.GET)
     code = request.GET.get('code')
 
 
@@ -912,11 +892,6 @@ def OAuth2CallbackView(request):
     clientSecret = os.getenv('REACT_APP_CLIENT_SECRET')
     redirectUri = os.getenv('REACT_APP_REDIRECT_URI')
         
-    print('code:', code)
-    print('clientId:', clientId)
-    print('clientSecret:', clientSecret)
-    print('redirectUri:', redirectUri)
-    print('user:', request.user)
 
     data = {
         'code': code,
@@ -931,17 +906,13 @@ def OAuth2CallbackView(request):
     if response.status_code == 200:
         access_token = response.json()['access_token']
         refresh_token = response.json()['refresh_token']
-        print('access_token:', access_token)
-        print('refresh_token:', refresh_token)
         user_token, created = UserToken.objects.get_or_create(user=request.user)
         user_token.access_token = access_token
         user_token.refresh_token = refresh_token
         user_token.save()
-        print('tokens saved')
 
         return JsonResponse({'message': 'Google Calendar linked successfully'})
     else:
-        print('error:', response.status_code, response.json())
         return JsonResponse({'error': 'Failed to exchange authorization code for tokens'}, status=400)
 
 
@@ -956,8 +927,6 @@ def user_token_view(request):
     except Exception as e:
         return Response({'error': 'An error occurred'}, status=500)
 
-    print('access_token', user_token.access_token)
-    print('refresh_token', user_token.refresh_token)
     return Response({'access_token': user_token.access_token, 'refresh_token': user_token.refresh_token})
 
 
@@ -1040,17 +1009,13 @@ class SyncGoogleCalendarView(View):
 
         # Iterate over Google Calendar events
         for gcal_event in gcal_events:
-            # print gcal_event with all its fields
-            print('gcal_event: ', gcal_event)
             gcal_updated = parse_datetime(gcal_event['updated'])
 
             if gcal_event['id'] not in [local_event.gcal_id for local_event in local_events]:
                 if gcal_updated < last_gcal_sync_time_stamp:
                     # The event has been deleted in local calendar
                     service.events().delete(calendarId='primary', eventId=gcal_event['id']).execute()
-                    print(f"Deleted Google Calendar event: {gcal_event['summary']}")
                 elif gcal_updated > last_gcal_sync_time_stamp:
-                    print('gcal_updated > first_available_last_updated', gcal_updated,  last_gcal_sync_time_stamp)
                     # The event has been created in Google Calendar
                     if 'dateTime' in gcal_event['start']:
                         gcal_start = parse_datetime(gcal_event['start']['dateTime'])
@@ -1071,8 +1036,6 @@ class SyncGoogleCalendarView(View):
                     )
 
                     new_event.save()
-                    print(f"Created local event: {new_event.event_title}")
-                    print('new_event: ', new_event.__dict__)
                     
         # Iterate over local events
         for local_event in local_events:
@@ -1083,7 +1046,6 @@ class SyncGoogleCalendarView(View):
                 if local_event.last_sync is not None:
                     # The event has been deleted in Google Calendar
                     local_event.delete()
-                    print(f"Deleted local event: {local_event.event_title}")
                 elif local_event.last_sync is None:
                     # The event has been created in local calendar
                     if local_event.event_allDay:
@@ -1103,7 +1065,6 @@ class SyncGoogleCalendarView(View):
                     ).execute()
                     local_event.gcal_id = gcal_event['id']  # Store the Google Calendar event ID
                     local_event.save()
-                    print(f"Created Google Calendar event: {local_event.event_title}")
                     
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) > local_event.last_updated:
                 # The event has been updated in Google Calendar
@@ -1118,8 +1079,6 @@ class SyncGoogleCalendarView(View):
                     local_event.event_allDay = True
                 local_event.last_updated = parse_datetime(corresponding_gcal_event['updated'])
                 local_event.save()
-                print(f"Updated local event: {local_event.event_title}")
-                print('local_event: ', local_event.__dict__)
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) < local_event.last_updated:
                 # The event has been updated in local calendar
                 if local_event.event_allDay:
@@ -1140,8 +1099,6 @@ class SyncGoogleCalendarView(View):
                         # Add other fields as necessary
                     },
                 ).execute()
-                print(f"Updated Google Calendar event: {local_event.event_title}")
-                print('local_event: ', local_event.__dict__)
 
         # record the last sync time
         user_token.last_gCal_sync = timezone.now()
