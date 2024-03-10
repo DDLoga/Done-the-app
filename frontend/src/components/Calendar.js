@@ -115,7 +115,6 @@ function Calendar() {
         },
     });
     
-
 /////////////////////////////////////////////////////////////////////   Handle events /////////////////////////////////////////////////////////////////
     const handleDrop = async (info) => {
         const draggedEl = info.draggedEl;                           // get the dragged element
@@ -211,6 +210,13 @@ function Calendar() {
 
     const [isConnected, setIsConnected] = useState(false);          // confirm if the user is connected to google calendar
     const [isSyncing, setIsSyncing] = useState(false);              // confirm if the user is syncing google calendar
+    const [syncStatus, setSyncStatus] = useState({
+        status: '',
+        created_events: 0,
+        updated_events: 0,
+        deleted_events: 0,
+    });
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     useEffect(() => {                                               // check if the user is connected to google calendar on page load
         fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
@@ -235,6 +241,7 @@ function Calendar() {
     const syncGoogleCalendar = () => {
         if (isConnected) {
             setIsSyncing(true);
+            setIsDialogOpen(true);
             fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
                 .then(response => response.json())
                 .then(userData => {
@@ -244,17 +251,16 @@ function Calendar() {
                         fetchWithToken(`${process.env.REACT_APP_API_URL}/sync-google-calendar?userId=${userId}`, { method: 'GET' })
                             .then(response => response.json())
                             .then(data => {
-                                if (data.message === 'Calendar synced successfully') {
-                                    console.log('Google Calendar synced successfully');
-                                    queryClient.invalidateQueries('fetchedEventsData');
-                                } else {
-                                    console.error('Error syncing Google Calendar:', data.message);
-                                }
+                                setSyncStatus(data);  // Set the sync status with the response from the backend
                                 setIsSyncing(false);
+                                setTimeout(() => {
+                                    setIsDialogOpen(false);
+                                }, 2000);
                             })
                             .catch(error => {
                                 console.error('Error:', error);
                                 setIsSyncing(false);
+                                setIsDialogOpen(false);
                             });
                     }
                 })
@@ -269,7 +275,11 @@ function Calendar() {
         syncGoogleCalendar();
     }, [isConnected, queryClient]);
 
-
+    useEffect(() => {                                               // refetch the events data after syncing with google calendar
+        if (!isSyncing) {
+            queryClient.invalidateQueries('fetchedEventsData');
+        }
+    }, [isSyncing, queryClient]);
 
     function setErrorLoadingTasks(error) {
         console.error("An error occurred while loading tasks: ", error);
@@ -358,14 +368,23 @@ function Calendar() {
                     </DialogActions>
                 </Dialog>
             )}
-            {isSyncing && (
-                <Dialog open={true}>
+                <Dialog open={isDialogOpen}>
                     <DialogTitle>Syncing...</DialogTitle>
-                    <DialogContent>
+                    <DialogContent className="flex items-center justify-center h-24">
+                    {isSyncing ? (
                         <CircularProgress />
+                    ) : (
+                        syncStatus && (
+                            <div>
+                                {/* <p>Status: {syncStatus.status}</p> */}
+                                <p>Created events: {syncStatus.created_events}</p>
+                                <p>Updated events: {syncStatus.updated_events}</p>
+                                <p>Deleted events: {syncStatus.deleted_events}</p>
+                            </div>
+                        )
+)}
                     </DialogContent>
                 </Dialog>
-            )}
         </BaseLayout>
     );
     }

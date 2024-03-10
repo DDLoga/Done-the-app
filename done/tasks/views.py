@@ -970,6 +970,9 @@ class SyncGoogleCalendarView(View):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        created_events = 0
+        updated_events = 0
+        deleted_events = 0
         user_id = request.GET.get('userId')
         user = User.objects.get(id=user_id)
         user_token = UserToken.objects.get(user__id=user_id)
@@ -1015,6 +1018,7 @@ class SyncGoogleCalendarView(View):
                 if gcal_updated < last_gcal_sync_time_stamp:
                     # The event has been deleted in local calendar
                     service.events().delete(calendarId='primary', eventId=gcal_event['id']).execute()
+                    deleted_events += 1  # Increment the deleted events counter
                 elif gcal_updated > last_gcal_sync_time_stamp:
                     # The event has been created in Google Calendar
                     if 'dateTime' in gcal_event['start']:
@@ -1036,6 +1040,7 @@ class SyncGoogleCalendarView(View):
                     )
 
                     new_event.save()
+                    created_events += 1  # Increment the created events counter
                     
         # Iterate over local events
         for local_event in local_events:
@@ -1046,6 +1051,7 @@ class SyncGoogleCalendarView(View):
                 if local_event.last_sync is not None:
                     # The event has been deleted in Google Calendar
                     local_event.delete()
+                    deleted_events += 1  # Increment the deleted events counter
                 elif local_event.last_sync is None:
                     # The event has been created in local calendar
                     if local_event.event_allDay:
@@ -1065,6 +1071,7 @@ class SyncGoogleCalendarView(View):
                     ).execute()
                     local_event.gcal_id = gcal_event['id']  # Store the Google Calendar event ID
                     local_event.save()
+                    created_events += 1  # Increment the created events counter
                     
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) > local_event.last_updated:
                 # The event has been updated in Google Calendar
@@ -1079,6 +1086,7 @@ class SyncGoogleCalendarView(View):
                     local_event.event_allDay = True
                 local_event.last_updated = parse_datetime(corresponding_gcal_event['updated'])
                 local_event.save()
+                updated_events += 1  # Increment the updated events counter
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) < local_event.last_updated:
                 # The event has been updated in local calendar
                 if local_event.event_allDay:
@@ -1099,9 +1107,15 @@ class SyncGoogleCalendarView(View):
                         # Add other fields as necessary
                     },
                 ).execute()
+                updated_events += 1  # Increment the updated events counter
 
         # record the last sync time
         user_token.last_gCal_sync = timezone.now()
         user_token.save()
 
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({
+            'status': 'success',
+            'created_events': created_events,
+            'updated_events': updated_events,
+            'deleted_events': deleted_events,
+        })
