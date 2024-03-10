@@ -210,6 +210,7 @@ function Calendar() {
     
 
     const [isConnected, setIsConnected] = useState(false);          // confirm if the user is connected to google calendar
+    const [isSyncing, setIsSyncing] = useState(false);              // confirm if the user is syncing google calendar
 
     useEffect(() => {                                               // check if the user is connected to google calendar on page load
         fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
@@ -233,6 +234,7 @@ function Calendar() {
 
     const syncGoogleCalendar = () => {
         if (isConnected) {
+            setIsSyncing(true);
             fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
                 .then(response => response.json())
                 .then(userData => {
@@ -242,23 +244,32 @@ function Calendar() {
                         fetchWithToken(`${process.env.REACT_APP_API_URL}/sync-google-calendar?userId=${userId}`, { method: 'GET' })
                             .then(response => response.json())
                             .then(data => {
-                                if (data.status === 'success') {
+                                if (data.message === 'Calendar synced successfully') {
                                     console.log('Google Calendar synced successfully');
                                     queryClient.invalidateQueries('fetchedEventsData');
                                 } else {
                                     console.error('Error syncing Google Calendar:', data.message);
                                 }
+                                setIsSyncing(false);
                             })
-                            .catch(error => console.error('Error:', error));
+                            .catch(error => {
+                                console.error('Error:', error);
+                                setIsSyncing(false);
+                            });
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    setIsSyncing(false);
+                });
         }
     };
 
-    useEffect(() => {
+    useEffect(() => {                                               // trigger the sync function when the user is connected
         syncGoogleCalendar();
     }, [isConnected, queryClient]);
+
+
 
     function setErrorLoadingTasks(error) {
         console.error("An error occurred while loading tasks: ", error);
@@ -345,6 +356,14 @@ function Calendar() {
                             Delete
                         </Button>
                     </DialogActions>
+                </Dialog>
+            )}
+            {isSyncing && (
+                <Dialog open={true}>
+                    <DialogTitle>Syncing...</DialogTitle>
+                    <DialogContent>
+                        <CircularProgress />
+                    </DialogContent>
                 </Dialog>
             )}
         </BaseLayout>
