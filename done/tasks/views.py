@@ -824,21 +824,40 @@ class CalendarView(APIView):
         serializer = CalendarSerializer(calendars, many=True)
         return JsonResponse(serializer.data, safe=False)
 
+    from datetime import datetime, timedelta
+
     def post(self, request):
         serializer = CalendarSerializer(data=request.data)
         if serializer.is_valid():
+            if serializer.validated_data.get('event_allDay'):
+                event_start = serializer.validated_data.get('event_start')
+                event_end = serializer.validated_data.get('event_end')
+
+                # Adjust event_start and event_end if event_allDay is True
+                serializer.validated_data['event_start'] = datetime.combine(event_start.date() + timedelta(days=1), datetime.min.time())
+                serializer.validated_data['event_end'] = datetime.combine(event_end.date() + timedelta(days=1), datetime.min.time())
+
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
     def put(self, request, pk=None):
-        
         calendar = get_object_or_404(Calendar, pk=pk, user=request.user)
         serializer = CalendarSerializer(calendar, data=request.data)
         if serializer.is_valid():
+            if serializer.validated_data.get('event_allDay'):
+                event_start = serializer.validated_data.get('event_start')
+                event_end = serializer.validated_data.get('event_end')
+
+                # Adjust event_start and event_end if event_allDay is True
+                serializer.validated_data['event_start'] = datetime.combine(event_start.date() + timedelta(days=1), datetime.min.time())
+                serializer.validated_data['event_end'] = datetime.combine(event_end.date() + timedelta(days=1), datetime.min.time())
+
             serializer.save()
             return Response(serializer.data)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
@@ -1005,9 +1024,6 @@ class SyncGoogleCalendarView(View):
         events_result = service.events().list(calendarId='primary', timeMin=two_weeks_ago, timeMax=one_year_later, singleEvents=True, orderBy='startTime').execute()
         gcal_events = events_result.get('items', [])
 
-        # Create a list of Google Calendar event summaries
-        gcal_event_summaries = [event['summary'] for event in gcal_events]
-
 
 
         # Iterate over Google Calendar events
@@ -1081,8 +1097,8 @@ class SyncGoogleCalendarView(View):
                     local_event.event_end = parse_datetime(corresponding_gcal_event['end']['dateTime'])
                     local_event.event_allDay = False
                 else:
-                    local_event.event_start = parse_datetime(corresponding_gcal_event['start']['date'] + 'T00:00:00Z')
-                    local_event.event_end = parse_datetime(corresponding_gcal_event['end']['date'] + 'T00:00:00Z')
+                    local_event.event_start = parse_datetime(corresponding_gcal_event['start']['date'] + 'T00:00:00Z') + timedelta(days=0)
+                    local_event.event_end = parse_datetime(corresponding_gcal_event['end']['date'] + 'T00:00:00Z') + timedelta(days=0)
                     local_event.event_allDay = True
                 local_event.last_updated = parse_datetime(corresponding_gcal_event['updated'])
                 local_event.save()
@@ -1090,8 +1106,8 @@ class SyncGoogleCalendarView(View):
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) < local_event.last_updated:
                 # The event has been updated in local calendar
                 if local_event.event_allDay:
-                    start = {'date': (local_event.event_start + timedelta(days=1)).date().isoformat()} 
-                    end = {'date': (local_event.event_end + timedelta(days=1)).date().isoformat()}  # Add one day to the end date
+                    start = {'date': (local_event.event_start + timedelta(days=0)).date().isoformat()} 
+                    end = {'date': (local_event.event_end + timedelta(days=0)).date().isoformat()}  # Add one day to the end date
                 else:
                     start = {'dateTime': local_event.event_start.isoformat()}
                     # If the event is no longer an all-day event, set the end time to be at least one hour after the start time
@@ -1111,6 +1127,7 @@ class SyncGoogleCalendarView(View):
 
         # record the last sync time
         user_token.last_gCal_sync = timezone.now()
+        print('last sync time: ', user_token.last_gCal_sync)
         user_token.save()
 
         return JsonResponse({
