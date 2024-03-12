@@ -1091,39 +1091,45 @@ class SyncGoogleCalendarView(View):
                     
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) > local_event.last_updated:
                 # The event has been updated in Google Calendar
-                local_event.event_title = corresponding_gcal_event['summary']
-                if 'dateTime' in corresponding_gcal_event['start']:
-                    local_event.event_start = parse_datetime(corresponding_gcal_event['start']['dateTime'])
-                    local_event.event_end = parse_datetime(corresponding_gcal_event['end']['dateTime'])
-                    local_event.event_allDay = False
-                else:
-                    local_event.event_start = parse_datetime(corresponding_gcal_event['start']['date'] + 'T00:00:00Z') + timedelta(days=0)
-                    local_event.event_end = parse_datetime(corresponding_gcal_event['end']['date'] + 'T00:00:00Z') + timedelta(days=0)
-                    local_event.event_allDay = True
-                local_event.last_updated = parse_datetime(corresponding_gcal_event['updated'])
-                local_event.save()
-                updated_events += 1  # Increment the updated events counter
+                gcal_event_title = corresponding_gcal_event['summary']
+                gcal_event_start = parse_datetime(corresponding_gcal_event['start']['dateTime']) if 'dateTime' in corresponding_gcal_event['start'] else parse_datetime(corresponding_gcal_event['start']['date'] + 'T00:00:00Z')
+                gcal_event_end = parse_datetime(corresponding_gcal_event['end']['dateTime']) if 'dateTime' in corresponding_gcal_event['end'] else parse_datetime(corresponding_gcal_event['end']['date'] + 'T00:00:00Z')
+
+                if gcal_event_title != local_event.event_title or gcal_event_start != local_event.event_start or gcal_event_end != local_event.event_end:
+                    local_event.event_title = gcal_event_title
+                    local_event.event_start = gcal_event_start
+                    local_event.event_end = gcal_event_end
+                    local_event.event_allDay = 'dateTime' not in corresponding_gcal_event['start']
+                    local_event.last_updated = parse_datetime(corresponding_gcal_event['updated'])
+                    local_event.save()
+                    updated_events += 1  # Increment the updated events counter
+
             elif corresponding_gcal_event and parse_datetime(corresponding_gcal_event['updated']) < local_event.last_updated:
                 # The event has been updated in local calendar
-                if local_event.event_allDay:
-                    start = {'date': (local_event.event_start + timedelta(days=0)).date().isoformat()} 
-                    end = {'date': (local_event.event_end + timedelta(days=0)).date().isoformat()}  # Add one day to the end date
-                else:
-                    start = {'dateTime': local_event.event_start.isoformat()}
-                    # If the event is no longer an all-day event, set the end time to be at least one hour after the start time
-                    end_time = max(local_event.event_end, local_event.event_start + timedelta(hours=1))
-                    end = {'dateTime': end_time.isoformat()}
-                service.events().update(
-                    calendarId='primary',
-                    eventId=corresponding_gcal_event['id'],
-                    body={
-                        'summary': local_event.event_title,
-                        'start': start,
-                        'end': end,
-                        # Add other fields as necessary
-                    },
-                ).execute()
-                updated_events += 1  # Increment the updated events counter
+                gcal_event_title = corresponding_gcal_event['summary']
+                gcal_event_start = parse_datetime(corresponding_gcal_event['start']['dateTime']) if 'dateTime' in corresponding_gcal_event['start'] else parse_datetime(corresponding_gcal_event['start']['date'] + 'T00:00:00Z')
+                gcal_event_end = parse_datetime(corresponding_gcal_event['end']['dateTime']) if 'dateTime' in corresponding_gcal_event['end'] else parse_datetime(corresponding_gcal_event['end']['date'] + 'T00:00:00Z')
+
+                if gcal_event_title != local_event.event_title or gcal_event_start != local_event.event_start or gcal_event_end != local_event.event_end:
+                    if local_event.event_allDay:
+                        start = {'date': (local_event.event_start + timedelta(days=0)).date().isoformat()} 
+                        end = {'date': (local_event.event_end + timedelta(days=0)).date().isoformat()}  # Add one day to the end date
+                    else:
+                        start = {'dateTime': local_event.event_start.isoformat()}
+                        # If the event is no longer an all-day event, set the end time to be at least one hour after the start time
+                        end_time = max(local_event.event_end, local_event.event_start + timedelta(hours=1))
+                        end = {'dateTime': end_time.isoformat()}
+                    service.events().update(
+                        calendarId='primary',
+                        eventId=corresponding_gcal_event['id'],
+                        body={
+                            'summary': local_event.event_title,
+                            'start': start,
+                            'end': end,
+                            # Add other fields as necessary
+                        },
+                    ).execute()
+                    updated_events += 1  # Increment the updated events counter
 
         # record the last sync time
         user_token.last_gCal_sync = timezone.now()
