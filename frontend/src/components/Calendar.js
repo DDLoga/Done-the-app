@@ -363,7 +363,14 @@ function Calendar() {
                                     <button onClick={handleUnlink}>Unlink Google Calendar</button>
                                 </div>
                             ) : (
-                                <button onClick={handleAuthRedirect}>Link Google Calendar</button>
+                                <Button 
+                                    variant="contained"
+                                    onClick={handleAuthRedirect}
+                                    color="primary"
+                                    style={{ marginTop: '10px' }}
+                                    >
+                                    Link Your Google Calendar
+                                </Button>
                             )}
                         </div>
                         <div className="overflow-auto max-h-80">
