@@ -934,6 +934,15 @@ def OAuth2CallbackView(request):
     else:
         return JsonResponse({'error': 'Failed to exchange authorization code for tokens'}, status=400)
 
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def UnlinkView(request):
+    user_token = UserToken.objects.get(user=request.user)
+    if user_token:
+        user_token.delete()
+
+    return JsonResponse({'message': 'Google Calendar unlinked successfully'})
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -954,33 +963,36 @@ def user_token_view(request):
 
 class IsConnectedToGoogleApiView(View):
     def get(self, request, *args, **kwargs):
-        user_id = request.GET.get('userId')
-        user_token = UserToken.objects.get(user__id=user_id)
-        
-
-
         try:
-            # Verify the access token
-            response = requests.get('https://www.googleapis.com/oauth2/v2/tokeninfo', params={'access_token': user_token.access_token})
-            if response.status_code == 200:
-                # If the access token is valid, return a positive response
+            user_id = request.GET.get('userId')
+            user_token = UserToken.objects.get(user__id=user_id)
+            
+
+
+            try:
+                # Verify the access token
+                response = requests.get('https://www.googleapis.com/oauth2/v2/tokeninfo', params={'access_token': user_token.access_token})
+                if response.status_code == 200:
+                    # If the access token is valid, return a positive response
+                    return JsonResponse({'is_connected': True})
+                else:
+                    raise ValueError('Failed to verify token')
+
+            except ValueError:
+                # The access token is expired or invalid, try to refresh it
+                client = BackendApplicationClient(client_id=os.getenv('REACT_APP_CLIENT_ID'))
+                oauth = OAuth2Session(client=client)
+                token = oauth.refresh_token(token_url="https://oauth2.googleapis.com/token", refresh_token=user_token.refresh_token, client_id=os.getenv('REACT_APP_CLIENT_ID'), client_secret=os.getenv('REACT_APP_CLIENT_SECRET'))
+
+                # Update the tokens in the UserToken model
+                user_token.access_token = token['access_token']
+                user_token.refresh_token = token['refresh_token']
+                user_token.save()
+
+                # Return a positive response
                 return JsonResponse({'is_connected': True})
-            else:
-                raise ValueError('Failed to verify token')
-
-        except ValueError:
-            # The access token is expired or invalid, try to refresh it
-            client = BackendApplicationClient(client_id=os.getenv('REACT_APP_CLIENT_ID'))
-            oauth = OAuth2Session(client=client)
-            token = oauth.refresh_token(token_url="https://oauth2.googleapis.com/token", refresh_token=user_token.refresh_token, client_id=os.getenv('REACT_APP_CLIENT_ID'), client_secret=os.getenv('REACT_APP_CLIENT_SECRET'))
-
-            # Update the tokens in the UserToken model
-            user_token.access_token = token['access_token']
-            user_token.refresh_token = token['refresh_token']
-            user_token.save()
-
-            # Return a positive response
-            return JsonResponse({'is_connected': True})
+        except UserToken.DoesNotExist:
+            return JsonResponse({'is_connected': False})
         
         
 

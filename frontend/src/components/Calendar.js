@@ -208,6 +208,8 @@ function Calendar() {
     };
     
 
+
+
     const [isConnected, setIsConnected] = useState(false);          // confirm if the user is connected to google calendar
     const [isSyncing, setIsSyncing] = useState(false);              // confirm if the user is syncing google calendar
     const [syncStatus, setSyncStatus] = useState({
@@ -216,32 +218,63 @@ function Calendar() {
         updated_events: 0,
         deleted_events: 0,
     });
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false);
+    const [isUnlinkDialogOpen, setIsUnlinkDialogOpen] = useState(false);
 
-    useEffect(() => {                                               // check if the user is connected to google calendar on page load
-        fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
-            .then(response => response.json())
-            .then(userData => {
-                const userId = userData.id;
-                console.log('userId:', userId);
-                if (userId) {
-                    fetchWithToken(`${process.env.REACT_APP_API_URL}/IsConnectedToGoogleApiView?userId=${userId}`, { method: 'GET' })
-                        .then(response => response.json())
-                        .then(data => {
-                            setIsConnected(data.is_connected);
-                            console.log('isConnected:', data.is_connected);
-                        })
-                        .catch(error => console.error('Error:', error));
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }, []);
+
+    useEffect(() => {
+        if (!isUnlinkDialogOpen) { // Only run the effect if isUnlinkDialogOpen is false
+            fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
+                .then(response => response.json())
+                .then(userData => {
+                    const userId = userData.id;
+                    console.log('userId:', userId);
+                    if (userId) {
+                        fetchWithToken(`${process.env.REACT_APP_API_URL}/IsConnectedToGoogleApiView?userId=${userId}`, { method: 'GET' })
+                            .then(response => response.json())
+                            .then(data => {
+                                setIsConnected(data.is_connected);
+                                console.log('isConnected:', data.is_connected);
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }, [isUnlinkDialogOpen]); // Add isUnlinkDialogOpen as a dependency
     
+    const handleUnlink = () => {
+        // Make a request to your Django server to remove the user's Google Calendar link
+        const url = `http://localhost:8000/api/unlink-google-calendar/`; // replace with your Django server URL
+        const token = localStorage.getItem('token'); // Get the user's token
 
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            console.log('response:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('data:', data);
+            setIsUnlinkDialogOpen(true);
+            setTimeout(() => {
+                setIsUnlinkDialogOpen(false);
+            }, 2000); // 2000 milliseconds = 2 seconds
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    };
+    
     const syncGoogleCalendar = () => {
         if (isConnected) {
             setIsSyncing(true);
-            setIsDialogOpen(true);
+            setIsSyncDialogOpen(true);
             fetchWithToken(`${process.env.REACT_APP_API_URL}/getUser/`, { method: 'GET' })
                 .then(response => response.json())
                 .then(userData => {
@@ -254,13 +287,13 @@ function Calendar() {
                                 setSyncStatus(data);  // Set the sync status with the response from the backend
                                 setIsSyncing(false);
                                 setTimeout(() => {
-                                    setIsDialogOpen(false);
+                                    setIsSyncDialogOpen(false);
                                 }, 2000);
                             })
                             .catch(error => {
                                 console.error('Error:', error);
                                 setIsSyncing(false);
-                                setIsDialogOpen(false);
+                                setIsSyncDialogOpen(false);
                             });
                     }
                 })
@@ -327,6 +360,7 @@ function Calendar() {
                                         >
                                         </Button>
                                     </Tooltip>
+                                    <button onClick={handleUnlink}>Unlink Google Calendar</button>
                                 </div>
                             ) : (
                                 <button onClick={handleAuthRedirect}>Link Google Calendar</button>
@@ -368,7 +402,7 @@ function Calendar() {
                     </DialogActions>
                 </Dialog>
             )}
-                <Dialog open={isDialogOpen}>
+                <Dialog open={isSyncDialogOpen}>
                     <DialogTitle>Syncing...</DialogTitle>
                     <DialogContent className="flex items-center justify-center h-24">
                     {isSyncing ? (
@@ -383,6 +417,12 @@ function Calendar() {
                             </div>
                         )
 )}
+                    </DialogContent>
+                </Dialog>
+                <Dialog open={isUnlinkDialogOpen}>
+                    <DialogTitle>Unlinking...</DialogTitle>
+                    <DialogContent className="flex items-center justify-center h-24">
+                        <p>Successfully Unlinked with Google Calendar</p>
                     </DialogContent>
                 </Dialog>
         </BaseLayout>

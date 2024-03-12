@@ -34,5 +34,6 @@ urlpatterns = [
         path('user-token/', views.user_token_view, name='user-token'),
         path('IsConnectedToGoogleApiView/', views.IsConnectedToGoogleApiView.as_view(), name='IsConnectedToGoogleApiView'),
         path('sync-google-calendar/', views.SyncGoogleCalendarView.as_view(), name='sync-google-calendar'),
+        path('unlink-google-calendar/', views.UnlinkView, name='unlink-google-calendar'),
     ])),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
