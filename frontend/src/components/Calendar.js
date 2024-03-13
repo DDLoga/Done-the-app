@@ -13,7 +13,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import SyncIcon from '@mui/icons-material/Sync';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import Tooltip from '@mui/material/Tooltip';
+import LinkIcon from '@mui/icons-material/Link';
 
 
 function Calendar() {
@@ -347,30 +349,27 @@ function Calendar() {
                     <div className="flex flex-col">
                         <div>
                             {isConnected ? (
-                                <div className="flex items-center">
-                                    <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 mr-2" />
-                                    Linked to Google Calendar
+                                <div className="flex items-center space-x-10">
+                                    <Tooltip title="Connected to Google Calendar">
+                                        <LinkIcon color="success" className="mx-2.5" />
+                                    </Tooltip>
                                     <Tooltip title="Sync">
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            startIcon={<SyncIcon />}
-                                            style={{ justifyContent: 'center' }}
-                                            onClick={syncGoogleCalendar}
-                                        >
+                                        <Button onClick={syncGoogleCalendar}>
+                                            <SyncIcon />
                                         </Button>
                                     </Tooltip>
-                                    <button onClick={handleUnlink}>Unlink Google Calendar</button>
+                                    <Tooltip title="Unlink Google Calendar">
+                                        <Button onClick={handleUnlink}>
+                                            <LinkOffIcon />
+                                        </Button>
+                                    </Tooltip>
                                 </div>
                             ) : (
-                                <Button 
-                                    variant="contained"
-                                    onClick={handleAuthRedirect}
-                                    color="primary"
-                                    style={{ marginTop: '10px' }}
-                                    >
-                                    Link Your Google Calendar
-                                </Button>
+                                <Tooltip title="Link Your Google Calendar">
+                                    <Button onClick={handleAuthRedirect}>
+                                        <LinkIcon />
+                                    </Button>
+                                </Tooltip>
                             )}
                         </div>
                         <div className="overflow-auto max-h-80">
