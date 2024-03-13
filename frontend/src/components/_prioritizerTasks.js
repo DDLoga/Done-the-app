@@ -59,6 +59,7 @@ const TasksPrioritizer = ({ columns }) => {
         },
     });
 
+
     const updateTask = (params, field, value) => {                  // function to collect the updated task and fire the updateTaskMutation
         const updatedTask = filteredTasksData.find((task) => task.id === params.id);
         if (updatedTask) {
@@ -80,6 +81,7 @@ const TasksPrioritizer = ({ columns }) => {
         onSuccess: (data) => {
             const newTask = {
                 assignee: null,
+                user: data.user,
                 complete: false,
                 context: null,
                 deadline: null,
@@ -90,7 +92,6 @@ const TasksPrioritizer = ({ columns }) => {
                 parent: data.parent,
                 priority: 'A',
                 status: "Ns",
-                user: 1
             };
             updateTasksData((prevTasksData) => [...prevTasksData, newTask]);
         },
@@ -459,10 +460,10 @@ const TasksPrioritizer = ({ columns }) => {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{"Add Assignee"}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{"Add new task"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Please enter the name and description for the new assignee.
+                        Enter the name name of the new task.
                     </DialogContentText>
                     <TextField
                         autoFocus
