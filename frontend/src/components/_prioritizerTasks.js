@@ -39,18 +39,14 @@ const TasksPrioritizer = ({ columns }) => {
     const [filteredTasksData, setFilteredTasksData] = useState([]); // filtering tasks based on selected project
     useEffect(() => {                                               // set tasksData once fetched
         updateTasksData(fetchedTasksData);
-        console.log('fetched tasks data:', fetchedTasksData)
     }, [fetchedTasksData]);
 
     const [projectSelectedRows, ] = useContext(SelectedRowsContext); // get the selected project IDs from the context
 
-    useEffect(() => {                                               // update the filteredTasksData when the projectSelectedRows or tasksData change
-        console.log('project selected rows:', projectSelectedRows)                                        
+    useEffect(() => {                                               // update the filteredTasksData when the projectSelectedRows or tasksData change                                      
         const tasks = tasksData || [];
-        console.log('tasks data to be filtered with projectSelectedRows:', tasks)
         const updatedTasksData = projectSelectedRows.length > 0 ? 
             tasks.filter(task => projectSelectedRows.includes(task.parent)) : tasks;
-        console.log('updated tasks data based on projectSelectedRows:', updatedTasksData)
         setFilteredTasksData(updatedTasksData);
     }, [projectSelectedRows, tasksData]);
 
@@ -59,7 +55,7 @@ const TasksPrioritizer = ({ columns }) => {
             const updatedTasksData = filteredTasksData.map((task) =>
                 task.id === data.id ? data : task
             );
-            updateTasksData(updatedTasksData);
+            setFilteredTasksData(updatedTasksData);
         },
     });
 
@@ -76,7 +72,8 @@ const TasksPrioritizer = ({ columns }) => {
         const updatedTasksData = filteredTasksData.filter((task) =>
             !selectedRows.includes(task.id)
         );
-        updateTasksData(updatedTasksData);
+
+        setFilteredTasksData(updatedTasksData);
         setSelectedRows([]);
         setOpen(false);
     };
@@ -97,9 +94,9 @@ const TasksPrioritizer = ({ columns }) => {
                 priority: 'A',
                 status: "Ns",
             };
-            updateTasksData((prevTasksData) => [...prevTasksData, newTask]);
-            console.log('new task created:', newTask)
-            console.log('updated tasks data:', tasksData)
+            updateTasksData((tasksData) => {
+                return [...tasksData, newTask];
+            });
         },
     });
 
