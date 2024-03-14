@@ -171,6 +171,7 @@ const NewTaskOrganizer = () => {
                         body: JSON.stringify({
                             name: nextAction,
                             user: userId,
+                            new_task: false,
                             parent: data.project_id,
                         }),
                     })

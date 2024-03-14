@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import BaseLayout from './baselayout';
 import TasksPrioritizer from './_prioritizerTasks';
@@ -8,12 +8,12 @@ import { SelectedRowsContext } from './_prioritizerSelectedRowsContext';    // i
 
 
 
+
 const Prioritizer = () => {
 
     const headerContent = "Next Task Capture";
 
     const [selectedRowsContext, setSelectedRowsContext] = useState([]);
-
 
     return (
         <BaseLayout headerContent={headerContent}>

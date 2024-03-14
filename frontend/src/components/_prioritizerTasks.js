@@ -29,24 +29,28 @@ const TasksPrioritizer = ({ columns }) => {
 
       // Filter the columns based on the columns prop
     //////////////////////////////////////////////////////////////  // TASKS API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const {                                                        // fetching tasks data to fetchedTasksData by using { fetchTasks } from './_fetchTasks'
+    const {                                                        // fetching tasks data to fetchedTasksData
         data: fetchedTasksData, 
         isLoading:isLoadingTasks, 
         error:errorLoadingTasks 
     } = useQuery('fetchedTasksData', fetchTasks);
     
-    const [tasksData, updateTasksData] = useState([]);              // declare the tasks data variable and the function to update it
+    const [tasksData, updateTasksData] = useState([]);              // declare the tasksData variable and the function to update it
     const [filteredTasksData, setFilteredTasksData] = useState([]); // filtering tasks based on selected project
     useEffect(() => {                                               // set tasksData once fetched
-        updateTasksData(fetchedTasksData); 
+        updateTasksData(fetchedTasksData);
+        console.log('fetched tasks data:', fetchedTasksData)
     }, [fetchedTasksData]);
 
-    const [projectSelectedRows, ] = useContext(SelectedRowsContext); // get the selected project IDs from the project table
+    const [projectSelectedRows, ] = useContext(SelectedRowsContext); // get the selected project IDs from the context
 
     useEffect(() => {                                               // update the filteredTasksData when the projectSelectedRows or tasksData change
-        const tasks = tasksData || [];                              
+        console.log('project selected rows:', projectSelectedRows)                                        
+        const tasks = tasksData || [];
+        console.log('tasks data to be filtered with projectSelectedRows:', tasks)
         const updatedTasksData = projectSelectedRows.length > 0 ? 
             tasks.filter(task => projectSelectedRows.includes(task.parent)) : tasks;
+        console.log('updated tasks data based on projectSelectedRows:', updatedTasksData)
         setFilteredTasksData(updatedTasksData);
     }, [projectSelectedRows, tasksData]);
 
@@ -94,6 +98,8 @@ const TasksPrioritizer = ({ columns }) => {
                 status: "Ns",
             };
             updateTasksData((prevTasksData) => [...prevTasksData, newTask]);
+            console.log('new task created:', newTask)
+            console.log('updated tasks data:', tasksData)
         },
     });
 

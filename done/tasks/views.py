@@ -671,9 +671,11 @@ class QuickTaskEntryViewAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print(request.data)
         task_names = request.data.get('name', None)
         user_id = request.data.get('user', None)
         parent_id = request.data.get('parent', None)
+        new_task = request.data.get('new_task', None)
 
 
         if not isinstance(task_names, list):
@@ -683,7 +685,7 @@ class QuickTaskEntryViewAPI(APIView):
         for task_name in task_names:
             if not task_name.strip():  # skip this iteration if task_name is empty or only contains spaces
                 continue
-            task_data = {'name': task_name, 'user': user_id, 'effort':0, 'parent': parent_id}
+            task_data = {'name': task_name, 'user': user_id, 'effort':0, 'parent': parent_id, 'new_task': new_task}
             serializer = TaskSerializer(data=task_data)
             if serializer.is_valid():
                 serializer.save()
@@ -698,6 +700,7 @@ class NtoTaskView(APIView):
 
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             task = serializer.save(user=request.user)
             userId = request.user.id

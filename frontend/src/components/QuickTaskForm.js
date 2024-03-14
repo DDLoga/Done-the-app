@@ -39,7 +39,7 @@ const QuickTaskForm = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Token ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({ name: task, user: userId })
+                body: JSON.stringify({ name: task, user: userId, new_task: true})
             });
             if (response.ok) {
                 setDialogMessage('Submitted successfully');
