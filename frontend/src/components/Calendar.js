@@ -10,8 +10,6 @@ import { TrashIcon } from '@heroicons/react/24/solid';
 import TasksTable from './_calendarTasksTable';
 import EventsCalendar from './_CalendarEventsCalendar';
 import CircularProgress from '@mui/material/CircularProgress';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import SyncIcon from '@mui/icons-material/Sync';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import Tooltip from '@mui/material/Tooltip';
@@ -247,7 +245,7 @@ function Calendar() {
     
     const handleUnlink = () => {
         // Make a request to your Django server to remove the user's Google Calendar link
-        const url = `http://localhost:8000/api/unlink-google-calendar/`; // replace with your Django server URL
+        const url = `${process.env.REACT_APP_API_URL}/unlink-google-calendar/`;
         const token = localStorage.getItem('token'); // Get the user's token
 
         fetch(url, {
@@ -372,7 +370,7 @@ function Calendar() {
                                 </Tooltip>
                             )}
                         </div>
-                        <div className="overflow-auto max-h-80">
+                        <div>
                             <TasksTable tasks={tasks} />
                         </div>
                     </div>

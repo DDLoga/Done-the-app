@@ -20,7 +20,7 @@ function OAuth2Callback() {
         const token = localStorage.getItem('token');
 
         // Make a request to your Django server with the 'code' and the Django authentication token
-        const url = `http://localhost:8000/api/oauth2callback/?code=${code}`; // replace with your Django server URL
+        const url = `${process.env.REACT_APP_API_URL}/oauth2callback/?code=${code}`;
 
         fetch(url, {
             method: 'GET',

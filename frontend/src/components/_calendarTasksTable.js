@@ -27,42 +27,44 @@ function TasksTable({ tasks }) {
                     <th className="border-gray-700 border p-2">Task Names</th>
                 </tr>
             </thead>
-            <tbody>
-                {tasks && [...tasks].sort((a, b) => b.compound_priority - a.compound_priority).map((task, index) => {
-                    const taskDeadline = new Date(task.deadline);
-                    taskDeadline.setHours(0, 0, 0, 0); // set time to 00:00:00
+            <div className="overflow-auto" style={{ height: '68vh', maxHeight: '100%' }}>
+                <tbody>
+                    {tasks && [...tasks].sort((a, b) => b.compound_priority - a.compound_priority).map((task, index) => {
+                        const taskDeadline = new Date(task.deadline);
+                        taskDeadline.setHours(0, 0, 0, 0); // set time to 00:00:00
 
-                    let chipLabel = '';
-                    let chipColor = '';
+                        let chipLabel = '';
+                        let chipColor = '';
 
-                    if (taskDeadline.getTime() !== defaultDate.getTime()) {
-                        if (taskDeadline < today) {
-                            chipLabel = 'overdue';
-                            chipColor = 'error';
-                        } else if (taskDeadline.getTime() === today.getTime()) {
-                            chipLabel = 'today';
-                            chipColor = 'warning';
-                        } else if (taskDeadline.getTime() === tomorrow.getTime()) {
-                            chipLabel = 'tomorrow';
-                            chipColor = 'primary';
+                        if (taskDeadline.getTime() !== defaultDate.getTime()) {
+                            if (taskDeadline < today) {
+                                chipLabel = 'overdue';
+                                chipColor = 'error';
+                            } else if (taskDeadline.getTime() === today.getTime()) {
+                                chipLabel = 'today';
+                                chipColor = 'warning';
+                            } else if (taskDeadline.getTime() === tomorrow.getTime()) {
+                                chipLabel = 'tomorrow';
+                                chipColor = 'primary';
+                            }
                         }
-                    }
 
-                    return (
-                        <tr key={task.id} data-title={task.name} data-id={task.id} className="fc-event draggable bg-gray-700 hover:bg-gray-600 cursor-move" draggable="true">
-                            <td className="border-gray-700 border p-2">
-                                <Tooltip title={<div style={{ fontSize: '1.25em' }}>
-                                    Compound Priority: {task.compound_priority}<br/>
-                                    Due Date: {taskDeadline.getTime() === defaultDate.getTime() ? 'none' : formatDate(taskDeadline)}
-                                </div>}>
-                                    <span >{task.name}</span>
-                                </Tooltip>
-                                {chipLabel && <Chip className="ml-2" label={chipLabel} color={chipColor} size="small" />}
-                            </td>
-                        </tr>
-                    );
-                })}
-            </tbody>
+                        return (
+                            <tr key={task.id} data-title={task.name} data-id={task.id} className="fc-event draggable bg-gray-700 hover:bg-gray-600 cursor-move" draggable="true">
+                                <td className="border-gray-700 border p-2">
+                                    <Tooltip title={<div style={{ fontSize: '1.25em' }}>
+                                        Compound Priority: {task.compound_priority}<br/>
+                                        Due Date: {taskDeadline.getTime() === defaultDate.getTime() ? 'none' : formatDate(taskDeadline)}
+                                    </div>}>
+                                        <span >{task.name}</span>
+                                    </Tooltip>
+                                    {chipLabel && <Chip className="ml-2" label={chipLabel} color={chipColor} size="small" />}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </div>
         </table>
     );
 }
