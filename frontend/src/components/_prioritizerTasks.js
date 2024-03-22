@@ -64,6 +64,7 @@ const TasksPrioritizer = ({ columns }) => {
         const updatedTask = filteredTasksData.find((task) => task.id === params.id);
         if (updatedTask) {
             updatedTask[field] = value;
+            console.log('updatedTask:', updatedTask);
             updateTaskMutation.mutate({ taskId: params.id, updatedTask });
         }
     };
@@ -123,14 +124,14 @@ const TasksPrioritizer = ({ columns }) => {
         refetch: refetchProjects 
     } = useQuery('fetchProjects', fetchProjectsAPI);
 
-    useEffect(() => {
-        refetchProjects();
-    }, [projectSelectedRows, refetchProjects]);
-
     const getProjectName = (parentId) => {                          // Function translate the project id to the project name
         const project = projectsData.find((project) => project.id === parentId);
         return project ? project.project_name : '';
     };
+
+    useEffect(() => {
+        refetchProjects();
+    }, [projectSelectedRows, refetchProjects]);
 
 
     ///////////////////////////////////////////////////////////////////////  // DIALOG BOX //  ///////////////////////////////////////////////////////////////////////
