@@ -2,7 +2,6 @@ $(document).ready(function() {
 
     // set the side menu hide or show
     $('.slider-btn').on('click', function() {
-        console.log('slider-btn clicked');
         var sideMenuDiv = $('.side-menu-div');
         var sliderIcon = $('.slider-icon');
         if (sideMenuDiv.width() === 25) {

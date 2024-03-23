@@ -27,9 +27,22 @@ function Calendar() {
     } = useQuery('fetchedTasksData', fetchTasks);
 
     const [tasks, setTasks] = useState([]);                         // update task dataset
+
+
+    const handleTaskUpdate = (updatedTask) => {                     // update a specific in the local dataset - props from the TasksTable component
+        const taskIndex = tasks.findIndex(
+            task => task.id === updatedTask.id);
+        const newTasks = [...tasks];
+        newTasks[taskIndex] = updatedTask;
+        const filteredTasks = newTasks.filter(task => task.status !== 'Cn' && task.status !== 'Co');
+        setTasks(filteredTasks);
+    };
     
-    useEffect(() => {                                               // load task dataset once fetched
-        setTasks(fetchedTasksData);
+    useEffect(() => {
+        if (fetchedTasksData) {
+            const filteredTasks = fetchedTasksData.filter(task => task.status !== 'Cn' && task.status !== 'Co');
+            setTasks(filteredTasks);
+        }
     }, [fetchedTasksData]);
 
     useEffect(() => {                                                   
@@ -87,7 +100,6 @@ function Calendar() {
                 id: data.id,
                 taskId: data.event_taskId,
             };
-            console.log('New event retrieved from api: ', newEvent);
             setEvents((prevEventsData) => [...prevEventsData, newEvent]);   // update the events dataset
         },
     });
@@ -118,7 +130,6 @@ function Calendar() {
 /////////////////////////////////////////////////////////////////////   Handle events /////////////////////////////////////////////////////////////////
     const handleDrop = async (info) => {
         const draggedEl = info.draggedEl;                           // get the dragged element
-        console.log('Dropped event: ', draggedEl);
         const id = draggedEl.getAttribute('data-id');               // get the id of the task
         const title = draggedEl.getAttribute('data-title');              // get the title of the task   
         const duration = 60 * 60 * 1000;                            // 1 hour in milliseconds
@@ -137,7 +148,6 @@ function Calendar() {
             user: userId,
             event_taskId: id
         };
-        console.log('New event dropped sending to API: ', newEvent);
         createEventMutation.mutate(newEvent);                       // send the event to the API
     };
 
@@ -176,7 +186,6 @@ function Calendar() {
             event_taskId: info.event.extendedProps.taskId,
             // You need to provide the task id here
         };
-        console.log('Updated event: ', updatedEvent);
         updateEventMutation.mutate({ eventId: event.id, updatedEvent: updatedEvent });
     };
 
@@ -228,13 +237,11 @@ function Calendar() {
                 .then(response => response.json())
                 .then(userData => {
                     const userId = userData.id;
-                    console.log('userId:', userId);
                     if (userId) {
                         fetchWithToken(`${process.env.REACT_APP_API_URL}/IsConnectedToGoogleApiView?userId=${userId}`, { method: 'GET' })
                             .then(response => response.json())
                             .then(data => {
                                 setIsConnected(data.is_connected);
-                                console.log('isConnected:', data.is_connected);
                             })
                             .catch(error => console.error('Error:', error));
                     }
@@ -256,11 +263,9 @@ function Calendar() {
             },
         })
         .then(response => {
-            console.log('response:', response);
             return response.json();
         })
         .then(data => {
-            console.log('data:', data);
             setIsUnlinkDialogOpen(true);
             setTimeout(() => {
                 setIsUnlinkDialogOpen(false);
@@ -279,7 +284,6 @@ function Calendar() {
                 .then(response => response.json())
                 .then(userData => {
                     const userId = userData.id;
-                    console.log('userId:', userId);
                     if (userId) {
                         fetchWithToken(`${process.env.REACT_APP_API_URL}/sync-google-calendar?userId=${userId}`, { method: 'GET' })
                             .then(response => response.json())
@@ -371,7 +375,9 @@ function Calendar() {
                             )}
                         </div>
                         <div>
-                            <TasksTable tasks={tasks} />
+                            <TasksTable 
+                            tasks={tasks}
+                            onTaskUpdate={handleTaskUpdate} />
                         </div>
                     </div>
                     <div className="flex-grow" style={{ height: '80vh', maxHeight: '100%' }}>

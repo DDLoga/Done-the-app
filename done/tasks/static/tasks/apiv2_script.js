@@ -65,12 +65,10 @@ $(document).ready(function() {
         // add a listener to the edit event that send the data to the server
         cellEdited: function(cell) {
             // send the new data to the server
-            console.log(cell.getField() + " of row " + cell.getRow().getIndex() + " changed to " + cell.getValue());
             var showAddTaskDialog = false;
         
             // Check if the edited cell is the 'complete' field and its new value is true
             if (cell.getField() == 'project_complete' && cell.getValue() == true) {
-            console.log("project_complete");
                 // Show the 'add-task-dialog'
                 document.getElementById('add-project-dialog').showModal();
                 showAddTaskDialog = true;
@@ -133,7 +131,6 @@ $(document).ready(function() {
         ],
     cellEdited: function(cell) {
         // send the new data to the server
-        console.log(cell.getField() + " of row " + cell.getRow().getIndex() + " changed to " + cell.getValue());
         var showAddTaskDialog = false;
     
         // Check if the edited cell is the 'complete' field and its new value is true

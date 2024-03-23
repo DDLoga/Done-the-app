@@ -6,15 +6,10 @@ $(document).ready(function(){
     // modify existing context
     $(document).on('blur keypress', 'td[contenteditable="True"]', function(e) {
         if (e.type === 'focusout' || e.keyCode == 13) {
-            console.log(csrftoken);
             e.preventDefault();
             var id = $(this).data('id');
             var field = $(this).data('field');
             var value = $(this).text();
-            console.log('id is: ' +id);
-            console.log('field is: ' +field);
-            console.log('value is: ' +value);
-            console.log('update url is: ' +updateUrl);
             $.ajax({
                 url: updateUrl,
                 type: 'POST',
@@ -26,11 +21,9 @@ $(document).ready(function(){
                 },
                 success: function(response) {
                     console.log("success");
-                    console.log(response);
                 },
                 error: function(response) {
                     console.log("error");
-                    console.log(response);
                 }
             });
         }
@@ -72,13 +65,11 @@ $(document).ready(function(){
 
     // delete a context
     $('.delete-btn').click(function(e) {
-        console.log("delete button clicked");
         e.preventDefault();
         var selected = [];
         $('table input[type="checkbox"]:checked').each(function() {
             selected.push($(this).parent().parent().data('id'));
         });
-        console.log(selected);
         $.ajax({
             url: deleteUrl,
             type: 'POST',
@@ -88,7 +79,6 @@ $(document).ready(function(){
             },
             success: function(response) {
                 console.log("success");
-                console.log(response);
                 $('table input[type="checkbox"]:checked').each(function() {
                     $(this).parent().parent().remove();
                 });
@@ -96,7 +86,6 @@ $(document).ready(function(){
             },
             error: function(response) {
                 console.log("error");
-                console.log(response);
             }
         });
     });

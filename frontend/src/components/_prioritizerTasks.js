@@ -68,6 +68,8 @@ const TasksPrioritizer = ({ columns }) => {
             updateTaskMutation.mutate({ taskId: params.id, updatedTask });
         }
     };
+
+    
     const handleDelete = async () => {                              // Function to handle the delete button click
         await deleteTasksAPI(selectedRows);
         const updatedTasksData = filteredTasksData.filter((task) =>

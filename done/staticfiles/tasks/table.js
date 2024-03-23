@@ -111,7 +111,6 @@ $(document).ready(function() {
 
     // CREATE AN ASSIGNEE DROP DOWN MENU ON CLICK
     $(document).on("click", ".assignee", function() {
-        console.log("event assignee triggered")
         var taskId = $(this).data("id");
         var options = assigneeOptions;
         var dropdownClass = "input-data-assignee form-control"
@@ -271,7 +270,6 @@ $(document).ready(function() {
     $('#task-completion-filter, #project-completion-filter').on('change', function() {
         // get the value defined on completion-filter id in selector from HTML file
         var selectedValue = $(this).val();
-        console.log("filter value on event: ", +selectedValue)
         // pass this value to the function
         filterTableByCompletion(selectedValue);
     });
@@ -299,13 +297,11 @@ $(document).ready(function() {
         var serverUrl;
     
         if (isChecked) {
-            console.log("project radio checked")
             // Set serverUrl to a specific value when the radio button is checked
             serverUrl = delete_completed_projects;
             table_id = '#project-table-div';
             completed_items = '#project-table-div';
         } else {
-            console.log("task radio checked")
             // If the radio button is unchecked, you can clear or set it to another value
             serverUrl = delete_completed_tasks;
             table_id = '#task-table-div';
@@ -316,8 +312,6 @@ $(document).ready(function() {
             return $(this).data('id');
             // return $(this).val();
         }).get();
-        console.log('searching for: ', (table_id + ' .completion-checkbox:checked'))
-        console.log("checked items: ", checkedItems);
 
         $.ajax({
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -340,7 +334,6 @@ $(document).ready(function() {
     function filterTableByCompletion(selectedValue) {
         // Show all rows initially (tr class)
         $('.rendered-row').show();
-        console.log("filter value on function: ", +selectedValue)
         // for each table cell of the datatype complete and input checkbox
         $('.tbl-cell[data-type="complete"] input:checkbox').each(function() {
             // Get the value of the checkbox and convert to string
@@ -353,7 +346,6 @@ $(document).ready(function() {
     }
 
     function sendToServer(id,value,type,serverUrl){
-        console.log('type: ', type)
         var isChecked = $("#project-radio").is(":checked");
         var serverUrl;
     

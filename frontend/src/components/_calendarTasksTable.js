@@ -1,29 +1,29 @@
 import React, { useState } from 'react';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
-import TaskPropertiesDialog from './_TaskPropertiesDialog'; // Import the TaskPropertiesDialog component
+import TaskPropertiesDialog from './_TaskPropertiesDialog'; 
 
-function formatDate(date) {
+function formatDate(date) {                                     // convert a date object to a string in the format "dd-mm-yyyy"
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
 }
 
-function TasksTable({ tasks }) {
-    const [editTaskDialogOpen, setEditTaskDialogOpen] = useState(false); // New state for the TaskPropertiesDialog
-    const [taskToEdit, setTaskToEdit] = useState(null); // New state for the task to edit
+function TasksTable({ tasks, onTaskUpdate }) {
+    const [editTaskDialogOpen, setEditTaskDialogOpen] = useState(false);        // TaskPropertiesDialog
+    const [taskToEdit, setTaskToEdit] = useState(null);                         // task to be passed to the TaskPropertiesDialog component
 
-    const handleEditTask = (task) => { // New handler for editing a task
+    const handleEditTask = (task) => {                                          // Editing a task
         setTaskToEdit(task);
         setEditTaskDialogOpen(true);
     };
 
-    const handleSaveTask = (updatedTask) => { // New handler for saving a task
-        // Save the updated task here...
+    const handleSaveTask = (updatedTask) => {                                   // get the updated task from the TaskPropertiesDialog component
+        onTaskUpdate(updatedTask);                                              // pass the updated task to the parent component
     };
 
-    const today = new Date();
+    const today = new Date();                                                   // used to determine if a task is overdue, due today or tomorrow with tags
     today.setHours(0, 0, 0, 0);
 
     const tomorrow = new Date(today);
@@ -41,7 +41,7 @@ function TasksTable({ tasks }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks && tasks.sort((a, b) => b.compound_priority - a.compound_priority).map((task) => {
+                    {tasks && [...tasks].sort((a, b) => b.compound_priority - a.compound_priority).map((task) => {
                         const taskDeadline = new Date(task.deadline);
                         taskDeadline.setHours(0, 0, 0, 0);
 

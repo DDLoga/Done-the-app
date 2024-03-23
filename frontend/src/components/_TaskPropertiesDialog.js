@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem } from '@mui/material';
 import DatePicker from './_DatePicker';
 import PrioritySelect from './_PrioritySelect';
-import { useQuery } from 'react-query';
+import { updateTaskAPI } from './_fetchTasks';
+import { useQuery, useMutation } from 'react-query';
 import { fetchProjectsAPI } from './_fetchProjects';
+import { fetchWithToken } from './_api';
 
 const TaskPropertiesDialog = ({ open, onClose, task, onSave }) => {
-    const [name, setName] = useState(task ? task.name : '');
+    const [name, setName] = useState(task ? task.name : '');                                    // Task attributes declaration
     const [deadline, setDeadline] = useState(task && task.deadline ? task.deadline : '');
     const [priority, setPriority] = useState(task ? task.priority : '');
+    const [status, setStatus] = useState(task && task.status ? task.status : '');
     const [parent, setParent] = useState(task ? task.parent : '');
-    console.log(task)
-    console.log('task name: ', name)
-    console.log('due date: ', deadline)
-    console.log('Priority: ', priority)
-    console.log('Parent: ', parent)
-    let deadlineDate = new Date(deadline);
+    let deadlineDate = new Date(deadline);                                                      // transform the deadline to a Date object
     let formattedDeadline = deadlineDate instanceof Date && !isNaN(deadlineDate)
         ? `${deadlineDate.getFullYear()}-${("0" + (deadlineDate.getMonth() + 1)).slice(-2)}-${("0" + deadlineDate.getDate()).slice(-2)}`
         : '';
 
-    const { 
+    const {                                                                                     // Fetch projects data to convert parent id to project name                                            
         data: projectsData,
     } = useQuery('fetchProjects', fetchProjectsAPI);
 
@@ -32,19 +30,42 @@ const TaskPropertiesDialog = ({ open, onClose, task, onSave }) => {
         return project ? project.project_name : "No parent project";
     };
 
-    useEffect(() => {
+    useEffect(() => {                                                                           // Update task properties when task changes
         if (task) {
             setName(task.name ? task.name : '');
             setDeadline(task.deadline ? task.deadline : '');
             setPriority(task.priority ? task.priority : '');
             setParent(task.parent ? task.parent : '');
+            setStatus(task.status ? task.status : '');
         }
     }, [task]);
 
-    const handleSave = () => {
-        onSave({ ...task, name, deadline, priority, parent });
+    const updateTaskMutation = useMutation(updateTaskAPI, {                                     // Update task on backend
+        onSuccess: (data) => {
+            const updatedTask = { ...task, name, deadline, priority, parent, status };
+            onSave(updatedTask);
+        },
+    });
+
+    const handleSave = async () => {                                                            // on save button click
+        const userResponse = await fetchWithToken(                                              // Get user id
+            `${process.env.REACT_APP_API_URL}/getUser/`,
+            { method: 'GET' });
+        const userData = await userResponse.json();                                             
+        const userId = userData.id;                                                             // Get user id
+        const deadlineDate = new Date(deadline);                                                // Convert deadline to 'YYYY-MM-DD' format
+        const formattedDeadline = `${deadlineDate.getFullYear()}-${String(deadlineDate.getMonth() + 1).padStart(2, '0')}-${String(deadlineDate.getDate()).padStart(2, '0')}`;
+        const updatedTask = {
+            name: name,
+            priority: priority,
+            status: status,
+            deadline: formattedDeadline,
+            user: userId,
+        };
+        updateTaskMutation.mutate({ taskId: task.id, updatedTask});
         onClose();
     };
+
 
     return (
         <Dialog open={open} onClose={onClose}>
@@ -56,7 +77,6 @@ const TaskPropertiesDialog = ({ open, onClose, task, onSave }) => {
                     value={formattedDeadline} 
                     onChange={(event) => {
                         const selectedDate = new Date(event.target.value);
-                        console.log('Selected date: ', selectedDate);
                         setDeadline(selectedDate);
                     }} 
                     fullWidth 
@@ -65,8 +85,20 @@ const TaskPropertiesDialog = ({ open, onClose, task, onSave }) => {
                     label="Priority" 
                     value={priority} 
                     onChange={e => setPriority(e.target.value)} 
-                    style={{ minWidth: '600px' }}
                 />
+                <Select
+                    label="Status" 
+                    value={status || ''}
+                    onChange={e => setStatus(e.target.value)} 
+                    
+                >
+                    <MenuItem value="Co">Completed</MenuItem>
+                    <MenuItem value="Cn">Cancelled</MenuItem>
+                    <MenuItem value="De">Delegated</MenuItem>
+                    <MenuItem value="Ip">In Process</MenuItem>
+                    <MenuItem value="Ns">Not Started</MenuItem>
+                    <MenuItem value="Wa">Wait for</MenuItem>
+                </Select>
                 <TextField 
                     label="Parent" 
                     value={getProjectName(parent)} 
