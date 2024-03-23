@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'react-query';
 
 import { fetchProjectsAPI, updateProjectAPI, deleteProjectsAPI } from './_fetchProjects';
+import { fetchTasks } from './_fetchTasks';
 
 
 
@@ -22,17 +23,21 @@ const ProjectsPrioritizer = () => {
 
 
     //////////////////////////////////////////////////////////////  // PROJECTS API COMMUNICATION //  //////////////////////////////////////////////////////////////
-    const {                                                        // useQuery hook to fetch the projects data into fetchedProjectsData
+    const {                                                         // fetch projects data
         data: fetchedProjectsData, 
         isLoading:isLoadingProjects, 
         error:errorLoadingProjects 
-    } = useQuery('fetchedProjectsData', fetchProjectsAPI);             // use the function { fetchProjectsAPI } from './_fetchProjects' and stores data into fetchedProjectsData
+    } = useQuery('fetchedProjectsData', fetchProjectsAPI);
     
-    const [projectsData, updateProjectsData] = useState([]);        // useState hook to store and update the projects data
+    const [projectsData, updateProjectsData] = useState([]);        // projectData variable and its setter function
     
-    useEffect(() => {                                               // useEffect hook to update the projects data state when the fetchedProjectsData changes
+    useEffect(() => {                                               // update the projects data state when the fetchedProjectsData changes
         updateProjectsData(fetchedProjectsData);
     }, [fetchedProjectsData]);
+    
+    const {                                                        // fetching tasks data (used later on in deletion confirmation dialog)
+        data: fetchedTasksData, 
+        } = useQuery('fetchedTasksData', fetchTasks);
     
     const updateProjectMutation = useMutation(updateProjectAPI, {   // useMutation hook to update the project data on table edit with { updateProjectAPI } from './_updateProject';
         onSuccess: (data) => {                                      // onSuccess function to update the projects data state when the updateProjectAPI is successful
@@ -44,12 +49,15 @@ const ProjectsPrioritizer = () => {
     });
     
     const updateProject = (params, field, value) => {               // Function to update the project data on table edit (used in columns definition)
-        const updatedProject = projectsData.find((project) => project.id === params.id);
+        const updatedProject = projectsData.find(
+            (project) => project.id === params.id);
         if (updatedProject) {
             updatedProject[field] = value;
-            updateProjectMutation.mutate({ projectId: params.id, updatedProject });
+            updateProjectMutation.mutate(
+                { projectId: params.id, updatedProject });
         }
     };
+
     const handleDelete = async () => {                              // Function to handle the delete button click
         await deleteProjectsAPI(selectedRows);
         const updatedProjectsData = projectsData.filter((project) =>
@@ -72,12 +80,47 @@ const ProjectsPrioritizer = () => {
 
 
     // selectedRows is used to store the selected rows in the data grid
-    const [selectedRows, setSelectedRows] = useState([]); // Initialize selectedRows with an empty array
-    const [, setSelectedRowsContext] = React.useContext(SelectedRowsContext); //pass the selectedRows state to the SelectedRowsContext  
+    const [selectedRows, setSelectedRows] = useState([]);                       // Initialize selectedRows with an empty array
+    const [, setSelectedRowsContext] = React.useContext(SelectedRowsContext);   //pass the selectedRows state to the SelectedRowsContext  
     useEffect(() => {
         setSelectedRowsContext(selectedRows);
     }, [selectedRows, setSelectedRowsContext]);
 
+
+
+    const generateDeleteMessage = () => {
+        let message = "Are you sure you want to delete ";
+        const selectedProjectNames = selectedRows.map((rowId) => {
+            const project = projectsData.find((project) => project.id === rowId);
+            return project ? project.project_name : null;
+        });
+        const filteredTasks = fetchedTasksData.filter(
+            task => task.status !== 'Cn' && task.status !== 'Co'
+        );
+
+        const tasksSum = filteredTasks.reduce((acc, task) => {
+            if (task.parent && selectedRows.includes(task.parent)) {
+                acc++;
+            }
+            return acc;
+        }, 0);
+        if (selectedRows.length === 1) {
+            message += `'${selectedProjectNames[0]}'`;
+            if (tasksSum > 0) {
+                message += ` and ${tasksSum} related active task(s)?`;
+            } else {
+                message += "?";
+            }
+        } else {
+            message += `'${selectedProjectNames[0]}' and ${selectedRows.length - 1} other(s)`;
+            if (tasksSum > 0) {
+                message += ` with ${tasksSum} related active task(s)?`;
+            } else {
+                message += "?";
+            }
+        }
+        return message;
+    };
 
 
     //project table columns definition
@@ -202,7 +245,7 @@ const ProjectsPrioritizer = () => {
                         <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
-                                Are you sure you want to delete the selected project(s)?
+                                {generateDeleteMessage()}
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
