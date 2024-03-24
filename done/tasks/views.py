@@ -700,12 +700,13 @@ class NtoTaskView(APIView):
 
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
-        print(request.data)
         if serializer.is_valid():
             task = serializer.save(user=request.user)
             userId = request.user.id
             return Response({'task_id': task.id, 'task_name': task.name, 'parent': task.parent_id, 'user': userId}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print(serializer.errors)  # print statement for debugging
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None):
         task = get_object_or_404(Tasks, pk=pk)

@@ -131,7 +131,7 @@ const NewTaskOrganizer = () => {
         setCurrentTask(tasksList.length > 1 ? tasksList[0] : null);
         setTaskType([]);
         setNextAction([])
-        setContext([])
+        setContext('')
         setDeadline(formattedDate)
         if (taskType !== 'task') {
             handleDelete();
